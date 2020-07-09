@@ -1,0 +1,16 @@
+name: ${project.name}
+author: ${authorName}
+version: ${project.version}
+main: ${project.groupId}.${main}
+depend: [ProjectKorra]
+api-version: 1.14
+permissions:
+  bending.command.board:
+    default: true
+    description: Allows toggling the bending board.
+  bending.command.hyperion:
+    default: true
+    description: Shows info about Hyperion.
+  bending.command.hyperion.reload:
+    default: op
+    description: Reload the config of Hyperion.
