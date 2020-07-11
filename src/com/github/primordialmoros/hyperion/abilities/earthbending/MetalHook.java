@@ -33,23 +33,26 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MetalHook extends MetalAbility implements AddonAbility {
+	private Set<Location> pointLocations = new LinkedHashSet<>();
+	private Location location;
+	private Location hookLocation;
+	private Arrow hook;
+
 	private long cooldown;
 	private int range;
 	private boolean requireSource;
 	private boolean reeling;
 	private boolean setByEvent;
 	private long time;
-	private Location location;
-	private Location hookLocation;
-	private List<Location> pointLocations = new ArrayList<>();
-	private Arrow hook;
 	private int counter;
 
 	public MetalHook(Player player) {
@@ -104,7 +107,7 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 			return;
 		}
 
-		pointLocations = CoreMethods.getLinePoints(player.getLocation().add(0, 1.2, 0), location, (int) Math.ceil(distance) * 2);
+		pointLocations = CoreMethods.getLinePoints(player.getLocation().add(0, 1.2, 0), location, NumberConversions.ceil(distance * 2));
 		for (Location tempLocation : pointLocations) {
 			if (tempLocation != location) {
 				if (!isTransparent(tempLocation.getBlock()) || tempLocation.getBlock().isLiquid()) {
@@ -187,7 +190,7 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 
 	@Override
 	public List<Location> getLocations() {
-		return pointLocations;
+		return pointLocations.stream().collect(Collectors.toList());
 	}
 
 	@Override
@@ -230,7 +233,7 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 	}
 
 	public boolean hasRequiredInv() {
-		final List<Material> inventoryItems = Arrays.asList(Material.IRON_CHESTPLATE, Material.IRON_INGOT, Material.IRON_BLOCK);
+		final Material[] inventoryItems = { Material.IRON_CHESTPLATE, Material.IRON_INGOT, Material.IRON_BLOCK };
 		final PlayerInventory pi = player.getInventory();
 		for (Material mat : inventoryItems) {
 			if (pi.contains(mat)) {

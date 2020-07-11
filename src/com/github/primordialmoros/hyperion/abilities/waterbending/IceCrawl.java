@@ -36,7 +36,6 @@ import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import com.projectkorra.projectkorra.waterbending.ice.PhaseChange;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -194,12 +193,10 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
 					continue;
 				}
-				DamageHandler.damageEntity(entity, damage, this);
-				final BendingFallingBlock bfb = new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0), Material.PACKED_ICE.createBlockData(), new Vector(), this, false);
-				Bukkit.getScheduler().runTaskLater(Hyperion.getPlugin(), bfb::remove, duration / 50);
 				entity.setVelocity(new Vector());
-				PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, NumberConversions.round(duration / 50F), 5);
-				new TempPotionEffect((LivingEntity) entity, effect);
+				DamageHandler.damageEntity(entity, damage, this);
+				new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0), Material.PACKED_ICE.createBlockData(), new Vector(), this, false, duration);
+				new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOW, NumberConversions.round(duration / 50F), 5));
 				hasHit = true;
 			}
 		}

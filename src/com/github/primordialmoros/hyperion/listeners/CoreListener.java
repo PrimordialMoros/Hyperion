@@ -31,6 +31,7 @@ import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.event.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.*;
@@ -46,7 +47,6 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.BlockIterator;
 
 public class CoreListener implements Listener {
@@ -233,11 +233,6 @@ public class CoreListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPKReload(final BendingReloadEvent event) {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				Hyperion.reload();
-			}
-		}.runTaskLater(Hyperion.getPlugin(), 4);
+		Bukkit.getScheduler().runTaskLater(Hyperion.getPlugin(), Hyperion::reload,  4);
 	}
 }

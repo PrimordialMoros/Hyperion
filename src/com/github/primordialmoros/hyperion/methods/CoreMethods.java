@@ -42,7 +42,9 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CoreMethods {
@@ -86,8 +88,8 @@ public class CoreMethods {
 		}
 	}
 
-	public static List<Location> getLinePoints(Location startLoc, Location endLoc, int points) {
-		List<Location> locations = new ArrayList<>();
+	public static Set<Location> getLinePoints(Location startLoc, Location endLoc, int points) {
+		Set<Location> locations = new LinkedHashSet<>();
 		Location diff = endLoc.clone().subtract(startLoc);
 		double diffX = diff.getX() / points;
 		double diffY = diff.getY() / points;
