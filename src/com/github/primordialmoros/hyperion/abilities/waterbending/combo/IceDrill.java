@@ -154,7 +154,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 			return false;
 		}
 		playFocusWaterEffect(sourceBlock);
-		origin = sourceBlock.getLocation().clone();
+		origin = sourceBlock.getLocation().clone().add(0.5, 0.5, 0.5);
 		return true;
 	}
 

@@ -34,7 +34,6 @@ public class FastMath {
 	}
 
 	public static float cos(int angle) {
-		float result = sin[Math.abs(angle + 90) % 360];
-		return angle >= 0 ? result : -result;
+		return sin(angle+90);
 	}
 }
