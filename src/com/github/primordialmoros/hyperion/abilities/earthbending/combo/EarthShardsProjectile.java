@@ -37,12 +37,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class EarthShardsProjectile extends EarthAbility implements AddonAbility {
-	private double distanceTravelled;
-	private final Vector direction;
 	private final Location location;
 	private final Location origin;
+	private final Vector direction;
+
 	private final double damage;
 	private final int range;
+
+	private double distanceTravelled;
 
 	public EarthShardsProjectile(Player player, Location spawnLocation) {
 		super(player);
@@ -54,7 +56,7 @@ public class EarthShardsProjectile extends EarthAbility implements AddonAbility 
 		distanceTravelled = 0;
 
 		origin = spawnLocation.clone();
-		Location targetLocation = GeneralMethods.getTargetedLocation(player, range);
+		final Location targetLocation = GeneralMethods.getTargetedLocation(player, range);
 		direction = GeneralMethods.getDirection(origin, CoreMethods.getRandomOffsetLocation(targetLocation, accuracyDrop * targetLocation.distance(origin)));
 		location = origin.clone();
 

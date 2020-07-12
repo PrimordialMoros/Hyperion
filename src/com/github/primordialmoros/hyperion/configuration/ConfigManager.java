@@ -157,14 +157,14 @@ public class ConfigManager {
 		config.addDefault("Abilities.Fire.Bolt.Damage", 6.0);
 		config.addDefault("Abilities.Fire.Bolt.Cooldown", 2000);
 		config.addDefault("Abilities.Fire.Bolt.Range", 30);
-		config.addDefault("Abilities.Fire.Bolt.Warmup", 1500);
+		config.addDefault("Abilities.Fire.Bolt.ChargeTime", 1500);
 
 		config.addDefault("Abilities.Fire.Combustion.Enabled", true);
 		config.addDefault("Abilities.Fire.Combustion.Description", "Hold sneak to focus large amounts of energy into your body. Once charged, release shift to fire a powerful maneuverable Combustion beam Left click to detonate the beam manually.");
 		config.addDefault("Abilities.Fire.Combustion.Damage", 6.0);
 		config.addDefault("Abilities.Fire.Combustion.Cooldown", 10000);
 		config.addDefault("Abilities.Fire.Combustion.Range", 80);
-		config.addDefault("Abilities.Fire.Combustion.Warmup", 1500);
+		config.addDefault("Abilities.Fire.Combustion.ChargeTime", 1500);
 		config.addDefault("Abilities.Fire.Combustion.Power", 3);
 		config.addDefault("Abilities.Fire.Combustion.MisfireModifier", -1);
 		config.addDefault("Abilities.Fire.Combustion.RegenBlockTime", 15000);
@@ -187,19 +187,19 @@ public class ConfigManager {
 
 		config.addDefault("Abilities.Water.FrostBreath.Enabled", true);
 		config.addDefault("Abilities.Water.FrostBreath.Description", "As demonstrated by Katara, a Waterbender is able to freeze their breath, causing anything it touches to be frozen! With this ability bound, simply hold sneak to start breathing frost!");
-		config.addDefault("Abilities.Water.FrostBreath.Cooldown", 15000);
-		config.addDefault("Abilities.Water.FrostBreath.Range", 6);
-		config.addDefault("Abilities.Water.FrostBreath.Duration", 3000);
+		config.addDefault("Abilities.Water.FrostBreath.Damage", 3.0);
+		config.addDefault("Abilities.Water.FrostBreath.Range", 5);
+		config.addDefault("Abilities.Water.FrostBreath.Cooldown", 10000);
+		config.addDefault("Abilities.Water.FrostBreath.ChargeTime", 1000);
 		config.addDefault("Abilities.Water.FrostBreath.FrostDuration", 5000);
-		config.addDefault("Abilities.Water.FrostBreath.Slowness", true);
 
 		config.addDefault("Abilities.Water.IceCrawl.Enabled", true);
 		config.addDefault("Abilities.Water.IceCrawl.Description", "Tap sneak at a water or ice source block and then left click in a direction to launch forward a narrow line of ice. Upon colliding with an enemy, it deals damage and freezes the target's feet.");
 		config.addDefault("Abilities.Water.IceCrawl.Damage", 5.0);
 		config.addDefault("Abilities.Water.IceCrawl.Cooldown", 5000);
 		config.addDefault("Abilities.Water.IceCrawl.Range", 24);
-		config.addDefault("Abilities.Water.IceCrawl.FreezeDuration", 2000);
 		config.addDefault("Abilities.Water.IceCrawl.PrepareRange", 8);
+		config.addDefault("Abilities.Water.IceCrawl.FreezeDuration", 2000);
 
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Enabled", true);
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Description", "Given a large enough source of water or ice, a master waterbender is able to form a vast spike of ice capable of drilling through blocks.");

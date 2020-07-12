@@ -42,7 +42,7 @@ public class TempArmorStand {
 	private final long expirationTime;
 
 	public TempArmorStand(CoreAbility abilityInstance, Location location, Material material) {
-		this(abilityInstance, location, material, 0);
+		this(abilityInstance, location, material, 30000);
 	}
 
 	public TempArmorStand(CoreAbility abilityInstance, Location location, Material material, long delay) {

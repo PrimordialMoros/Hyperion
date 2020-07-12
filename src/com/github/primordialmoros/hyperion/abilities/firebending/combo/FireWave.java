@@ -47,21 +47,20 @@ import java.util.stream.Collectors;
 
 public class FireWave extends FireAbility implements AddonAbility, ComboAbility {
 	private final Set<Block> blocks = new HashSet<>();
+	private ListIterator<Block> waveIterator;
+	private Location origin;
+	private Vector direction;
 
-	private int damageTick;
-	private int moveTick;
-
-	private int height;
-	private int maxHeight;
-	private int width;
 	private double damage;
 	private long cooldown;
 	private long duration;
 	private long moveRate;
+	private int maxHeight;
+	private int width;
+	private int height;
 
-	private Location origin;
-	private Vector direction;
-	private ListIterator<Block> waveIterator;
+	private int damageTick;
+	private int moveTick;
 
 	public FireWave(Player player) {
 		super(player);
@@ -77,7 +76,6 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 		moveRate = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.FireCombo.FireWave.MoveRate");
 		maxHeight = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.FireCombo.FireWave.MaxHeight");
 		width = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.FireCombo.FireWave.Width");
-		origin = GeneralMethods.getTargetedLocation(player, 3);
 
 		damage = getDayFactor(damage, player.getWorld());
 		height = (int) getDayFactor(2, player.getWorld());
@@ -85,23 +83,24 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 		width = (int) getDayFactor(width, player.getWorld());
 		duration = (long) getDayFactor(duration, player.getWorld());
 
+		origin = GeneralMethods.getTargetedLocation(player, 3);
 		direction = player.getEyeLocation().getDirection().clone().setY(0).normalize();
 		final BlockIterator tempBlockIterator = new BlockIterator(origin.getWorld(), origin.toVector(), direction, 0, range);
 		final List<Block> blockList = new LinkedList<>();
 		tempBlockIterator.forEachRemaining(blockList::add);
 		waveIterator = blockList.listIterator();
 		if (prepare(origin.getBlock())) {
-			bPlayer.addCooldown(this);
-			start();
 			if (hasAbility(player, WallOfFire.class)) {
 				getAbility(player, WallOfFire.class).remove();
 			}
+			bPlayer.addCooldown(this);
+			start();
 		}
 	}
 
 	@Override
 	public void progress() {
-		if (!bPlayer.canBendIgnoreBindsCooldowns(this) || !bPlayer.getBoundAbilityName().equalsIgnoreCase("WallOfFire") || blocks.isEmpty() || !player.isSneaking()) {
+		if (!bPlayer.canBendIgnoreBindsCooldowns(this) || bPlayer.getBoundAbilityName() == null || !bPlayer.getBoundAbilityName().equalsIgnoreCase("WallOfFire") || blocks.isEmpty() || !player.isSneaking()) {
 			remove();
 			return;
 		}

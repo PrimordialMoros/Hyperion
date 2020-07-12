@@ -44,29 +44,30 @@ import org.bukkit.util.Vector;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EarthShot extends EarthAbility implements AddonAbility {
+	private BendingFallingBlock projectile;
+	private TempBlock source;
+	private TempBlock readySource;
+	private Vector lastVelocity;
 	private Location location;
+	private Location origin;
+
 	private double damage;
 	private long cooldown;
 	private int range;
 	private int selectRange;
-	private boolean thrown;
-	private boolean ready;
-	private Location origin;
-	private TempBlock source;
-	private TempBlock readySource;
-	private BendingFallingBlock projectile;
-	private Vector lastVelocity;
-
 	private boolean magmaShot;
-	private boolean convertedMagma;
 	private double magmaModifier;
 	private long magmaPrepareTime;
-	private long magmaStartTime = 0;
+
+	private boolean ready;
+	private boolean thrown;
+	private boolean convertedMagma;
+	private long magmaStartTime;
 
 	public EarthShot(Player player) {
 		super(player);
 
-		if (!bPlayer.canBend(this) || hasAbility(player, EarthShot.class)) {
+		if (hasAbility(player, EarthShot.class) || !bPlayer.canBend(this)) {
 			return;
 		}
 
@@ -81,6 +82,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 		ready = false;
 		thrown = false;
 		convertedMagma = false;
+		magmaStartTime = 0;
 		origin = player.getLocation().clone();
 
 		if (prepare()) {

@@ -47,7 +47,7 @@ public class Fireball extends FireAbility implements AddonAbility {
 	public Fireball(Player player) {
 		super(player);
 
-		if (!bPlayer.canBend(this)) {
+		if (isWater(player.getEyeLocation().getBlock()) || !bPlayer.canBend(this)) {
 			return;
 		}
 
@@ -56,10 +56,6 @@ public class Fireball extends FireAbility implements AddonAbility {
 		range = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Fireball.Range");
 
 		location = player.getEyeLocation();
-
-		if (isWater(player.getEyeLocation().getBlock())) {
-			return;
-		}
 
 		damage = getDayFactor(damage, player.getWorld());
 		range = (int) getDayFactor(range, player.getWorld());
@@ -92,8 +88,8 @@ public class Fireball extends FireAbility implements AddonAbility {
 				return;
 			}
 
-			ParticleEffect.SMOKE_LARGE.display(location, 2, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 4, 0.005F);
-			ParticleEffect.FLAME.display(location, 5, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 4, 0.01F);
+			ParticleEffect.SMOKE_NORMAL.display(location, 2, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 4);
+			playFirebendingParticles(location, 5, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 4);
 
 			if (distanceTravelled > 2) new BlazeArc(player, location, direction, 2);
 

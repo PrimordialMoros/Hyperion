@@ -90,14 +90,11 @@ public class LavaDisk extends LavaAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (!bPlayer.canBendIgnoreCooldowns(this)) {
+		if (!bPlayer.canBendIgnoreCooldowns(this) || isWater(location.getBlock())) {
 			remove();
 			return;
 		}
-		if (isWater(location.getBlock())) {
-			remove();
-			return;
-		}
+
 		if (player.isSneaking() && !isTraveling) {
 			location = player.getEyeLocation();
 			Vector dV = location.getDirection().normalize();

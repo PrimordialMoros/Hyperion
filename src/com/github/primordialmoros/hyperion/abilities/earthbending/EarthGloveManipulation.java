@@ -22,6 +22,7 @@ package com.github.primordialmoros.hyperion.abilities.earthbending;
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.projectkorra.projectkorra.GeneralMethods;
+import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.PassiveAbility;
 import org.bukkit.Location;
@@ -29,7 +30,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 
-public class EarthGloveManipulation extends EarthAbility implements PassiveAbility {
+public class EarthGloveManipulation extends EarthAbility implements AddonAbility, PassiveAbility {
 	public EarthGloveManipulation(Player player) {
 		super(player);
 	}
@@ -51,6 +52,16 @@ public class EarthGloveManipulation extends EarthAbility implements PassiveAbili
 	@Override
 	public String getDescription() {
 		return "Allows the earthbender to destroy or redirect others' earthgloves.";
+	}
+
+	@Override
+	public String getAuthor() {
+		return Hyperion.getAuthor();
+	}
+
+	@Override
+	public String getVersion() {
+		return Hyperion.getVersion();
 	}
 
 	@Override
@@ -81,6 +92,14 @@ public class EarthGloveManipulation extends EarthAbility implements PassiveAbili
 	@Override
 	public boolean isProgressable() {
 		return false;
+	}
+
+	@Override
+	public void load() {
+	}
+
+	@Override
+	public void stop() {
 	}
 
 	public static void attemptDestroy(Player p) {

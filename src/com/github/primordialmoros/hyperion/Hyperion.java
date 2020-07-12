@@ -37,7 +37,6 @@ public class Hyperion extends JavaPlugin {
 	private static String author;
 	private static String version;
 	private static Logger log;
-	private static int scheduledTask;
 
 	@Override
 	public void onEnable() {
@@ -54,8 +53,8 @@ public class Hyperion extends JavaPlugin {
 
 		getServer().getPluginManager().registerEvents(new AbilityListener(), this);
 		getServer().getPluginManager().registerEvents(new CoreListener(), this);
-
-		scheduledTask = getServer().getScheduler().scheduleSyncRepeatingTask(this, TempArmorStand::manage, 0, 1);
+		getServer().getScheduler().scheduleSyncRepeatingTask(this, TempArmorStand::manage, 0, 1);
+		getServer().getScheduler().scheduleSyncRepeatingTask(this, BendingFallingBlock::manage, 0, 5);
 	}
 
 	@Override
@@ -63,7 +62,7 @@ public class Hyperion extends JavaPlugin {
 		BendingFallingBlock.removeAll();
 		TempArmorStand.removeAll();
 		BendingBoardManager.saveChanges();
-		getServer().getScheduler().cancelTask(scheduledTask);
+		getServer().getScheduler().cancelTasks(this);
 	}
 
 	public static void reload() {

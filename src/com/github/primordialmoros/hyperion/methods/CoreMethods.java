@@ -32,6 +32,7 @@ import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.firebending.FireShield;
+import com.projectkorra.projectkorra.util.ParticleEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -42,7 +43,9 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CoreMethods {
@@ -62,6 +65,11 @@ public class CoreMethods {
 			locations.add(location.clone().add(x, 0, z));
 		}
 		return locations;
+	}
+
+	public static void playFocusParticles(final Player player) {
+		final Location smokeLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(1.2)).add(0, 0.3, 0);
+		ParticleEffect.SMOKE_NORMAL.display(smokeLoc, 2, 0.05, 0.05, 0.05);
 	}
 
 	public static BlockFace getLeftBlockFace(BlockFace forward) {
@@ -86,8 +94,8 @@ public class CoreMethods {
 		}
 	}
 
-	public static List<Location> getLinePoints(Location startLoc, Location endLoc, int points) {
-		List<Location> locations = new ArrayList<>();
+	public static Set<Location> getLinePoints(Location startLoc, Location endLoc, int points) {
+		Set<Location> locations = new LinkedHashSet<>();
 		Location diff = endLoc.clone().subtract(startLoc);
 		double diffX = diff.getX() / points;
 		double diffY = diff.getY() / points;

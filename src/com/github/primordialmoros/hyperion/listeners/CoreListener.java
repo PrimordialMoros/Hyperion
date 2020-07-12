@@ -31,8 +31,7 @@ import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
 import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.event.*;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -43,14 +42,8 @@ import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-import org.bukkit.event.player.PlayerPickupArrowEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.util.BlockIterator;
-
-import java.util.ListIterator;
 
 public class CoreListener implements Listener {
 
@@ -74,19 +67,12 @@ public class CoreListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onArrowHit(final ProjectileHitEvent event) {
+		if (event.getHitBlock() == null) {
+			return;
+		}
 		if (event.getEntity() instanceof Arrow && event.getEntity().hasMetadata(CoreMethods.HOOK_KEY)) {
-			final BlockIterator blockIterator = new BlockIterator(event.getEntity().getWorld(), event.getEntity().getLocation().toVector(), event.getEntity().getVelocity().normalize(), 0, 4);
-			Block blockHit = null;
-			while (blockIterator.hasNext()) {
-				blockHit = blockIterator.next();
-				if (blockHit.getType() != Material.AIR && !blockHit.isLiquid()) {
-					break;
-				}
-			}
 			MetalHook hook = (MetalHook) event.getEntity().getMetadata(CoreMethods.HOOK_KEY).get(0).value();
-			if (blockHit != null && hook != null) {
-				hook.setBlockHit(blockHit);
-			}
+			if (hook != null) hook.setBlockHit(event.getHitBlock());
 		}
 	}
 
@@ -163,14 +149,6 @@ public class CoreListener implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onArrowPickup(final PlayerPickupArrowEvent event) {
-		if (event.getItem().hasMetadata(CoreMethods.NO_PICKUP_KEY)) {
-			event.setCancelled(true);
-			event.getItem().remove();
-		}
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onHopperItemPickup(final InventoryPickupItemEvent event) {
 		if (event.getItem().hasMetadata(CoreMethods.NO_PICKUP_KEY)) {
 			event.setCancelled(true);
@@ -236,11 +214,6 @@ public class CoreListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPKReload(final BendingReloadEvent event) {
-		new BukkitRunnable() {
-			@Override
-			public void run() {
-				Hyperion.reload();
-			}
-		}.runTaskLater(Hyperion.getPlugin(), 4);
+		Bukkit.getScheduler().runTaskLater(Hyperion.getPlugin(), Hyperion::reload,  4);
 	}
 }

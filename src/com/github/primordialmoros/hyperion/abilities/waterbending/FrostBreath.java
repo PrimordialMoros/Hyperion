@@ -29,39 +29,34 @@ import com.projectkorra.projectkorra.ability.IceAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.command.Commands;
+import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import com.projectkorra.projectkorra.waterbending.ice.PhaseChange;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Particle;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 public class FrostBreath extends IceAbility implements AddonAbility {
-	private final Set<Block> blocks = new HashSet<>();
-	private long cooldown;
-	private long duration;
-	private int frostDuration;
-	private int currentRange;
-	private int range;
-	private boolean slowEnabled;
+	private final Set<Location> line = new LinkedHashSet<>();
 	private Location location;
 
+	private double damage;
+	private int range;
+	private long cooldown;
+	private long chargeTime;
+	private long frostDuration;
+
+	private double currentRange;
+	private boolean charged;
+	private boolean released;
 
 	public FrostBreath(Player player) {
 		super(player);
@@ -70,14 +65,14 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 			return;
 		}
 
-		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.Cooldown");
+		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Water.FrostBreath.Damage");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.FrostBreath.Range");
-		duration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.Duration");
-		frostDuration = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.FrostBreath.FrostDuration");
-		slowEnabled = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Water.FrostBreath.Slowness");
+		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.Cooldown");
+		chargeTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.ChargeTime");
+		frostDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.FrostDuration");
 
-		range = (int) getNightFactor(range, player.getWorld());
-
+		charged = chargeTime <= 0;
+		released = false;
 		currentRange = 0;
 		location = player.getEyeLocation();
 
@@ -86,90 +81,108 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (!bPlayer.canBendIgnoreCooldowns(this) || !player.isSneaking()) {
+		if (!bPlayer.canBendIgnoreCooldowns(this)) {
 			remove();
 			return;
 		}
-		if (System.currentTimeMillis() > getStartTime() + duration) {
-			remove();
-			return;
-		}
-		blocks.clear();
-		createBeam();
-	}
 
-	private void createBeam() {
-		if (currentRange < range) currentRange++;
-
-		location = player.getEyeLocation();
-		final Vector direction = player.getEyeLocation().getDirection();
-		double size = 0;
-		double offset = 0;
-		double affect = 1.5;
-		for (int i = 0; i < currentRange; i++) {
-			location.add(direction.clone());
-			size += 0.005;
-			offset += 0.15;
-			affect += 0.01;
-
-			if (!isTransparent(location.getBlock())) {
-				return;
-			}
-
-			blocks.add(location.getBlock());
-
-			for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, affect)) {
-				if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
-					if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
-						continue;
+		if (charged) {
+			if (released) {
+				Iterator<Location> it = line.iterator();
+				for (int i = 0; i < 4; i++) {
+					if (it.hasNext()) {
+						location = it.next();
+						currentRange += 0.25;
+						visualizeBreath(currentRange * 0.4, currentRange * 0.025);
+						it.remove();
+					} else {
+						remove();
+						return;
 					}
-					for (Location l2 : createCage(entity.getLocation())) {
-						if (!GeneralMethods.isRegionProtectedFromBuild(this, l2) && (!l2.getBlock().getType().isSolid() || l2.getBlock().getType().equals(Material.AIR))) {
-							PhaseChange.getFrozenBlocksMap().put(new RegenTempBlock(l2.getBlock(), Material.ICE.createBlockData(), ThreadLocalRandom.current().nextInt(1000) + frostDuration), player);
-						}
-					}
-					if (slowEnabled) {
-						PotionEffect effect = new PotionEffect(PotionEffectType.SLOW, 60, 5);
-						new TempPotionEffect((LivingEntity) entity, effect);
+				}
+				checkArea(1.5 + currentRange * 0.2);
+			} else {
+				if (player.isSneaking()) {
+					CoreMethods.playFocusParticles(player);
+				} else {
+					if (calculateBreath()) {
+						bPlayer.addCooldown(this);
+						released = true;
+						freezeArea();
+					} else {
+						remove();
 					}
 				}
 			}
-
-			ParticleEffect.SNOW_SHOVEL.display(location, 3, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), size);
-			ParticleEffect.SPELL_MOB.display(CoreMethods.getRandomOffsetLocation(location, offset), 0, 220, 220, 220, 0.003, new Particle.DustOptions(Color.fromRGB(220, 220, 220), 1));
-			ParticleEffect.SPELL_MOB.display(CoreMethods.getRandomOffsetLocation(location, offset), 0, 180, 180, 255, 0.0035, new Particle.DustOptions(Color.fromRGB(180, 180, 255), 1));
+		} else {
+			if (!player.isSneaking()) {
+				remove();
+				return;
+			}
+			if (System.currentTimeMillis() > getStartTime() + chargeTime) {
+				charged = true;
+			}
 		}
 	}
 
-	private List<Location> createCage(Location centerBlock) {
-		List<Location> selectedBlocks = new ArrayList<>();
+	private void visualizeBreath(double offset, double particleSize) {
+		ParticleEffect.SNOW_SHOVEL.display(location, 5, ThreadLocalRandom.current().nextDouble(-offset, offset), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(-offset, offset), particleSize);
+		ParticleEffect.BLOCK_CRACK.display(location, 4, ThreadLocalRandom.current().nextDouble(-offset, offset), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(-offset, offset), particleSize, Material.ICE.createBlockData());
+		ParticleEffect.SPELL_MOB.display(CoreMethods.getRandomOffsetLocation(location, offset), 0, 220, 220, 220, 0.003, new Particle.DustOptions(Color.fromRGB(220, 220, 220), 1));
+		ParticleEffect.SPELL_MOB.display(CoreMethods.getRandomOffsetLocation(location, offset), 0, 180, 180, 255, 0.0035, new Particle.DustOptions(Color.fromRGB(180, 180, 255), 1));
+	}
 
-		int bX = centerBlock.getBlockX();
-		int bY = centerBlock.getBlockY();
-		int bZ = centerBlock.getBlockZ();
-		for (int x = bX - 1; x <= bX + 1; x++) {
-			for (int y = bY - 1; y <= bY + 1; y++) {
-				Location l = new Location(centerBlock.getWorld(), x, y, bZ);
-				selectedBlocks.add(l);
+	private boolean calculateBreath() {
+		range = (int) getNightFactor(range, player.getWorld());
+		final Vector direction = player.getEyeLocation().getDirection();
+		final Location origin = player.getEyeLocation().clone();
+		for (Location loc : CoreMethods.getLinePoints(origin, origin.clone().add(direction.clone().multiply(range)), 4 * range)) {
+			if (!line.contains(loc) && !isTransparent(loc.getBlock())) {
+				break;
+			}
+			line.add(loc);
+		}
+		location = origin.clone();
+		return !line.isEmpty();
+	}
+
+	private void freezeArea() {
+		final Location center = GeneralMethods.getTargetedLocation(player, range);
+
+		final List<BlockFace> faces = new ArrayList<>();
+		final Vector toPlayer = GeneralMethods.getDirection(center, player.getEyeLocation());
+		final double[] vars = { toPlayer.getX(), toPlayer.getY(), toPlayer.getZ() };
+		for (int i = 0; i < 3; i++) {
+			if (vars[i] != 0) {
+				faces.add(GeneralMethods.getBlockFaceFromValue(i, vars[i]));
 			}
 		}
-		for (int y = bY - 1; y <= bY + 2; y++) {
-			Location l = new Location(centerBlock.getWorld(), bX, y, bZ);
-			selectedBlocks.add(l);
-		}
-		for (int z = bZ - 1; z <= bZ + 1; z++) {
-			for (int y = bY - 1; y <= bY + 1; y++) {
-				Location l = new Location(centerBlock.getWorld(), bX, y, z);
-				selectedBlocks.add(l);
+		int radius = (int) getNightFactor(2, player.getWorld());
+		for (final Location l : GeneralMethods.getCircle(center, radius, 1, false, true, 0)) {
+			final Block b = l.getBlock();
+			for (final BlockFace face : faces) {
+				if (MaterialCheck.isAir(b.getRelative(face))) {
+					if (!isWater(b) || GeneralMethods.isRegionProtectedFromBuild(this.player, b.getLocation())) {
+						continue;
+					}
+					new RegenTempBlock(b, Material.ICE.createBlockData(), frostDuration);
+					break;
+				}
 			}
 		}
-		for (int x = bX - 1; x <= bX + 1; x++) {
-			for (int z = bZ - 1; z <= bZ + 1; z++) {
-				Location l = new Location(centerBlock.getWorld(), x, bY, z);
-				selectedBlocks.add(l);
+	}
+
+	private void checkArea(double radius) {
+		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, radius)) {
+			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
+				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
+					continue;
+				}
+				entity.setVelocity(new Vector());
+				DamageHandler.damageEntity(entity, getNightFactor(damage, player.getWorld()), this);
+				new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOW, (int) (frostDuration / 50), 3));
 			}
 		}
-		return selectedBlocks;
 	}
 
 	@Override
@@ -219,12 +232,12 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 
 	@Override
 	public List<Location> getLocations() {
-		return blocks.stream().map(Block::getLocation).collect(Collectors.toList());
+		return new ArrayList<>(line);
 	}
 
 	@Override
 	public boolean isCollidable() {
-		return true;
+		return released;
 	}
 
 	@Override
@@ -253,11 +266,5 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 
 	@Override
 	public void stop() {
-	}
-
-	@Override
-	public void remove() {
-		bPlayer.addCooldown(this);
-		super.remove();
 	}
 }

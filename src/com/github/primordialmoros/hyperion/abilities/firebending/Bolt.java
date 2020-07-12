@@ -28,7 +28,6 @@ import com.projectkorra.projectkorra.ability.AirAbility;
 import com.projectkorra.projectkorra.ability.LightningAbility;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
-import com.projectkorra.projectkorra.util.ParticleEffect;
 import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -41,7 +40,7 @@ public class Bolt extends LightningAbility implements AddonAbility {
 	private double damage;
 	private long cooldown;
 	private int range;
-	private long warmup;
+	private long chargeTime;
 
 	private long strikeTime;
 	private boolean charged;
@@ -50,16 +49,16 @@ public class Bolt extends LightningAbility implements AddonAbility {
 	public Bolt(final Player player) {
 		super(player);
 
-		if (!bPlayer.canBend(this) || hasAbility(player, Bolt.class) || isWater(player.getEyeLocation().getBlock())) {
+		if (isWater(player.getEyeLocation().getBlock()) || hasAbility(player, Bolt.class) || !bPlayer.canBend(this)) {
 			return;
 		}
 
 		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Fire.Bolt.Damage");
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Bolt.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.Bolt.Range");
-		warmup = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Bolt.Warmup");
+		chargeTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Bolt.ChargeTime");
 
-		charged = false;
+		charged = chargeTime <= 0;
 		struck = false;
 		strikeTime = System.currentTimeMillis();
 
@@ -85,22 +84,21 @@ public class Bolt extends LightningAbility implements AddonAbility {
 			}
 		}
 
-		if (!charged) {
+		if (charged) {
+			if (!struck) {
+				if (player.isSneaking()) {
+					CoreMethods.playFocusParticles(player);
+				} else {
+					strike();
+				}
+			}
+		} else {
 			if (!player.isSneaking()) {
 				remove();
 				return;
 			}
-			if (System.currentTimeMillis() > getStartTime() + warmup) {
+			if (System.currentTimeMillis() > getStartTime() + chargeTime) {
 				charged = true;
-			}
-		} else {
-			if (!struck) {
-				if (player.isSneaking()) {
-					Location smokeLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(1.2));
-					ParticleEffect.SMOKE_NORMAL.display(smokeLoc.add(0, 0.3, 0), 2, 0.05, 0.05, 0.05);
-				} else {
-					strike();
-				}
 			}
 		}
 	}

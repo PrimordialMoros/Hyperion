@@ -26,6 +26,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.util.Vector;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,12 +36,19 @@ public class BendingFallingBlock {
 	private static final Map<FallingBlock, BendingFallingBlock> instances = new ConcurrentHashMap<>();
 	private final FallingBlock fallingBlock;
 	private final CoreAbility ability;
+	private final long expirationTime;
 
 	public BendingFallingBlock(Location location, BlockData data, Vector velocity, CoreAbility abilityInstance, boolean gravity) {
+		this(location, data, velocity, abilityInstance, gravity, 30000);
+	}
+
+	public BendingFallingBlock(Location location, BlockData data, Vector velocity, CoreAbility abilityInstance, boolean gravity, long delay) {
 		fallingBlock = location.getWorld().spawnFallingBlock(location, data);
 		fallingBlock.setVelocity(velocity);
 		fallingBlock.setGravity(gravity);
 		fallingBlock.setDropItem(false);
+
+		expirationTime = System.currentTimeMillis() + delay;
 		ability = abilityInstance;
 		instances.put(fallingBlock, this);
 	}
@@ -53,6 +61,10 @@ public class BendingFallingBlock {
 		return fallingBlock;
 	}
 
+	public long getExpirationTime() {
+		return expirationTime;
+	}
+
 	public static boolean isBendingFallingBlock(FallingBlock fb) {
 		return instances.containsKey(fb);
 	}
@@ -63,6 +75,17 @@ public class BendingFallingBlock {
 
 	public static List<BendingFallingBlock> getFromAbility(CoreAbility ability) {
 		return instances.values().stream().filter(bfb -> bfb.getAbility().equals(ability)).collect(Collectors.toList());
+	}
+
+	public static void manage() {
+		Iterator<BendingFallingBlock> iterator = instances.values().iterator();
+		while (iterator.hasNext()) {
+			BendingFallingBlock bfb = iterator.next();
+			if (System.currentTimeMillis() > bfb.getExpirationTime()) {
+				bfb.getFallingBlock().remove();
+				iterator.remove();
+			}
+		}
 	}
 
 	public void remove() {
