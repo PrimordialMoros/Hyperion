@@ -89,26 +89,18 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 		if (charged) {
 			if (released) {
 				Iterator<Location> it = line.iterator();
-				if (it.hasNext()) {
-					location = it.next();
-					currentRange += 0.5;
-					double particleSize = currentRange * 0.05;
-					double offset = currentRange * 0.5;
-
-					ParticleEffect.BLOCK_CRACK.display(location, 4, ThreadLocalRandom.current().nextDouble(-offset, offset), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(-offset, offset), particleSize, Material.ICE.createBlockData());
-					ParticleEffect.SNOW_SHOVEL.display(location, 3, ThreadLocalRandom.current().nextDouble(-offset, offset), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(-offset, offset), particleSize);
-					ParticleEffect.SPELL_MOB.display(CoreMethods.getRandomOffsetLocation(location, offset), 0, 220, 220, 220, 0.003, new Particle.DustOptions(Color.fromRGB(220, 220, 220), 1));
-					ParticleEffect.SPELL_MOB.display(CoreMethods.getRandomOffsetLocation(location, offset), 0, 180, 180, 255, 0.0035, new Particle.DustOptions(Color.fromRGB(180, 180, 255), 1));
-
-					if (currentRange % 1 == 0) {
-						double radius = 1.5 + currentRange * 0.2;
-						checkArea(radius);
+				for (int i = 0; i < 4; i++) {
+					if (it.hasNext()) {
+						location = it.next();
+						currentRange += 0.25;
+						visualizeBreath(currentRange * 0.4, currentRange * 0.025);
+						it.remove();
+					} else {
+						remove();
+						return;
 					}
-
-					it.remove();
-				} else {
-					remove();
 				}
+				checkArea(1.5 + currentRange * 0.2);
 			} else {
 				if (player.isSneaking()) {
 					CoreMethods.playFocusParticles(player);
@@ -133,13 +125,19 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 		}
 	}
 
+	private void visualizeBreath(double offset, double particleSize) {
+		ParticleEffect.SNOW_SHOVEL.display(location, 5, ThreadLocalRandom.current().nextDouble(-offset, offset), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(-offset, offset), particleSize);
+		ParticleEffect.BLOCK_CRACK.display(location, 4, ThreadLocalRandom.current().nextDouble(-offset, offset), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(-offset, offset), particleSize, Material.ICE.createBlockData());
+		ParticleEffect.SPELL_MOB.display(CoreMethods.getRandomOffsetLocation(location, offset), 0, 220, 220, 220, 0.003, new Particle.DustOptions(Color.fromRGB(220, 220, 220), 1));
+		ParticleEffect.SPELL_MOB.display(CoreMethods.getRandomOffsetLocation(location, offset), 0, 180, 180, 255, 0.0035, new Particle.DustOptions(Color.fromRGB(180, 180, 255), 1));
+	}
+
 	private boolean calculateBreath() {
 		range = (int) getNightFactor(range, player.getWorld());
-
 		final Vector direction = player.getEyeLocation().getDirection();
 		final Location origin = player.getEyeLocation().clone();
-		for (Location loc : CoreMethods.getLinePoints(origin, origin.clone().add(direction.clone().multiply(range)), 2 * range)) {
-			if (!isTransparent(loc.getBlock())) {
+		for (Location loc : CoreMethods.getLinePoints(origin, origin.clone().add(direction.clone().multiply(range)), 4 * range)) {
+			if (!line.contains(loc) && !isTransparent(loc.getBlock())) {
 				break;
 			}
 			line.add(loc);
@@ -183,8 +181,6 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 				entity.setVelocity(new Vector());
 				DamageHandler.damageEntity(entity, getNightFactor(damage, player.getWorld()), this);
 				new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOW, (int) (frostDuration / 50), 3));
-				remove();
-				return;
 			}
 		}
 	}
