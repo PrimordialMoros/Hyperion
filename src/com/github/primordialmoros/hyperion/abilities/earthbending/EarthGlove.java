@@ -45,20 +45,21 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 	private static final double GLOVE_SPEED = 1.4;
 	private static final double GLOVE_GRABBED_SPEED = 0.7;
 
+	private LivingEntity grabbedTarget;
+	private Vector lastVelocity;
+	private Item glove;
+
 	private double damage;
 	private long cooldown;
 	private int range;
 
-	private Item glove;
-	private Vector lastVelocity;
 	public boolean returning;
 	public boolean grabbed;
-	private LivingEntity target = null;
 
 	public EarthGlove(Player player) {
 		super(player);
 
-		if (!bPlayer.canBend(this) || getAbilities(player, EarthGlove.class).size() >= 2) {
+		if (getAbilities(player, EarthGlove.class).size() >= 2 || !bPlayer.canBend(this)) {
 			return;
 		}
 
@@ -102,19 +103,10 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 			remove();
 			return;
 		}
-
 		if (!glove.getWorld().equals(player.getWorld()) || glove.getLocation().distanceSquared(player.getLocation()) > Math.pow(range + 5, 2)) {
 			remove();
 			return;
 		}
-
-		double velocityLimit = (grabbed ? GLOVE_GRABBED_SPEED : GLOVE_SPEED) - 0.2;
-
-		if (lastVelocity.angle(glove.getVelocity()) > Math.PI / 4 || glove.getVelocity().length() < velocityLimit) {
-			shatterGlove();
-			return;
-		}
-
 		if (glove.getLocation().distanceSquared(player.getLocation()) > range * range) {
 			returning = true;
 		}
@@ -127,7 +119,7 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 			Location returnLocation = player.getLocation().add(0, 0.8, 0).add(player.getEyeLocation().getDirection().normalize().multiply(2));
 			if (glove.getLocation().distanceSquared(returnLocation) <= 1) {
 				if (grabbed) {
-					target.setVelocity(new Vector());
+					grabbedTarget.setVelocity(new Vector());
 					grabbed = false;
 				}
 				remove();
@@ -135,11 +127,11 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 			}
 			final Vector returnVector = GeneralMethods.getDirection(glove.getLocation(), returnLocation);
 			if (grabbed) {
-				if (target == null || target.isDead() || !target.isValid() || (target instanceof Player && !((Player) target).isOnline())) {
+				if (grabbedTarget == null || grabbedTarget.isDead() || !grabbedTarget.isValid() || (grabbedTarget instanceof Player && !((Player) grabbedTarget).isOnline())) {
 					shatterGlove();
 					return;
 				}
-				target.setVelocity(returnVector.clone().normalize().multiply(GLOVE_GRABBED_SPEED));
+				grabbedTarget.setVelocity(returnVector.clone().normalize().multiply(GLOVE_GRABBED_SPEED));
 				setGloveVelocity(returnVector.clone().normalize().multiply(GLOVE_GRABBED_SPEED));
 			} else {
 				setGloveVelocity(returnVector.normalize().multiply(GLOVE_SPEED));
@@ -147,6 +139,11 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 		} else {
 			setGloveVelocity(lastVelocity.clone().normalize().multiply(GLOVE_SPEED));
 			checkDamage();
+		}
+
+		double velocityLimit = (grabbed ? GLOVE_GRABBED_SPEED : GLOVE_SPEED) - 0.2;
+		if (glove.isOnGround() || lastVelocity.angle(glove.getVelocity()) > Math.PI / 4 || glove.getVelocity().length() < velocityLimit) {
+			shatterGlove();
 		}
 	}
 
@@ -179,13 +176,13 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 	}
 
 	public void grabTarget(final LivingEntity entity) {
-		if (grabbed || target != null || entity == null) {
+		if (grabbed || grabbedTarget != null || entity == null) {
 			return;
 		}
 		returning = true;
 		grabbed = true;
-		target = entity;
-		glove.teleport(target.getEyeLocation());
+		grabbedTarget = entity;
+		glove.teleport(grabbedTarget.getEyeLocation());
 	}
 
 	public void checkDamage() {
@@ -249,7 +246,6 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 		return true;
 	}
 
-
 	@Override
 	public long getCooldown() {
 		return cooldown;
@@ -267,12 +263,12 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 
 	@Override
 	public double getCollisionRadius() {
-		return 0.8;
+		return 0.6;
 	}
 
 	@Override
 	public void handleCollision(Collision collision) {
-		collision.setRemovingSecond((collision.getAbilitySecond() instanceof EarthGlove));
+		collision.setRemovingSecond(collision.getAbilitySecond() instanceof EarthGlove);
 		super.handleCollision(collision);
 	}
 
@@ -305,7 +301,7 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 			return;
 		}
 		if (grabbed) {
-			target.setVelocity(new Vector());
+			grabbedTarget.setVelocity(new Vector());
 			grabbed = false;
 		}
 		ParticleEffect.BLOCK_CRACK.display(glove.getLocation(), 3, 0, 0, 0, Material.STONE.createBlockData());

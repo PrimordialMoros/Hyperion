@@ -45,8 +45,10 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
-	private final Set<Block> blocks = new HashSet<>();
 	private final List<BlockIterator> lines = new ArrayList<>();
+	private final Set<Block> blocks = new HashSet<>();
+	private Location origin;
+	private Location tip;
 
 	private long cooldown;
 	private int sourceRange;
@@ -55,8 +57,6 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 	private long regenDelay;
 
 	private boolean started;
-	private Location origin;
-	private Location tip;
 
 	public IceDrill(Player player) {
 		super(player);
@@ -68,7 +68,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.WaterCombo.IceDrill.Cooldown");
 		sourceRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.WaterCombo.IceDrill.SourceRange");
 		maxLength = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.WaterCombo.IceDrill.MaxLength");
-		duration = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.WaterCombo.IceDrill.Duration");
+		duration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.WaterCombo.IceDrill.Duration");
 		regenDelay = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.WaterCombo.IceDrill.RegenBlockTime");
 
 		sourceRange = (int) getNightFactor(sourceRange, player.getWorld());

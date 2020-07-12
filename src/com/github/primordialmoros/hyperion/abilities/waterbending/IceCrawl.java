@@ -55,20 +55,20 @@ import java.util.concurrent.ThreadLocalRandom;
 public class IceCrawl extends IceAbility implements AddonAbility {
 	private Location location;
 	private Location endLocation;
+	private LivingEntity target;
 	private Vector direction;
 	private Block sourceBlock;
-	private boolean progressing;
-	private boolean hasHit;
-	private boolean started;
-	private boolean locked;
-	private long cooldown;
-	private long duration;
-	private int range;
-	private boolean skipVisuals;
-	private double distanceTravelled;
-	private double prepareRange;
+
 	private double damage;
-	private LivingEntity target;
+	private long cooldown;
+	private int range;
+	private int prepareRange;
+	private int followRange;
+	private long duration;
+
+	private boolean launched;
+	private boolean prepared;
+	private boolean locked;
 
 	public IceCrawl(Player player) {
 		super(player);
@@ -82,101 +82,82 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 			return;
 		}
 
-		progressing = false;
-		hasHit = false;
-		started = false;
-		skipVisuals = false;
-
 		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Water.IceCrawl.Damage");
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceCrawl.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceCrawl.Range");
-		duration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceCrawl.FreezeDuration");
 		prepareRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceCrawl.PrepareRange");
+		followRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceCrawl.FollowRange");
+		duration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceCrawl.FreezeDuration");
 
 		damage = getNightFactor(damage, player.getWorld());
 		range = (int) getNightFactor(range, player.getWorld());
 		duration = (long) getNightFactor(duration, player.getWorld());
 
+		launched = false;
+		prepared = false;
+
 		if (prepare()) {
-			started = true;
+			prepared = true;
 			start();
 		}
 	}
 
 	@Override
 	public void progress() {
-		if (!progressing) {
-			if (!bPlayer.canBendIgnoreCooldowns(this)) {
+		if (launched) {
+			if (!bPlayer.canBendIgnoreBindsCooldowns(this)) {
 				remove();
 				return;
 			}
 
-			if (sourceBlock.getLocation().distanceSquared(player.getLocation()) > prepareRange * prepareRange) {
+			if (locked) {
+				if (target == null || target.isDead() || (target instanceof Player && !((Player) target).isOnline()) || target.getWorld().equals(location.getWorld()) || target.getLocation().distanceSquared(location) > Math.pow(followRange, 2)) {
+					locked = false;
+				} else {
+					endLocation = target.getLocation().clone();
+					direction = CoreMethods.calculateFlatVector(location, endLocation);
+				}
+			}
+			advanceLocation();
+			summonTrailBlock(location.clone().add(0, -1, 0));
+			if (ThreadLocalRandom.current().nextInt(5) == 0) {
+				playIcebendingSound(location);
+			}
+			checkDamage();
+		} else {
+			if (!bPlayer.canBendIgnoreCooldowns(this) || sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(prepareRange + 5, 2)) {
 				remove();
 				return;
 			}
-
 			if (isWater(sourceBlock) || isIce(sourceBlock)) {
 				playFocusWaterEffect(sourceBlock);
 			} else {
 				remove();
 			}
-			return;
-		} else {
-			if (!bPlayer.canBendIgnoreBindsCooldowns(this)) {
-				remove();
-				return;
-			}
 		}
+	}
 
-		if (locked) {
-			if (target == null || target.isDead() || (target instanceof Player && !((Player) target).isOnline()) || target.getLocation().distanceSquared(location) > Math.pow(range + 5, 2)) {
-				locked = false;
+	private void advanceLocation() {
+		location = location.add(direction.clone().multiply(0.4));
+		Block b = location.getBlock();
+		if (!isValid(b)) {
+			if (isValid(location.getBlock().getRelative(BlockFace.UP))) {
+				location.add(0, 1, 0);
+			} else if (isValid(location.getBlock().getRelative(BlockFace.DOWN))) {
+				location.add(0, -1, 0);
 			} else {
-				if (target.getWorld().equals(location.getWorld())) {
-					endLocation = target.getLocation().clone();
-					direction = CoreMethods.calculateFlatVector(location, endLocation);
-				}
+				remove();
+				return;
+			}
+		} else if (endLocation.getBlockY() != location.getBlockY()) {
+			if (endLocation.getBlockY() > location.getBlockY() && isValid(location.getBlock().getRelative(BlockFace.UP))) {
+				location.add(0, 1, 0);
+			} else if (endLocation.getBlockY() < location.getBlockY() && isValid(location.getBlock().getRelative(BlockFace.DOWN))) {
+				location.add(0, -1, 0);
 			}
 		}
-
-		for (int i = 0; i < 2; i++) {
-			distanceTravelled += 0.2;
-			location = location.add(direction.clone().multiply(0.2));
-
-			if (distanceTravelled > range) {
-				remove();
-				return;
-			}
-			Block b = location.getBlock();
-			if (!isValid(b)) {
-				if (isValid(location.getBlock().getRelative(BlockFace.UP))) {
-					location.add(0, 1, 0);
-				} else if (isValid(location.getBlock().getRelative(BlockFace.DOWN))) {
-					location.add(0, -1, 0);
-				} else {
-					remove();
-					return;
-				}
-			} else if (endLocation.getBlockY() != location.getBlockY()) {
-				if (endLocation.getBlockY() > location.getBlockY() && isValid(location.getBlock().getRelative(BlockFace.UP))) {
-					location.add(0, 1, 0);
-				} else if (endLocation.getBlockY() < location.getBlockY() && isValid(location.getBlock().getRelative(BlockFace.DOWN))) {
-					location.add(0, -1, 0);
-				}
-			}
-
-			if (GeneralMethods.isRegionProtectedFromBuild(this, location)) {
-				remove();
-				return;
-			}
-
-			if (ThreadLocalRandom.current().nextInt(5) == 0) {
-				playIcebendingSound(location);
-			}
-
-			summonTrailBlock(location.clone().add(0, -1, 0));
-			checkDamage();
+		if (GeneralMethods.isRegionProtectedFromBuild(this, location) || location.distanceSquared(sourceBlock.getLocation()) > Math.pow(range, 2)) {
+			remove();
 		}
 	}
 
@@ -188,6 +169,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 	}
 
 	private void checkDamage() {
+		boolean hasHit = false;
 		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, 1.25)) {
 			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
@@ -206,17 +188,14 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 	}
 
 	public boolean prepare() {
-		if (progressing) {
-			return false;
-		}
-
+		if (launched) return false;
 		Block block = getIceSourceBlock(player, prepareRange);
 		if (block == null) {
 			block = getWaterSourceBlock(player, prepareRange, false);
 		}
 
 		if (block == null || (!isWater(block) && !isIce(block)) || block.getLocation().distanceSquared(player.getLocation()) > prepareRange * prepareRange || !isTransparent(block.getRelative(BlockFace.UP))) {
-			if (started) {
+			if (prepared) {
 				remove();
 			}
 			return false;
@@ -229,11 +208,6 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 	}
 
 	private void summonTrailBlock(final Location spawnLoc) {
-		if (skipVisuals) {
-			skipVisuals = false;
-			return;
-		}
-		skipVisuals = true;
 		if (isWater(spawnLoc.getBlock())) {
 			PhaseChange.getFrozenBlocksMap().put(new RegenTempBlock(spawnLoc.getBlock(), Material.ICE.createBlockData(), 5000), player);
 		}
@@ -291,7 +265,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 
 	@Override
 	public boolean isCollidable() {
-		return progressing;
+		return launched;
 	}
 
 	@Override
@@ -316,7 +290,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 	}
 
 	private void shootLine() {
-		if (progressing || sourceBlock == null) {
+		if (launched || sourceBlock == null) {
 			return;
 		}
 
@@ -331,7 +305,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 		summonTrailBlock(sourceBlock.getLocation());
 		location = sourceBlock.getLocation().clone().add(0, 1, 0);
 		direction = CoreMethods.calculateFlatVector(location, endLocation);
-		progressing = true;
+		launched = true;
 		playIcebendingSound(sourceBlock.getLocation());
 		bPlayer.addCooldown(this);
 	}

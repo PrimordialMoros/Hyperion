@@ -20,6 +20,7 @@
 package com.github.primordialmoros.hyperion.abilities.firebending;
 
 import com.github.primordialmoros.hyperion.Hyperion;
+import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.FastMath;
 import com.github.primordialmoros.hyperion.util.MaterialCheck;
 import com.github.primordialmoros.hyperion.util.RegenTempBlock;
@@ -44,41 +45,45 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Combustion extends CombustionAbility implements AddonAbility {
-	private boolean charged;
-	private int currentRingPoint;
 	private Location location;
-	private double distanceTravelled;
-	private boolean launched;
-	private boolean hasClicked;
-	private double initialHealth;
+
 	private double damage;
 	private int range;
 	private int power;
 	private int misfireModifier;
-	private long warmup;
+	private long chargeTime;
 	private long cooldown;
 	private long regenBlockTime;
+
+	private boolean charged;
+	private boolean launched;
+	private boolean hasClicked;
 	private boolean hasExploded;
+
+	private double initialHealth;
+	private double distanceTravelled;
+	private int currentRingPoint;
 
 	public Combustion(final Player player) {
 		super(player);
 
-		if (!bPlayer.canBend(this) || isWater(player.getEyeLocation().getBlock())) {
+		if (isWater(player.getEyeLocation().getBlock()) || hasAbility(player, Combustion.class) || !bPlayer.canBend(this)) {
 			return;
 		}
 
 		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Fire.Combustion.Damage");
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Combustion.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.Combustion.Range");
-		warmup = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Combustion.Warmup");
+		chargeTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Combustion.ChargeTime");
 		power = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.Combustion.Power");
 		misfireModifier = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.Combustion.MisfireModifier");
 		regenBlockTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Combustion.RegenBlockTime");
 
-		hasExploded = false;
-		charged = warmup <= 0;
+		charged = chargeTime <= 0;
 		launched = false;
 		hasClicked = false;
+		hasExploded = false;
+
 		initialHealth = player.getHealth();
 		location = player.getEyeLocation();
 		damage = getDayFactor(damage, player.getWorld());
@@ -107,13 +112,12 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 			}
 			playParticleRing();
 			if (!charged) {
-				if (System.currentTimeMillis() > getStartTime() + warmup) {
+				if (System.currentTimeMillis() > getStartTime() + chargeTime) {
 					charged = true;
 				}
 			} else {
-				Location smokeLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(1.2));
-				ParticleEffect.SMOKE_NORMAL.display(smokeLoc.add(0, 0.3, 0), 2, 0.05, 0.05, 0.05);
-				if (player.getHealth() < initialHealth) {
+				CoreMethods.playFocusParticles(player);
+				if (player.getHealth() + 0.5 < initialHealth) {
 					createExplosion(player.getEyeLocation(), power + misfireModifier, damage + misfireModifier);
 					return;
 				}
@@ -274,7 +278,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 
 	@Override
 	public double getCollisionRadius() {
-		return 0.7;
+		return 0.8;
 	}
 
 	@Override

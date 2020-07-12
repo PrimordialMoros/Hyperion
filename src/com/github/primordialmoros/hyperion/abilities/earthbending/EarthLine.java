@@ -49,14 +49,14 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	private Location endLocation;
 	private Block sourceBlock;
 	private BlockData sourceData;
-	private boolean progressing;
-	private boolean hasHit;
-	private boolean hasClicked;
-	private boolean started;
+
+	private double damage;
 	private long cooldown;
 	private int range;
 	private int prepareRange;
-	private double damage;
+
+	private boolean launched;
+	private boolean started;
 
 	public EarthLine(Player player) {
 		super(player);
@@ -70,9 +70,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 			return;
 		}
 
-		progressing = false;
-		hasHit = false;
-		hasClicked = false;
+		launched = false;
 		started = false;
 
 		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Damage");
@@ -88,69 +86,58 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (!progressing) {
-			if (!bPlayer.canBendIgnoreCooldowns(this)) {
-				remove();
-				return;
-			}
-
-			if (sourceBlock.getLocation().distanceSquared(player.getLocation()) > prepareRange * prepareRange) {
-				remove();
-				return;
-			}
-			return;
-		} else {
+		if (launched) {
 			if (!bPlayer.canBendIgnoreBindsCooldowns(this)) {
 				remove();
 				return;
 			}
+			advanceLocation();
+			summonTrailBlock(location.clone().add(0, -1, 0));
+			if (ThreadLocalRandom.current().nextInt(5) == 0) {
+				playEarthbendingSound(location);
+			}
+			checkDamage(CoreMethods.calculateFlatVector(location, endLocation));
+		} else {
+			if (!bPlayer.canBendIgnoreCooldowns(this) || sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(prepareRange + 5, 2)) {
+				remove();
+			}
 		}
+	}
 
+	private void raiseSpikes() {
+		RaiseEarth pillar1 = new RaiseEarth(player, location.clone().add(0, -1, 0), 1);
+		pillar1.setCooldown(0);
+		pillar1.setInterval(100);
+
+		final Vector direction = CoreMethods.calculateFlatVector(location, endLocation);
+		RaiseEarth pillar2 = new RaiseEarth(player, location.add(direction).clone().add(0, -1, 0), 2);
+		pillar2.setCooldown(0);
+		pillar2.setInterval(100);
+		remove();
+	}
+
+	private void advanceLocation() {
 		if (player.isSneaking()) {
 			endLocation = GeneralMethods.getTargetedLocation(player, range + prepareRange);
 		}
-
-		if (ThreadLocalRandom.current().nextInt(5) == 0) {
-			playEarthbendingSound(location);
-		}
-
-		checkDamage(CoreMethods.calculateFlatVector(location, endLocation));
-
-		if (hasHit || hasClicked) {
-			RaiseEarth pillar1 = new RaiseEarth(player, location.clone().add(0, -1, 0), 1);
-			pillar1.setCooldown(0);
-			pillar1.setInterval(100);
-
-			location = location.add(CoreMethods.calculateFlatVector(location, endLocation));
-			RaiseEarth pillar2 = new RaiseEarth(player, location.clone().add(0, -1, 0), 2);
-			pillar2.setCooldown(0);
-			pillar2.setInterval(100);
-			remove();
-			return;
-		}
-
+		location = location.add(CoreMethods.calculateFlatVector(sourceBlock.getLocation(), endLocation).multiply(0.7));
 		if (location.distanceSquared(endLocation) < 0.4) {
 			remove();
 			return;
 		}
-
-		location = location.add(CoreMethods.calculateFlatVector(sourceBlock.getLocation(), endLocation).multiply(0.7));
 		Block below = location.getBlock().getRelative(BlockFace.DOWN);
-
 		if (isEarthbendable(location.getBlock())) {
 			location.add(0, 1, 0);
 		} else if (isEarthbendable(below.getRelative(BlockFace.DOWN)) && isTransparent(below)) {
 			location.add(0, -1, 0);
 		}
-
-		if (location.distanceSquared(sourceBlock.getLocation()) > range * range) {
+		if (GeneralMethods.isRegionProtectedFromBuild(this, location) || location.distanceSquared(sourceBlock.getLocation()) > Math.pow(range, 2)) {
 			remove();
-			return;
 		}
-		summonTrailBlock(location.clone().add(0, -1, 0));
 	}
 
 	private void checkDamage(Vector push) {
+		boolean hasHit = false;
 		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, 1.25)) {
 			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
@@ -161,31 +148,28 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				hasHit = true;
 			}
 		}
+		if (hasHit) {
+			raiseSpikes();
+		}
 	}
 
 	public boolean prepare() {
-		if (progressing) {
-			return false;
-		}
+		if (launched) return false;
 
 		if (sourceBlock != null) {
 			sourceBlock.setBlockData(sourceData);
 		}
-
 		final Block block = getEarthSourceBlock(prepareRange);
-
 		if (block == null || block.getRelative(BlockFace.UP).isLiquid() || !isTransparent(block.getRelative(BlockFace.UP))) {
 			if (started) {
 				remove();
 			}
 			return false;
 		}
-
 		sourceBlock = block;
 		if (DensityShift.isPassiveSand(sourceBlock)) {
 			DensityShift.revertSand(sourceBlock);
 		}
-
 		sourceData = sourceBlock.getBlockData();
 		if (sourceBlock.getType() == Material.SAND) {
 			sourceBlock.setType(Material.SANDSTONE);
@@ -196,7 +180,6 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		} else {
 			sourceBlock.setType(Material.STONE);
 		}
-
 		location = sourceBlock.getLocation().clone();
 		return true;
 	}
@@ -260,7 +243,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	@Override
 	public boolean isCollidable() {
-		return progressing;
+		return launched;
 	}
 
 	@Override
@@ -289,8 +272,8 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	}
 
 	public void shootLine() {
-		if (progressing) {
-			hasClicked = true;
+		if (launched) {
+			raiseSpikes();
 			return;
 		}
 		if (!isEarthbendable(player, sourceBlock)) {
@@ -306,7 +289,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		sourceBlock.setBlockData(sourceData);
 		summonTrailBlock(sourceBlock.getLocation());
 		location = sourceBlock.getLocation().clone().add(0, 1, 0);
-		progressing = true;
+		launched = true;
 		playEarthbendingSound(sourceBlock.getLocation());
 		bPlayer.addCooldown(this);
 	}

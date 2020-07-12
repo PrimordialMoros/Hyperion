@@ -45,19 +45,21 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EarthGuard extends EarthAbility implements AddonAbility {
+	private final List<ItemStack> oldArmor = new ArrayList<>(4);
+	private final List<ItemStack> newArmor = new ArrayList<>(4);
+	private BendingFallingBlock armorFallingBlock;
+	private BlockData blockData;
+	private GameMode originalMode;
+
+	private long cooldown;
+	private long duration;
+	private int selectRange;
+	private int resistance;
+
 	private boolean formed;
 	private boolean metal;
 	private boolean gold;
 	private long time;
-	private long cooldown;
-	private long duration;
-	private int resistance;
-	private int selectRange;
-	private BlockData blockData;
-	private BendingFallingBlock armorFallingBlock;
-	private GameMode originalMode;
-	public final List<ItemStack> oldArmor = new ArrayList<>(4);
-	public final List<ItemStack> newArmor = new ArrayList<>(4);
 
 	public EarthGuard(Player player) {
 		super(player);

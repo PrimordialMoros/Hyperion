@@ -32,6 +32,7 @@ import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.firebending.FireShield;
+import com.projectkorra.projectkorra.util.ParticleEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -64,6 +65,11 @@ public class CoreMethods {
 			locations.add(location.clone().add(x, 0, z));
 		}
 		return locations;
+	}
+
+	public static void playFocusParticles(final Player player) {
+		final Location smokeLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(1.2)).add(0, 0.3, 0);
+		ParticleEffect.SMOKE_NORMAL.display(smokeLoc, 2, 0.05, 0.05, 0.05);
 	}
 
 	public static BlockFace getLeftBlockFace(BlockFace forward) {

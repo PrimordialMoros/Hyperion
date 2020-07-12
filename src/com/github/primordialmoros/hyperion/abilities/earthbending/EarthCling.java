@@ -21,6 +21,7 @@ package com.github.primordialmoros.hyperion.abilities.earthbending;
 
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
+import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.PassiveAbility;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -29,16 +30,13 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-public class EarthCling extends EarthAbility implements PassiveAbility {
+public class EarthCling extends EarthAbility implements AddonAbility, PassiveAbility {
 	private double speed;
 
 	public EarthCling(Player player) {
 		super(player);
 
-		if (!isEnabled()) {
-			return;
-		}
-
+		if (!isEnabled()) return;
 		speed = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthGlove.ClingPassive.Speed");
 	}
 
@@ -48,7 +46,7 @@ public class EarthCling extends EarthAbility implements PassiveAbility {
 			return;
 		}
 
-		if (bPlayer.getBoundAbility() == null || !bPlayer.getBoundAbility().getName().equals("EarthGlove")) {
+		if (bPlayer.getBoundAbility() == null || !bPlayer.getBoundAbility().getName().equalsIgnoreCase("EarthGlove")) {
 			return;
 		}
 
@@ -87,6 +85,16 @@ public class EarthCling extends EarthAbility implements PassiveAbility {
 	}
 
 	@Override
+	public String getAuthor() {
+		return Hyperion.getAuthor();
+	}
+
+	@Override
+	public String getVersion() {
+		return Hyperion.getVersion();
+	}
+
+	@Override
 	public boolean isHarmlessAbility() {
 		return false;
 	}
@@ -114,5 +122,13 @@ public class EarthCling extends EarthAbility implements PassiveAbility {
 	@Override
 	public boolean isProgressable() {
 		return true;
+	}
+
+	@Override
+	public void load() {
+	}
+
+	@Override
+	public void stop() {
 	}
 }

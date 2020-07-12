@@ -46,15 +46,17 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class FrostBreath extends IceAbility implements AddonAbility {
 	private final Set<Location> line = new LinkedHashSet<>();
+	private Location location;
+
+	private double damage;
+	private int range;
 	private long cooldown;
 	private long chargeTime;
 	private long frostDuration;
-	private int range;
+
 	private double currentRange;
-	private double damage;
 	private boolean charged;
 	private boolean released;
-	private Location location;
 
 	public FrostBreath(Player player) {
 		super(player);
@@ -69,6 +71,7 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 		chargeTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.ChargeTime");
 		frostDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.FrostDuration");
 
+		charged = chargeTime <= 0;
 		currentRange = 0;
 		location = player.getEyeLocation();
 
@@ -107,8 +110,7 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 				}
 			} else {
 				if (player.isSneaking()) {
-					Location smokeLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(1.2));
-					ParticleEffect.SMOKE_NORMAL.display(smokeLoc.add(0, 0.3, 0), 2, 0.05, 0.05, 0.05);
+					CoreMethods.playFocusParticles(player);
 				} else {
 					if (calculateBreath()) {
 						bPlayer.addCooldown(this);

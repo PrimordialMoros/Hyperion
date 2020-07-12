@@ -21,7 +21,6 @@ package com.github.primordialmoros.hyperion.abilities.earthbending;
 
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
-import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.MetalAbility;
@@ -53,23 +52,21 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 
 	private long cooldown;
 	private int range;
-	private boolean requireSource;
 
 	private boolean reeling;
 	private long time;
+	private int ticks;
 
 	public MetalHook(Player player) {
 		super(player);
 
-		if (hasAbility(player, MetalHook.class) || !bPlayer.canBend(this) || (requireSource && !hasRequiredInv()) || player.isSneaking()) {
+		if (hasAbility(player, MetalHook.class) || player.isSneaking() || !hasRequiredInv() || !bPlayer.canBend(this)) {
 			return;
 		}
 
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.MetalHook.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.MetalHook.Range");
-		requireSource = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.MetalHook.RequireItem");
 
-		reeling = false;
 		if (launchHook()) {
 			start();
 		}
@@ -82,8 +79,13 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 			return;
 		}
 
+		if (origin.distanceSquared(hook.getLocation()) > range*range) {
+			remove();
+			return;
+		}
+
 		if (player.isSneaking()) {
-			if (System.currentTimeMillis() > time + 500) {
+			if (System.currentTimeMillis() > time + 250) {
 				remove();
 				return;
 			}
@@ -91,25 +93,10 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 			time = System.currentTimeMillis();
 		}
 
-		location = reeling ? player.getLocation() : hook.getLocation();
-
-		if (origin.distanceSquared(hook.getLocation()) > range*range) {
-			remove();
-			return;
-		}
 		double distanceToPlayer = player.getLocation().distance(hook.getLocation());
-		pointLocations = CoreMethods.getLinePoints(player.getLocation().add(0, 1.2, 0), hook.getLocation(), NumberConversions.ceil(distanceToPlayer * 2));
-		int counter = 0;
-		for (final Location tempLocation : pointLocations) {
-			if (tempLocation.getBlock().isLiquid() || !isTransparent(tempLocation.getBlock())) {
-				counter++;
-				if (counter > 2) {
-					remove();
-					return;
-				}
-			}
-			GeneralMethods.displayColoredParticle("#444444", tempLocation);
-		}
+
+		visualizeLine(distanceToPlayer);
+		location = reeling ? player.getLocation() : hook.getLocation();
 
 		if (reeling) {
 			if (!hookedBlock.getBlockData().equals(originalData)) {
@@ -117,11 +104,11 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 				return;
 			}
 
-			final Vector direction = GeneralMethods.getDirection(player.getLocation(), hook.getLocation());
+			final Vector direction = GeneralMethods.getDirection(player.getLocation(), hook.getLocation()).normalize();
 			if (distanceToPlayer > 2.5) {
-				player.setVelocity(direction.clone().normalize().multiply(0.8));
+				player.setVelocity(direction.clone().multiply(0.8));
 			} else if (distanceToPlayer <= 2.5 && distanceToPlayer > 1.5) {
-				player.setVelocity(direction.clone().normalize().multiply(0.35));
+				player.setVelocity(direction.clone().multiply(0.35));
 			} else {
 				player.setVelocity(new Vector(0, 0.5, 0));
 				remove();
@@ -129,7 +116,7 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 		}
 	}
 
-	public boolean launchHook() {
+	private boolean launchHook() {
 		final Location target = GeneralMethods.getTargetedLocation(player, range);
 		if (target.getBlock().isLiquid()) {
 			return false;
@@ -147,6 +134,24 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 		playMetalbendingSound(arrow.getLocation());
 		bPlayer.addCooldown(this);
 		return true;
+	}
+
+	private void visualizeLine(double distance) {
+		ticks++;
+		if (ticks % 2 == 0) return;
+
+		pointLocations = CoreMethods.getLinePoints(player.getLocation().add(0, 1.2, 0), hook.getLocation(), NumberConversions.ceil(distance * 2));
+		int counter = 0;
+		for (final Location tempLocation : pointLocations) {
+			if (tempLocation.getBlock().isLiquid() || !isTransparent(tempLocation.getBlock())) {
+				counter++;
+				if (counter > 2) {
+					remove();
+					return;
+				}
+			}
+			GeneralMethods.displayColoredParticle("#444444", tempLocation);
+		}
 	}
 
 	@Override
@@ -206,14 +211,13 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 
 	@Override
 	public double getCollisionRadius() {
-		return 0.4;
+		return 0.6;
 	}
 
 	@Override
 	public void handleCollision(Collision collision) {
-		if (!collision.getAbilitySecond().getElement().equals(Element.ICE)) {
-			super.handleCollision(collision);
-		}
+		collision.setRemovingSecond(collision.getAbilitySecond() instanceof  MetalHook);
+		super.handleCollision(collision);
 	}
 
 	@Override
@@ -241,6 +245,8 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 	}
 
 	public boolean hasRequiredInv() {
+		if (!Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.MetalHook.RequireItem")) return true;
+
 		final Material[] inventoryItems = { Material.IRON_CHESTPLATE, Material.IRON_INGOT, Material.IRON_BLOCK };
 		final PlayerInventory pi = player.getInventory();
 		for (Material mat : inventoryItems) {
