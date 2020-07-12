@@ -63,7 +63,6 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 	private long cooldown;
 	private int range;
 	private int prepareRange;
-	private int followRange;
 	private long duration;
 
 	private boolean launched;
@@ -86,7 +85,6 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceCrawl.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceCrawl.Range");
 		prepareRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceCrawl.PrepareRange");
-		followRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceCrawl.FollowRange");
 		duration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceCrawl.FreezeDuration");
 
 		damage = getNightFactor(damage, player.getWorld());
@@ -111,7 +109,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 			}
 
 			if (locked) {
-				if (target == null || target.isDead() || (target instanceof Player && !((Player) target).isOnline()) || target.getWorld().equals(location.getWorld()) || target.getLocation().distanceSquared(location) > Math.pow(followRange, 2)) {
+				if (target == null || target.isDead() || (target instanceof Player && !((Player) target).isOnline()) || target.getWorld().equals(location.getWorld())) {
 					locked = false;
 				} else {
 					endLocation = target.getLocation().clone();

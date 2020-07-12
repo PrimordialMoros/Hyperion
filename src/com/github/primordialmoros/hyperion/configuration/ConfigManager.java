@@ -199,7 +199,6 @@ public class ConfigManager {
 		config.addDefault("Abilities.Water.IceCrawl.Cooldown", 5000);
 		config.addDefault("Abilities.Water.IceCrawl.Range", 24);
 		config.addDefault("Abilities.Water.IceCrawl.PrepareRange", 8);
-		config.addDefault("Abilities.Water.IceCrawl.FollowRange", 10);
 		config.addDefault("Abilities.Water.IceCrawl.FreezeDuration", 2000);
 
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Enabled", true);

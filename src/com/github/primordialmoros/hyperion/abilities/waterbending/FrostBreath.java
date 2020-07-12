@@ -72,6 +72,7 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 		frostDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.FrostDuration");
 
 		charged = chargeTime <= 0;
+		released = false;
 		currentRange = 0;
 		location = player.getEyeLocation();
 
@@ -240,7 +241,7 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 
 	@Override
 	public boolean isCollidable() {
-		return true;
+		return released;
 	}
 
 	@Override
