@@ -245,7 +245,7 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 	}
 
 	public boolean hasRequiredInv() {
-		if (!Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.MetalHook.RequireItem")) return true;
+		if (!Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.MetalHook.RequireItems")) return true;
 
 		final Material[] inventoryItems = { Material.IRON_CHESTPLATE, Material.IRON_INGOT, Material.IRON_BLOCK };
 		final PlayerInventory pi = player.getInventory();
