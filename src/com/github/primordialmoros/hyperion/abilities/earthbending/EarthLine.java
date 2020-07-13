@@ -91,12 +91,12 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				remove();
 				return;
 			}
-			advanceLocation();
-			summonTrailBlock(location.clone().add(0, -1, 0));
 			if (ThreadLocalRandom.current().nextInt(5) == 0) {
 				playEarthbendingSound(location);
 			}
+			summonTrailBlock(location.clone().add(0, -1, 0));
 			checkDamage(CoreMethods.calculateFlatVector(location, endLocation));
+			advanceLocation();
 		} else {
 			if (!bPlayer.canBendIgnoreCooldowns(this) || sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(prepareRange + 5, 2)) {
 				remove();
@@ -138,7 +138,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	private void checkDamage(Vector push) {
 		boolean hasHit = false;
-		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, 1.25)) {
+		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, 1)) {
 			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
 					continue;

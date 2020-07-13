@@ -42,8 +42,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EarthGlove extends EarthAbility implements AddonAbility {
 	private static final Map<UUID, Boolean> side = new ConcurrentHashMap<>();
-	private static final double GLOVE_SPEED = 1.4;
-	private static final double GLOVE_GRABBED_SPEED = 0.7;
+	private static final double GLOVE_SPEED = 1.2;
+	private static final double GLOVE_GRABBED_SPEED = 0.6;
 
 	private LivingEntity grabbedTarget;
 	private Vector lastVelocity;
@@ -116,25 +116,22 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 				shatterGlove();
 				return;
 			}
-			Location returnLocation = player.getLocation().add(0, 0.8, 0).add(player.getEyeLocation().getDirection().normalize().multiply(2));
-			if (glove.getLocation().distanceSquared(returnLocation) <= 1) {
-				if (grabbed) {
-					grabbedTarget.setVelocity(new Vector());
-					grabbed = false;
-				}
+			Location returnLocation = player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(1.5));
+			if (glove.getLocation().distanceSquared(returnLocation) < 1) {
+				if (grabbed && grabbedTarget != null) grabbedTarget.setVelocity(new Vector());
 				remove();
 				return;
 			}
-			final Vector returnVector = GeneralMethods.getDirection(glove.getLocation(), returnLocation);
+			final Vector returnVector = GeneralMethods.getDirection(glove.getLocation(), returnLocation).normalize();
 			if (grabbed) {
 				if (grabbedTarget == null || grabbedTarget.isDead() || !grabbedTarget.isValid() || (grabbedTarget instanceof Player && !((Player) grabbedTarget).isOnline())) {
 					shatterGlove();
 					return;
 				}
-				grabbedTarget.setVelocity(returnVector.clone().normalize().multiply(GLOVE_GRABBED_SPEED));
-				setGloveVelocity(returnVector.clone().normalize().multiply(GLOVE_GRABBED_SPEED));
+				grabbedTarget.setVelocity(returnVector.clone().multiply(GLOVE_GRABBED_SPEED));
+				setGloveVelocity(returnVector.clone().multiply(GLOVE_GRABBED_SPEED));
 			} else {
-				setGloveVelocity(returnVector.normalize().multiply(GLOVE_SPEED));
+				setGloveVelocity(returnVector.clone().multiply(GLOVE_SPEED));
 			}
 		} else {
 			setGloveVelocity(lastVelocity.clone().normalize().multiply(GLOVE_SPEED));
@@ -299,10 +296,6 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 	public void shatterGlove() {
 		if (glove.isDead() || !glove.isValid()) {
 			return;
-		}
-		if (grabbed) {
-			grabbedTarget.setVelocity(new Vector());
-			grabbed = false;
 		}
 		ParticleEffect.BLOCK_CRACK.display(glove.getLocation(), 3, 0, 0, 0, Material.STONE.createBlockData());
 		ParticleEffect.BLOCK_DUST.display(glove.getLocation(), 2, 0, 0, 0, Material.STONE.createBlockData());

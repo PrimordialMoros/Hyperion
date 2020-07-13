@@ -24,6 +24,7 @@ import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
 import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.github.primordialmoros.hyperion.util.TempArmorStand;
+import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.projectkorra.ability.AddonAbility;
@@ -33,6 +34,7 @@ import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
+import com.projectkorra.projectkorra.util.MovementHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import com.projectkorra.projectkorra.waterbending.ice.PhaseChange;
@@ -107,21 +109,24 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 				remove();
 				return;
 			}
-
 			if (locked) {
-				if (target == null || target.isDead() || (target instanceof Player && !((Player) target).isOnline()) || target.getWorld().equals(location.getWorld())) {
+				if (target == null || target.isDead() || (target instanceof Player && !((Player) target).isOnline()) || !target.getWorld().equals(location.getWorld())) {
 					locked = false;
 				} else {
-					endLocation = target.getLocation().clone();
-					direction = CoreMethods.calculateFlatVector(location, endLocation);
+					if (target.getLocation().distanceSquared(endLocation) < 25) {
+						endLocation = target.getLocation().clone();
+						direction = CoreMethods.calculateFlatVector(location, endLocation);
+					} else {
+						locked = false;
+					}
 				}
 			}
-			advanceLocation();
-			summonTrailBlock(location.clone().add(0, -1, 0));
 			if (ThreadLocalRandom.current().nextInt(5) == 0) {
 				playIcebendingSound(location);
 			}
+			summonTrailBlock(location.clone().add(0, -1, 0));
 			checkDamage();
+			advanceLocation();
 		} else {
 			if (!bPlayer.canBendIgnoreCooldowns(this) || sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(prepareRange + 5, 2)) {
 				remove();
@@ -168,15 +173,18 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 
 	private void checkDamage() {
 		boolean hasHit = false;
-		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, 1.25)) {
+		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, 0.8)) {
 			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
 					continue;
 				}
-				entity.setVelocity(new Vector());
 				DamageHandler.damageEntity(entity, damage, this);
-				new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0), Material.PACKED_ICE.createBlockData(), new Vector(), this, false, duration);
-				new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOW, NumberConversions.round(duration / 50F), 5));
+				if (!entity.isDead()) {
+					final MovementHandler mh = new MovementHandler((LivingEntity) entity, CoreAbility.getAbility(IceCrawl.class));
+					mh.stopWithDuration(duration / 50, Element.ICE.getColor() + "* Frozen *");
+					new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0), Material.PACKED_ICE.createBlockData(), new Vector(), this, false, duration);
+					new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOW, NumberConversions.round(duration / 50F), 5));
+				}
 				hasHit = true;
 			}
 		}
