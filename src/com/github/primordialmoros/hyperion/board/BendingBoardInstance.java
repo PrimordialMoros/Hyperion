@@ -76,7 +76,7 @@ public class BendingBoardInstance {
 			if (cooldown || bendingPlayer.isOnCooldown(coreAbility)) sb.append(ChatColor.STRIKETHROUGH);
 			sb.append(coreAbility.getName());
 		}
-		sb.append(ChatColor.RESET.toString().repeat(slot));
+		sb.append(String.join("", Collections.nCopies(slot, ChatColor.RESET.toString())));
 
 		if (!cachedSlots[slot].equals(sb.toString())) {
 			bendingBoard.resetScores(cachedSlots[slot]);
