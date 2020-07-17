@@ -258,7 +258,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		if (armorFallingBlock != null) {
 			armorFallingBlock.remove();
 		}
-		if (!player.isDead() && player.isOnline() && formed) {
+		if (player.isValid() && player.isOnline() && formed) {
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 			if (!originalMode.equals(player.getGameMode())) {
 				for (ItemStack armorItem : oldArmor) {

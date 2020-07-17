@@ -27,6 +27,7 @@ import com.github.primordialmoros.hyperion.listeners.AbilityListener;
 import com.github.primordialmoros.hyperion.listeners.CoreListener;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
+import com.github.primordialmoros.hyperion.util.MetricsLite;
 import com.github.primordialmoros.hyperion.util.TempArmorStand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -45,6 +46,7 @@ public class Hyperion extends JavaPlugin {
 		version = getDescription().getVersion();
 		author = getDescription().getAuthors().get(0);
 
+		new MetricsLite(this, 8212);
 		new ConfigManager();
 		new HyperionCommand();
 		new BoardCommand();

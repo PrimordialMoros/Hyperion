@@ -146,6 +146,42 @@ public class CoreMethods {
 		return new Vector(end.getX() - start.getX(), 0, end.getZ() - start.getZ()).normalize();
 	}
 
+	public static Material getBannerColor(final Material material) {
+		switch (material) {
+			case GRAVEL:
+			case CLAY:
+			case DIORITE:
+			case IRON_BLOCK:
+			case QUARTZ_BLOCK:
+				return Material.LIGHT_GRAY_BANNER;
+			case STONE:
+			case STONE_SLAB:
+			case STONE_BRICKS:
+			case COBBLESTONE:
+			case COBBLESTONE_SLAB:
+			case ANDESITE:
+				return Material.GRAY_BANNER;
+			case GOLD_BLOCK:
+				return Material.YELLOW_BANNER;
+			case RED_SAND:
+			case RED_SANDSTONE:
+			case RED_SANDSTONE_SLAB:
+			case GRANITE:
+				return Material.ORANGE_BANNER;
+			case NETHERRACK:
+				return Material.RED_BANNER;
+			case DIRT:
+			case GRASS_BLOCK:
+			case GRASS_PATH:
+			case MYCELIUM:
+			case SAND:
+			case SANDSTONE:
+			case SANDSTONE_SLAB:
+			default:
+				return Material.BROWN_BANNER;
+		}
+	}
+
 	public static void loadAbilities() {
 		CoreAbility.registerPluginAbilities(Hyperion.getPlugin(), "com.github.primordialmoros.hyperion.abilities");
 		boolean collisions = Hyperion.getPlugin().getConfig().getBoolean("EnableCollisions");

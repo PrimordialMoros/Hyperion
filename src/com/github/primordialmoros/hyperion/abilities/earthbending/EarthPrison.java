@@ -34,6 +34,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.EulerAngle;
 
 import java.util.Collections;
 
@@ -64,9 +65,13 @@ public class EarthPrison extends EarthAbility implements AddonAbility {
 				return;
 			}
 			bPlayer.addCooldown(this);
-			for (Location loc : CoreMethods.getCirclePoints(location.clone().add(0, -1.05, 0), points, radius, 0)) {
-				new TempArmorStand(this, loc.clone(), blockUnderEntity.getType(), duration);
-				new TempArmorStand(this, loc.clone().add(0, -0.6, 0), blockBelow.getType(), duration);
+			EulerAngle upsideDown = new EulerAngle(Math.toRadians(15), Math.PI,  Math.PI);
+			float step = 360f/points;
+			float yaw = step;
+			for (Location loc : CoreMethods.getCirclePoints(location.clone().add(0, 0.5, 0), points, radius, 0)) {
+				yaw += step;
+				loc.setYaw(yaw);
+				new TempArmorStand(this, loc, CoreMethods.getBannerColor(blockUnderEntity.getType()), duration-100, upsideDown);
 			}
 			final MovementHandler mh = new MovementHandler(target, CoreAbility.getAbility(EarthPrison.class));
 			mh.stopWithDuration(duration / 50, Element.EARTH.getColor() + "* Imprisoned *");
@@ -76,7 +81,7 @@ public class EarthPrison extends EarthAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (!bPlayer.canBendIgnoreBindsCooldowns(this) || target == null || target.isDead() || !target.isValid()) {
+		if (!bPlayer.canBendIgnoreBindsCooldowns(this) || target == null || !target.isValid()) {
 			remove();
 			return;
 		}

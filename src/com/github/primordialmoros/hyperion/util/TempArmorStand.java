@@ -28,26 +28,33 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.util.EulerAngle;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class TempArmorStand {
 	private static final Map<ArmorStand, TempArmorStand> instances = new ConcurrentHashMap<>();
+	private static final Queue<TempArmorStand> tasQueue = new PriorityQueue<>(Comparator.comparingLong(TempArmorStand::getExpirationTime));
+	private static final EulerAngle DEFAULT_ANGLE = new EulerAngle(0, 0, 0);
+
 	private final ArmorStand armorStand;
 	private final CoreAbility ability;
 	private final long expirationTime;
 
 	public TempArmorStand(CoreAbility abilityInstance, Location location, Material material) {
-		this(abilityInstance, location, material, 30000);
+		this(abilityInstance, location, material, 30000, DEFAULT_ANGLE);
 	}
 
 	public TempArmorStand(CoreAbility abilityInstance, Location location, Material material, long delay) {
+		this(abilityInstance, location, material, delay, DEFAULT_ANGLE);
+	}
+
+	public TempArmorStand(CoreAbility abilityInstance, Location location, Material material, long delay, EulerAngle headPose) {
 		Location spawnLocation = location.clone();
 		armorStand = spawnLocation.getWorld().spawn(spawnLocation, ArmorStand.class, entity -> {
+			entity.setHeadPose(headPose);
 			entity.setInvulnerable(true);
 			entity.setVisible(false);
 			entity.setGravity(false);
@@ -58,6 +65,7 @@ public class TempArmorStand {
 		expirationTime = System.currentTimeMillis() + delay;
 		ability = abilityInstance;
 		instances.put(armorStand, this);
+		tasQueue.add(this);
 	}
 
 	public CoreAbility getAbility() {
@@ -85,12 +93,14 @@ public class TempArmorStand {
 	}
 
 	public static void manage() {
-		Iterator<TempArmorStand> iterator = instances.values().iterator();
-		while (iterator.hasNext()) {
-			TempArmorStand tas = iterator.next();
-			if (System.currentTimeMillis() > tas.getExpirationTime()) {
-				tas.getArmorStand().remove();
-				iterator.remove();
+		final long currentTime = System.currentTimeMillis();
+		while (!tasQueue.isEmpty()) {
+			final TempArmorStand tas = tasQueue.peek();
+			if (currentTime > tas.getExpirationTime()) {
+				tasQueue.poll();
+				tas.remove();
+			} else {
+				return;
 			}
 		}
 	}
@@ -101,6 +111,7 @@ public class TempArmorStand {
 	}
 
 	public static void removeAll() {
+		tasQueue.clear();
 		instances.keySet().forEach(Entity::remove);
 		instances.clear();
 	}

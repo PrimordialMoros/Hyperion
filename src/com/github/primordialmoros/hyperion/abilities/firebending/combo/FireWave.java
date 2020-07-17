@@ -187,10 +187,9 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 			if (!isTransparent(block)) {
 				continue;
 			}
-			ParticleEffect.FLAME.display(block.getLocation(), 3, 0.3F, 0.3F, 0.3F);
-			ParticleEffect.SMOKE_NORMAL.display(block.getLocation(), 1, 0.3F, 0.3F, 0.3F);
-
-			if (ThreadLocalRandom.current().nextInt(7) == 0) {
+			playFirebendingParticles(block.getLocation(), 3, 0.3, 0.3, 0.3);
+			ParticleEffect.SMOKE_NORMAL.display(block.getLocation(), 1, 0.3, 0.3, 0.3);
+			if (ThreadLocalRandom.current().nextInt(10) == 0) {
 				playFirebendingSound(block.getLocation());
 			}
 		}

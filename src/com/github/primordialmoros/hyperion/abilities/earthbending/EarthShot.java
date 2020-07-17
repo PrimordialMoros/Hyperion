@@ -98,7 +98,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 				return;
 			}
 
-			if (projectile == null || projectile.getFallingBlock().isDead() || projectile.getFallingBlock().getLocation().distanceSquared(origin) > range * range) {
+			if (projectile == null || !projectile.getFallingBlock().isValid() || projectile.getFallingBlock().getLocation().distanceSquared(origin) > range * range) {
 				remove();
 				return;
 			}

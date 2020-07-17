@@ -78,10 +78,11 @@ public class BendingFallingBlock {
 	}
 
 	public static void manage() {
+		final long currentTime = System.currentTimeMillis();
 		Iterator<BendingFallingBlock> iterator = instances.values().iterator();
 		while (iterator.hasNext()) {
 			BendingFallingBlock bfb = iterator.next();
-			if (System.currentTimeMillis() > bfb.getExpirationTime()) {
+			if (currentTime > bfb.getExpirationTime()) {
 				bfb.getFallingBlock().remove();
 				iterator.remove();
 			}

@@ -99,7 +99,7 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (!bPlayer.canBendIgnoreBindsCooldowns(this) || glove == null || glove.isDead() || !glove.isValid()) {
+		if (!bPlayer.canBendIgnoreBindsCooldowns(this) || glove == null || !glove.isValid()) {
 			remove();
 			return;
 		}
@@ -124,7 +124,7 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 			}
 			final Vector returnVector = GeneralMethods.getDirection(glove.getLocation(), returnLocation).normalize();
 			if (grabbed) {
-				if (grabbedTarget == null || grabbedTarget.isDead() || !grabbedTarget.isValid() || (grabbedTarget instanceof Player && !((Player) grabbedTarget).isOnline())) {
+				if (grabbedTarget == null || !grabbedTarget.isValid() || (grabbedTarget instanceof Player && !((Player) grabbedTarget).isOnline())) {
 					shatterGlove();
 					return;
 				}
@@ -294,7 +294,7 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 	}
 
 	public void shatterGlove() {
-		if (glove.isDead() || !glove.isValid()) {
+		if (!glove.isValid()) {
 			return;
 		}
 		ParticleEffect.BLOCK_CRACK.display(glove.getLocation(), 3, 0, 0, 0, Material.STONE.createBlockData());

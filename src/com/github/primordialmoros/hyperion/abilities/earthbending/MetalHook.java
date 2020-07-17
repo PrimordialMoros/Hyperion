@@ -74,7 +74,7 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (hook == null || hook.isDead() || !player.getWorld().equals(hook.getWorld()) || !bPlayer.canBendIgnoreCooldowns(this) ) {
+		if (hook == null || !hook.isValid() || !player.getWorld().equals(hook.getWorld()) || !bPlayer.canBendIgnoreCooldowns(this) ) {
 			remove();
 			return;
 		}

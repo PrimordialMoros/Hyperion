@@ -183,7 +183,7 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 					continue;
 				}
 				DamageHandler.damageEntity(entity, getNightFactor(damage, player.getWorld()), this);
-				if (!entity.isDead()) {
+				if (entity.isValid()) {
 					final MovementHandler mh = new MovementHandler((LivingEntity) entity, CoreAbility.getAbility(IceCrawl.class));
 					mh.stopWithDuration(frostDuration / 50, Element.ICE.getColor() + "* Frozen *");
 					new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0), Material.PACKED_ICE.createBlockData(), new Vector(), this, false, frostDuration);

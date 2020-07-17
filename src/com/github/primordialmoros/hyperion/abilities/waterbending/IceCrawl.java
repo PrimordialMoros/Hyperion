@@ -110,7 +110,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 				return;
 			}
 			if (locked) {
-				if (target == null || target.isDead() || (target instanceof Player && !((Player) target).isOnline()) || !target.getWorld().equals(location.getWorld())) {
+				if (target == null || !target.isValid() || (target instanceof Player && !((Player) target).isOnline()) || !target.getWorld().equals(location.getWorld())) {
 					locked = false;
 				} else {
 					if (target.getLocation().distanceSquared(endLocation) < 25) {
@@ -179,7 +179,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 					continue;
 				}
 				DamageHandler.damageEntity(entity, damage, this);
-				if (!entity.isDead()) {
+				if (entity.isValid()) {
 					final MovementHandler mh = new MovementHandler((LivingEntity) entity, CoreAbility.getAbility(IceCrawl.class));
 					mh.stopWithDuration(duration / 50, Element.ICE.getColor() + "* Frozen *");
 					new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0), Material.PACKED_ICE.createBlockData(), new Vector(), this, false, duration);
