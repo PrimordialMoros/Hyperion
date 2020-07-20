@@ -50,22 +50,21 @@ public class EarthCling extends EarthAbility implements AddonAbility, PassiveAbi
 		if (bPlayer.getBoundAbility() == null || !bPlayer.getBoundAbility().getName().equalsIgnoreCase("EarthGlove")) {
 			return;
 		}
-
-		if (CoreMethods.isAgainstWall(player, true)) {
-			switch (getAbilities(player, EarthGlove.class).size()) {
-				case 0:
+		int counter = 2;
+		if (bPlayer.isOnCooldown(EarthGlove.getCooldownForSide(true))) counter--;
+		if (bPlayer.isOnCooldown(EarthGlove.getCooldownForSide(false))) counter--;
+		if (counter > 0) {
+			if (CoreMethods.isAgainstWall(player, true)) {
+				if (counter == 2) {
 					player.setVelocity(new Vector());
-					break;
-				case 1:
+				} else {
 					Vector vel = player.getVelocity().clone();
 					if (vel.getY() < 0) {
 						player.setVelocity(vel.multiply(speed));
 						ParticleEffect.CRIT.display(player.getEyeLocation(), 2, 0.05F, 0.4F, 0.05F, 0.1F);
 						ParticleEffect.BLOCK_CRACK.display(player.getEyeLocation(), 3, 0.1F, 0.4F, 0.1F, 0.1F, Material.STONE.createBlockData());
 					}
-					break;
-				default:
-					break;
+				}
 			}
 		}
 	}

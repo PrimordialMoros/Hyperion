@@ -138,7 +138,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 		tip = origin.clone().add(direction.clone().multiply(maxLength));
 		final Location targetLocation = origin.clone().add(direction.clone().multiply(maxLength - 1));
 		int radius = (int) Math.ceil(0.2 * maxLength);
-		for (Location testLoc : GeneralMethods.getCircle(origin, radius, 1, false, true, 0)) {
+		for (Location testLoc : GeneralMethods.getCircle(origin, radius, 1, true, true, 0)) {
 			if (!GeneralMethods.isRegionProtectedFromBuild(this, testLoc) && (isWater(testLoc.getBlock()) || isIce(testLoc.getBlock()))) {
 				lines.add(CoreMethods.blockRayTrace(testLoc.getBlock(), targetLocation.getBlock()));
 			}

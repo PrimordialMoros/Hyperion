@@ -26,7 +26,6 @@ import com.github.primordialmoros.hyperion.abilities.earthbending.EarthLine;
 import com.github.primordialmoros.hyperion.abilities.earthbending.EarthShot;
 import com.github.primordialmoros.hyperion.abilities.earthbending.LavaDisk;
 import com.github.primordialmoros.hyperion.abilities.earthbending.MetalHook;
-import com.github.primordialmoros.hyperion.abilities.earthbending.passive.EarthGloveManipulation;
 import com.github.primordialmoros.hyperion.abilities.firebending.Bolt;
 import com.github.primordialmoros.hyperion.abilities.firebending.Combustion;
 import com.github.primordialmoros.hyperion.abilities.waterbending.FrostBreath;
@@ -78,7 +77,7 @@ public class AbilityListener implements Listener {
 				} else if (abilityName.equalsIgnoreCase("earthguard")) {
 					new EarthGuardWall(player);
 				} else if (abilityName.equalsIgnoreCase("earthglove")) {
-					EarthGloveManipulation.attemptDestroy(player);
+					EarthGlove.attemptDestroy(player, bPlayer);
 				}
 			} else if (coreAbility instanceof FireAbility && bPlayer.isElementToggled(Element.FIRE)) {
 				if (abilityName.equalsIgnoreCase("combustion")) {
@@ -136,8 +135,6 @@ public class AbilityListener implements Listener {
 				} else if (abilityName.equalsIgnoreCase("earthglove")) {
 					if (player.isSneaking()) {
 						new EarthGlove(player);
-					} else {
-						EarthGloveManipulation.attemptRedirect(player);
 					}
 				}
 			} else if (coreAbility instanceof FireAbility && bPlayer.isElementToggled(Element.FIRE)) {

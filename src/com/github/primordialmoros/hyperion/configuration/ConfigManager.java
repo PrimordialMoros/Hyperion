@@ -56,9 +56,9 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.PrepareTime", 1500);
 
 		config.addDefault("Abilities.Earth.EarthGlove.Enabled", true);
-		config.addDefault("Abilities.Earth.EarthGlove.Description", "Dai Li agents use this technique for various purposes. Hold sneak and click to launch your glove and attempt to grab your target. If you continue holding sneak, the gloves will attempt to return to you. You can also redirect or destroy other players' gloves.");
+		config.addDefault("Abilities.Earth.EarthGlove.Description", "Dai Li agents use this technique for various purposes. Hold sneak and click to launch your glove and attempt to grab your target. If you continue holding sneak, the gloves will attempt to return to you. You can also destroy other players' gloves by tapping sneak while looking at them.");
 		config.addDefault("Abilities.Earth.EarthGlove.Damage", 1.0);
-		config.addDefault("Abilities.Earth.EarthGlove.Cooldown", 500);
+		config.addDefault("Abilities.Earth.EarthGlove.Cooldown", 5000);
 		config.addDefault("Abilities.Earth.EarthGlove.Range", 24);
 		config.addDefault("Abilities.Earth.EarthGlove.ClingPassive.Enabled", true);
 		config.addDefault("Abilities.Earth.EarthGlove.ClingPassive.Description", "EarthGloves can be used to either slow or stop your descend while opposing a wall made of earthbendable materials. Hold sneak to use.");

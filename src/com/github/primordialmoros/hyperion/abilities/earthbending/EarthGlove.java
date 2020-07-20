@@ -21,6 +21,7 @@ package com.github.primordialmoros.hyperion.abilities.earthbending;
 
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
+import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
@@ -45,7 +46,9 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EarthGlove extends EarthAbility implements AddonAbility {
-	private static final Map<UUID, Boolean> side = new ConcurrentHashMap<>();
+	enum Side { RIGHT, LEFT }
+
+	private static final Map<UUID, Side> lastUsedSide = new ConcurrentHashMap<>();
 	private static final double GLOVE_SPEED = 1.2;
 	private static final double GLOVE_GRABBED_SPEED = 0.6;
 
@@ -63,7 +66,7 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 	public EarthGlove(Player player) {
 		super(player);
 
-		if (getAbilities(player, EarthGlove.class).size() >= 2 || !bPlayer.canBend(this)) {
+		if (getAbilities(player, EarthGlove.class).size() >= 2 || !bPlayer.canBendIgnoreCooldowns(this)) {
 			return;
 		}
 
@@ -71,34 +74,9 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthGlove.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthGlove.Range");
 
-		if (launchEarthGlove(!side.getOrDefault(player.getUniqueId(), false))) {
-			bPlayer.addCooldown(this);
+		if (launchEarthGlove()) {
 			start();
 		}
-	}
-
-	public EarthGlove(Player player, Item gloveItem) {
-		super(player);
-
-		if (!bPlayer.canBendIgnoreCooldowns(this)) {
-			return;
-		}
-
-		if (getAbilities(player, EarthGlove.class).size() >= 2) {
-			getAbility(player, EarthGlove.class).remove();
-		}
-
-		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthGlove.Damage");
-		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthGlove.Cooldown");
-		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthGlove.Range");
-
-		gloveItem.removeMetadata(CoreMethods.GLOVE_KEY, Hyperion.getPlugin());
-		gloveItem.setMetadata(CoreMethods.GLOVE_KEY, new FixedMetadataValue(Hyperion.getPlugin(), this));
-		glove = gloveItem;
-		bPlayer.addCooldown(this);
-
-		setGloveVelocity(GeneralMethods.getDirection(GeneralMethods.getMainHandLocation(player), glove.getLocation()).normalize().multiply(GLOVE_SPEED));
-		start();
 	}
 
 	@Override
@@ -148,13 +126,30 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 		}
 	}
 
-	private boolean launchEarthGlove(boolean right) {
+	private boolean launchEarthGlove() {
 		if (!player.isSneaking()) return false;
 
-		side.put(player.getUniqueId(), right);
-		final Location gloveSpawnLocation = right ? GeneralMethods.getRightSide(player.getLocation(), 0.5) : GeneralMethods.getLeftSide(player.getLocation(), 0.5);
-		gloveSpawnLocation.add(0, 0.8, 0);
+		final Location gloveSpawnLocation;
+		final boolean side;
+		switch (lastUsedSide.getOrDefault(player.getUniqueId(), Side.RIGHT)) {
+			case LEFT:
+				side = true;
+				gloveSpawnLocation = GeneralMethods.getRightSide(player.getLocation(), 0.5);
+				break;
+			case RIGHT:
+			default:
+				side = false;
+				gloveSpawnLocation = GeneralMethods.getLeftSide(player.getLocation(), 0.5);
+				break;
+		}
 
+		if (bPlayer.isOnCooldown(getCooldownForSide(side))) {
+			return false;
+		}
+
+		bPlayer.addCooldown(getCooldownForSide(side), cooldown);
+		lastUsedSide.put(player.getUniqueId(), side ? Side.RIGHT : Side.LEFT);
+		gloveSpawnLocation.add(0, 0.8, 0);
 		final Entity targetedEntity = GeneralMethods.getTargetedEntity(player, range, Collections.singletonList(player));
 		final Vector velocityVector;
 		if (targetedEntity instanceof LivingEntity) {
@@ -292,11 +287,6 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 		super.remove();
 	}
 
-	public void redirect(final Player newOwner) {
-		new EarthGlove(newOwner, glove);
-		remove();
-	}
-
 	public void shatterGlove() {
 		if (!glove.isValid()) {
 			return;
@@ -305,5 +295,24 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 		ParticleEffect.BLOCK_DUST.display(glove.getLocation(), 2, 0, 0, 0, Material.STONE.createBlockData());
 		glove.remove();
 		remove();
+	}
+
+	public static void attemptDestroy(final Player p, final BendingPlayer bendingPlayer) {
+		if (bendingPlayer.getBoundAbility() == null || !bendingPlayer.getBoundAbility().getName().equals("EarthGlove")) {
+			return;
+		}
+		for (Entity targetedEntity : GeneralMethods.getEntitiesAroundPoint(p.getEyeLocation(), 8)) {
+			if (targetedEntity instanceof Item && p.hasLineOfSight(targetedEntity) && targetedEntity.hasMetadata(CoreMethods.GLOVE_KEY)) {
+				EarthGlove ability = (EarthGlove) targetedEntity.getMetadata(CoreMethods.GLOVE_KEY).get(0).value();
+				if (ability != null && !p.equals(ability.getPlayer())) {
+					ability.shatterGlove();
+					return;
+				}
+			}
+		}
+	}
+
+	public static String getCooldownForSide(boolean right) {
+		return right ? "EarthGloveRight" : "EarthGloveLeft";
 	}
 }

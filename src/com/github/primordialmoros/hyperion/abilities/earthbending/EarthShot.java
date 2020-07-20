@@ -60,7 +60,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 	private long magmaPrepareTime;
 
 	private boolean ready;
-	private boolean thrown;
+	private boolean launched;
 	private boolean convertedMagma;
 	private long magmaStartTime;
 
@@ -80,7 +80,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 		magmaPrepareTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthShot.MagmaShot.PrepareTime");
 
 		ready = false;
-		thrown = false;
+		launched = false;
 		convertedMagma = false;
 		magmaStartTime = 0;
 		origin = player.getLocation().clone();
@@ -92,7 +92,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (thrown) {
+		if (launched) {
 			if (!bPlayer.canBendIgnoreBindsCooldowns(this)) {
 				remove();
 				return;
@@ -106,7 +106,6 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 			Vector velocity = projectile.getFallingBlock().getVelocity().clone();
 
 			if (lastVelocity.angle(velocity) > Math.PI / 4 || velocity.length() < 1.5) {
-				shatter();
 				remove();
 				return;
 			}
@@ -151,7 +150,6 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 					}
 				} else {
 					if (magmaStartTime != 0 && ThreadLocalRandom.current().nextInt(6) == 0) {
-						shatter();
 						remove();
 						return;
 					}
@@ -163,7 +161,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 
 	public boolean prepare() {
 		Block block = getEarthSourceBlock(selectRange + 2);
-		if (block == null || thrown) {
+		if (block == null || launched) {
 			return false;
 		}
 
@@ -177,6 +175,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 
 		if (isMetal(block)) {
 			playMetalbendingSound(block.getLocation());
+			magmaShot = false;
 		} else {
 			playEarthbendingSound(block.getLocation());
 		}
@@ -189,7 +188,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 
 	public void checkBlast(boolean hit) {
 		Location tempLocation = projectile.getFallingBlock().getLocation().clone().add(0, 0.5, 0);
-		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(tempLocation, 2)) {
+		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(tempLocation, 1.5)) {
 			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
 				if (entity instanceof Player && Commands.invincible.contains((entity).getName())) {
 					continue;
@@ -208,26 +207,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 
 		}
 		if (hit) {
-			shatter();
 			remove();
-		}
-	}
-
-	public void shatter() {
-		Location tempLocation = projectile.getFallingBlock().getLocation().clone();
-		ParticleEffect.BLOCK_CRACK.display(tempLocation, 6, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0, projectile.getFallingBlock().getBlockData());
-		ParticleEffect.BLOCK_DUST.display(tempLocation, 4, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0, projectile.getFallingBlock().getBlockData());
-		if (convertedMagma) {
-			ParticleEffect.EXPLOSION_NORMAL.display(tempLocation, 3, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.03);
-			ParticleEffect.SMOKE_LARGE.display(tempLocation, 20, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.5F);
-			ParticleEffect.FIREWORKS_SPARK.display(tempLocation, 10, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.5F);
-			tempLocation.getWorld().playSound(tempLocation, Sound.ENTITY_GENERIC_EXPLODE, 2, 0);
-		} else {
-			if (isMetal(projectile.getFallingBlock().getBlockData().getMaterial())) {
-				playMetalbendingSound(tempLocation);
-			} else {
-				playEarthbendingSound(tempLocation);
-			}
 		}
 	}
 
@@ -290,7 +270,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 
 	@Override
 	public boolean isCollidable() {
-		return thrown;
+		return launched;
 	}
 
 	@Override
@@ -308,7 +288,24 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 
 	@Override
 	public void remove() {
-		projectile.remove();
+		if (launched && projectile.getFallingBlock() != null) {
+			final Location tempLocation = projectile.getFallingBlock().getLocation().clone();
+			ParticleEffect.BLOCK_CRACK.display(tempLocation, 6, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0, projectile.getFallingBlock().getBlockData());
+			ParticleEffect.BLOCK_DUST.display(tempLocation, 4, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0, projectile.getFallingBlock().getBlockData());
+			if (convertedMagma) {
+				ParticleEffect.EXPLOSION_NORMAL.display(tempLocation, 3, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.03);
+				ParticleEffect.SMOKE_LARGE.display(tempLocation, 20, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.5F);
+				ParticleEffect.FIREWORKS_SPARK.display(tempLocation, 10, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.5F);
+				tempLocation.getWorld().playSound(tempLocation, Sound.ENTITY_GENERIC_EXPLODE, 2, 0);
+			} else {
+				if (isMetal(projectile.getFallingBlock().getBlockData().getMaterial())) {
+					playMetalbendingSound(tempLocation);
+				} else {
+					playEarthbendingSound(tempLocation);
+				}
+			}
+			projectile.remove();
+		}
 		source.revertBlock();
 		if (readySource != null) {
 			readySource.revertBlock();
@@ -324,7 +321,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 	}
 
 	public void throwProjectile() {
-		if (thrown || !ready) {
+		if (launched || !ready) {
 			return;
 		}
 
@@ -337,7 +334,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 		getPreventEarthbendingBlocks().remove(readySource.getBlock());
 
 		bPlayer.addCooldown(this, cooldown);
-		thrown = true;
+		launched = true;
 	}
 
 	public void playParticles(Location loc) {
