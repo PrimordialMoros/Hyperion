@@ -17,41 +17,72 @@
  *    along with Hyperion.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.github.primordialmoros.hyperion.abilities.earthbending;
+package com.github.primordialmoros.hyperion.abilities.earthbending.passive;
 
 import com.github.primordialmoros.hyperion.Hyperion;
+import com.github.primordialmoros.hyperion.abilities.earthbending.EarthGlove;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
-import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.PassiveAbility;
+import com.projectkorra.projectkorra.util.ParticleEffect;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
-public class EarthGloveManipulation extends EarthAbility implements AddonAbility, PassiveAbility {
-	public EarthGloveManipulation(Player player) {
+public class EarthCling extends EarthAbility implements AddonAbility, PassiveAbility {
+	private double speed;
+
+	public EarthCling(Player player) {
 		super(player);
+
+		if (!isEnabled()) return;
+		speed = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthGlove.ClingPassive.Speed");
 	}
 
 	@Override
 	public void progress() {
+		if (!player.isSneaking() || player.isOnGround()) {
+			return;
+		}
+
+		if (bPlayer.getBoundAbility() == null || !bPlayer.getBoundAbility().getName().equalsIgnoreCase("EarthGlove")) {
+			return;
+		}
+
+		if (CoreMethods.isAgainstWall(player, true)) {
+			switch (getAbilities(player, EarthGlove.class).size()) {
+				case 0:
+					player.setVelocity(new Vector());
+					break;
+				case 1:
+					Vector vel = player.getVelocity().clone();
+					if (vel.getY() < 0) {
+						player.setVelocity(vel.multiply(speed));
+						ParticleEffect.CRIT.display(player.getEyeLocation(), 2, 0.05F, 0.4F, 0.05F, 0.1F);
+						ParticleEffect.BLOCK_CRACK.display(player.getEyeLocation(), 3, 0.1F, 0.4F, 0.1F, 0.1F, Material.STONE.createBlockData());
+					}
+					break;
+				default:
+					break;
+			}
+		}
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthGlove.Enabled");
+		return Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthGlove.ClingPassive.Enabled");
 	}
 
 	@Override
 	public String getName() {
-		return "EarthGloveManipulation";
+		return "EarthCling";
 	}
 
 	@Override
 	public String getDescription() {
-		return "Allows the earthbender to destroy or redirect others' earthgloves.";
+		return Hyperion.getPlugin().getConfig().getString("Abilities.Earth.EarthGlove.ClingPassive.Description");
 	}
 
 	@Override
@@ -91,7 +122,7 @@ public class EarthGloveManipulation extends EarthAbility implements AddonAbility
 
 	@Override
 	public boolean isProgressable() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -100,37 +131,5 @@ public class EarthGloveManipulation extends EarthAbility implements AddonAbility
 
 	@Override
 	public void stop() {
-	}
-
-	public static void attemptDestroy(Player p) {
-		if (hasAbility(p, EarthGloveManipulation.class)) {
-			getAbility(p, EarthGloveManipulation.class).attemptAction(true);
-		}
-	}
-
-	public static void attemptRedirect(Player p) {
-		if (hasAbility(p, EarthGloveManipulation.class)) {
-			getAbility(p, EarthGloveManipulation.class).attemptAction(false);
-		}
-	}
-
-	private void attemptAction(boolean destroy) {
-		if (bPlayer.getBoundAbility() == null || !bPlayer.getBoundAbility().getName().equals("EarthGlove")) {
-			return;
-		}
-
-		for (Entity targetedEntity : GeneralMethods.getEntitiesAroundPoint(player.getEyeLocation(), 8)) {
-			if (targetedEntity instanceof Item && player.hasLineOfSight(targetedEntity) && targetedEntity.hasMetadata(CoreMethods.GLOVE_KEY)) {
-				EarthGlove ability = (EarthGlove) targetedEntity.getMetadata(CoreMethods.GLOVE_KEY).get(0).value();
-				if (ability != null && !player.equals(ability.getPlayer())) {
-					if (destroy) {
-						ability.shatterGlove();
-					} else {
-						ability.redirect(player);
-					}
-					return;
-				}
-			}
-		}
 	}
 }

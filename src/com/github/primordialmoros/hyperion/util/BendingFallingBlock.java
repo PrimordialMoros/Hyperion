@@ -26,14 +26,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.util.Vector;
 
+import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class BendingFallingBlock {
 	private static final Map<FallingBlock, BendingFallingBlock> instances = new ConcurrentHashMap<>();
+	private static final Queue<BendingFallingBlock> bfbQueue = new PriorityQueue<>(Comparator.comparingLong(BendingFallingBlock::getExpirationTime));
 	private final FallingBlock fallingBlock;
 	private final CoreAbility ability;
 	private final long expirationTime;
@@ -51,6 +55,7 @@ public class BendingFallingBlock {
 		expirationTime = System.currentTimeMillis() + delay;
 		ability = abilityInstance;
 		instances.put(fallingBlock, this);
+		bfbQueue.add(this);
 	}
 
 	public CoreAbility getAbility() {
@@ -73,12 +78,22 @@ public class BendingFallingBlock {
 		return instances.get(fb);
 	}
 
-	public static List<BendingFallingBlock> getFromAbility(CoreAbility ability) {
-		return instances.values().stream().filter(bfb -> bfb.getAbility().equals(ability)).collect(Collectors.toList());
+	public static Set<BendingFallingBlock> getFromAbility(CoreAbility ability) {
+		return instances.values().stream().filter(bfb -> bfb.getAbility().equals(ability)).collect(Collectors.toSet());
 	}
 
 	public static void manage() {
 		final long currentTime = System.currentTimeMillis();
+		while (!bfbQueue.isEmpty()) {
+			final BendingFallingBlock bfb = bfbQueue.peek();
+			if (currentTime > bfb.getExpirationTime()) {
+				bfbQueue.poll();
+				bfb.remove();
+			} else {
+				return;
+			}
+		}
+
 		Iterator<BendingFallingBlock> iterator = instances.values().iterator();
 		while (iterator.hasNext()) {
 			BendingFallingBlock bfb = iterator.next();
@@ -95,6 +110,7 @@ public class BendingFallingBlock {
 	}
 
 	public static void removeAll() {
+		bfbQueue.clear();
 		instances.keySet().forEach(Entity::remove);
 		instances.clear();
 	}

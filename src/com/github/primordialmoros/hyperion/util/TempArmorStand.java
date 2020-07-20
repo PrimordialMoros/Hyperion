@@ -22,50 +22,60 @@ package com.github.primordialmoros.hyperion.util;
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.projectkorra.projectkorra.ability.CoreAbility;
+import com.projectkorra.projectkorra.util.ParticleEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
-import org.bukkit.util.EulerAngle;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class TempArmorStand {
 	private static final Map<ArmorStand, TempArmorStand> instances = new ConcurrentHashMap<>();
 	private static final Queue<TempArmorStand> tasQueue = new PriorityQueue<>(Comparator.comparingLong(TempArmorStand::getExpirationTime));
-	private static final EulerAngle DEFAULT_ANGLE = new EulerAngle(0, 0, 0);
 
 	private final ArmorStand armorStand;
 	private final CoreAbility ability;
+	private final Material headMaterial;
 	private final long expirationTime;
-
-	public TempArmorStand(CoreAbility abilityInstance, Location location, Material material) {
-		this(abilityInstance, location, material, 30000, DEFAULT_ANGLE);
-	}
+	private final boolean particles;
 
 	public TempArmorStand(CoreAbility abilityInstance, Location location, Material material, long delay) {
-		this(abilityInstance, location, material, delay, DEFAULT_ANGLE);
+		this(abilityInstance, location, material, delay, false);
 	}
 
-	public TempArmorStand(CoreAbility abilityInstance, Location location, Material material, long delay, EulerAngle headPose) {
+	public TempArmorStand(CoreAbility abilityInstance, Location location, Material material, long delay, boolean showRemoveParticles) {
 		Location spawnLocation = location.clone();
+		headMaterial = material;
 		armorStand = spawnLocation.getWorld().spawn(spawnLocation, ArmorStand.class, entity -> {
-			entity.setHeadPose(headPose);
 			entity.setInvulnerable(true);
 			entity.setVisible(false);
 			entity.setGravity(false);
-			entity.getEquipment().setHelmet(new ItemStack(material));
+			entity.getEquipment().setHelmet(new ItemStack(headMaterial));
 			entity.setMetadata(CoreMethods.NO_INTERACTION_KEY, new FixedMetadataValue(Hyperion.getPlugin(), ""));
 		});
-
 		expirationTime = System.currentTimeMillis() + delay;
 		ability = abilityInstance;
 		instances.put(armorStand, this);
 		tasQueue.add(this);
+		particles = showRemoveParticles;
+		showParticles(true);
+	}
+
+	public void showParticles(boolean show) {
+		if (show) {
+			ParticleEffect.BLOCK_CRACK.display(armorStand.getEyeLocation().add(0, 0.2, 0), 4, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 8, ThreadLocalRandom.current().nextFloat() / 4, 0, headMaterial.createBlockData());
+			ParticleEffect.BLOCK_DUST.display(armorStand.getEyeLocation().add(0, 0.2, 0), 6, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 8, ThreadLocalRandom.current().nextFloat() / 4, 0, headMaterial.createBlockData());
+		}
 	}
 
 	public CoreAbility getAbility() {
@@ -88,8 +98,8 @@ public class TempArmorStand {
 		return instances.get(as);
 	}
 
-	public static List<TempArmorStand> getFromAbility(CoreAbility ability) {
-		return instances.values().stream().filter(tas -> tas.getAbility().equals(ability)).collect(Collectors.toList());
+	public static Set<TempArmorStand> getFromAbility(CoreAbility ability) {
+		return instances.values().stream().filter(tas -> tas.getAbility().equals(ability)).collect(Collectors.toSet());
 	}
 
 	public static void manage() {
@@ -107,6 +117,7 @@ public class TempArmorStand {
 
 	public void remove() {
 		instances.remove(armorStand);
+		showParticles(particles);
 		armorStand.remove();
 	}
 

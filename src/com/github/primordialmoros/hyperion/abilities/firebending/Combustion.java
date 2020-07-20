@@ -23,7 +23,6 @@ import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.FastMath;
 import com.github.primordialmoros.hyperion.util.MaterialCheck;
-import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
@@ -33,6 +32,7 @@ import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
+import com.projectkorra.projectkorra.util.TempBlock;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -182,7 +182,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 				if (MaterialCheck.isAir(l.getBlock()) || MaterialCheck.isUnbreakable(l.getBlock()) || l.getBlock().isLiquid()) {
 					continue;
 				}
-				new RegenTempBlock(l.getBlock(), Material.AIR.createBlockData(), regenBlockTime + ThreadLocalRandom.current().nextInt(1000));
+				new TempBlock(l.getBlock(), Material.AIR.createBlockData(), regenBlockTime + ThreadLocalRandom.current().nextInt(1000));
 				if (ThreadLocalRandom.current().nextInt(3) == 0 && l.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
 					l.getBlock().setType(Material.FIRE);
 				}

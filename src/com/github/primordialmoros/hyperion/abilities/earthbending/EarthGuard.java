@@ -21,13 +21,17 @@ package com.github.primordialmoros.hyperion.abilities.earthbending;
 
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
-import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.util.ParticleEffect;
+import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -90,7 +94,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 				resistance = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthGuard.BaseResistance") - 1;
 				playEarthbendingSound(sourceBlock.getLocation());
 			}
-			new RegenTempBlock(sourceBlock, Material.AIR.createBlockData(), ThreadLocalRandom.current().nextInt(2500, 5000) + duration);
+			new TempBlock(sourceBlock, Material.AIR.createBlockData(), ThreadLocalRandom.current().nextInt(2500, 5000) + duration);
 			armorFallingBlock = new BendingFallingBlock(sourceBlock.getLocation().add(0.5, 0, 0.5), blockData, new Vector(0, 0.2, 0), this, false);
 			bPlayer.addCooldown(this);
 			start();

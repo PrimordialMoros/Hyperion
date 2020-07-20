@@ -21,7 +21,6 @@ package com.github.primordialmoros.hyperion.abilities.earthbending;
 
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
-import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.LavaAbility;
@@ -159,9 +158,9 @@ public class LavaDisk extends LavaAbility implements AddonAbility {
 		}
 		if (meltables.contains(l.getBlock().getType().name()) || isEarthbendable(l.getBlock())) {
 			if (lavaTrail) {
-				new RegenTempBlock(l.getBlock(), Material.LAVA.createBlockData(d -> ((Levelled) d).setLevel(4)), regen);
+				new TempBlock(l.getBlock(), Material.LAVA.createBlockData(d -> ((Levelled) d).setLevel(4)), regen);
 			} else {
-				new RegenTempBlock(l.getBlock(), Material.AIR.createBlockData(), regen);
+				new TempBlock(l.getBlock(), Material.AIR.createBlockData(), regen);
 			}
 			ParticleEffect.LAVA.display(location, 1, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.2F);
 		}
@@ -206,7 +205,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility {
 			block = getEarthSourceBlock(4);
 		}
 		if (block != null && !isWater(block.getRelative(BlockFace.UP))) {
-			new RegenTempBlock(block, Material.LAVA.createBlockData(d -> ((Levelled) d).setLevel(4)), regen);
+			new TempBlock(block, Material.LAVA.createBlockData(d -> ((Levelled) d).setLevel(4)), regen);
 			location = block.getLocation();
 			return true;
 		}

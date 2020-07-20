@@ -22,7 +22,6 @@ package com.github.primordialmoros.hyperion.abilities.waterbending;
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
-import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.github.primordialmoros.hyperion.util.TempArmorStand;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
@@ -35,7 +34,7 @@ import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
-import com.projectkorra.projectkorra.util.ParticleEffect;
+import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import com.projectkorra.projectkorra.waterbending.ice.PhaseChange;
 import org.bukkit.Location;
@@ -115,7 +114,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 				} else {
 					if (target.getLocation().distanceSquared(endLocation) < 25) {
 						endLocation = target.getLocation().clone();
-						direction = CoreMethods.calculateFlatVector(location, endLocation);
+						direction = CoreMethods.calculateFlatVector(sourceBlock.getLocation(), endLocation);
 					} else {
 						locked = false;
 					}
@@ -141,7 +140,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 	}
 
 	private void advanceLocation() {
-		location = location.add(direction.clone().multiply(0.4));
+		location.add(direction.clone().multiply(0.4));
 		Block b = location.getBlock();
 		if (!isValid(b)) {
 			if (isValid(location.getBlock().getRelative(BlockFace.UP))) {
@@ -215,13 +214,11 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 
 	private void summonTrailBlock(final Location spawnLoc) {
 		if (isWater(spawnLoc.getBlock())) {
-			PhaseChange.getFrozenBlocksMap().put(new RegenTempBlock(spawnLoc.getBlock(), Material.ICE.createBlockData(), 5000), player);
+			PhaseChange.getFrozenBlocksMap().put(new TempBlock(spawnLoc.getBlock(), Material.ICE.createBlockData(), 5000), player);
 		}
 		double x = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
 		double z = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
-		TempArmorStand tas = new TempArmorStand(this, spawnLoc.clone().add(0.5 + x, -0.75, 0.5 + z), Material.PACKED_ICE, 1400);
-		ParticleEffect.BLOCK_CRACK.display(tas.getArmorStand().getEyeLocation().add(0, 0.2, 0), 6, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 8, ThreadLocalRandom.current().nextFloat() / 4, 0, Material.ICE.createBlockData());
-		ParticleEffect.BLOCK_DUST.display(tas.getArmorStand().getEyeLocation().add(0, 0.2, 0), 8, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 8, ThreadLocalRandom.current().nextFloat() / 4, 0, Material.ICE.createBlockData());
+		new TempArmorStand(this, spawnLoc.clone().add(0.5 + x, -0.75, 0.5 + z), Material.PACKED_ICE, 1400);
 	}
 
 	@Override

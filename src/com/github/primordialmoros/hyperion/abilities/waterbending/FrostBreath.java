@@ -23,7 +23,6 @@ import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
 import com.github.primordialmoros.hyperion.util.MaterialCheck;
-import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
@@ -35,17 +34,28 @@ import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
+import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import com.projectkorra.projectkorra.waterbending.ice.PhaseChange;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class FrostBreath extends IceAbility implements AddonAbility {
@@ -169,7 +179,7 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 					if (!isWater(b) || GeneralMethods.isRegionProtectedFromBuild(this.player, b.getLocation())) {
 						continue;
 					}
-					new RegenTempBlock(b, Material.ICE.createBlockData(), frostDuration);
+					new TempBlock(b, Material.ICE.createBlockData(), frostDuration);
 					break;
 				}
 			}
@@ -262,7 +272,7 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 				final Block testBlock = testLoc.getBlock();
 				if (MaterialCheck.isLeaf(testBlock)) testBlock.breakNaturally();
 				if (MaterialCheck.isAir(testBlock) || isWater(testBlock)) {
-					PhaseChange.getFrozenBlocksMap().put(new RegenTempBlock(testBlock, Material.ICE.createBlockData(), ThreadLocalRandom.current().nextInt(1000) + frostDuration), player);
+					PhaseChange.getFrozenBlocksMap().put(new TempBlock(testBlock, Material.ICE.createBlockData(), ThreadLocalRandom.current().nextInt(1000) + frostDuration), player);
 				}
 			}
 		}

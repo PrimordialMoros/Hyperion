@@ -1,8 +1,6 @@
 # Hyperion
 Addon plugin for ProjectKorra
 
-Includes BendingBoard
-
 ## Abilities
 ### Earth
 * EarthCling (passive)
@@ -17,7 +15,6 @@ Includes BendingBoard
 ### Fire
 * Bolt
 * Combustion
-* Fireball
 * FireWave (combo)
 ### Water
 * FrostBreath

@@ -25,23 +25,30 @@ import com.github.primordialmoros.hyperion.abilities.earthbending.EarthShot;
 import com.github.primordialmoros.hyperion.abilities.earthbending.MetalHook;
 import com.github.primordialmoros.hyperion.abilities.firebending.Bolt;
 import com.github.primordialmoros.hyperion.abilities.firebending.Bolt.BoltInfo;
-import com.github.primordialmoros.hyperion.board.BendingBoardManager;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
-import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.ability.CoreAbility;
-import com.projectkorra.projectkorra.event.*;
+import com.projectkorra.projectkorra.event.BendingReloadEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.LightningStrike;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.ItemMergeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -67,58 +74,18 @@ public class CoreListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onArrowHit(final ProjectileHitEvent event) {
-		if (event.getHitBlock() == null) {
-			return;
-		}
-		if (event.getEntity() instanceof Arrow && event.getEntity().hasMetadata(CoreMethods.HOOK_KEY)) {
-			MetalHook hook = (MetalHook) event.getEntity().getMetadata(CoreMethods.HOOK_KEY).get(0).value();
+		if (event.getHitBlock() != null && event.getEntity() instanceof Arrow && event.getEntity().hasMetadata(CoreMethods.HOOK_KEY)) {
+			final MetalHook hook = (MetalHook) event.getEntity().getMetadata(CoreMethods.HOOK_KEY).get(0).value();
 			if (hook != null) hook.setBlockHit(event.getHitBlock());
 		}
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onBendingElementChange(final PlayerChangeElementEvent event) {
-		final Player player = event.getTarget();
-		final BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-		if (bPlayer == null) return;
-
-		if (event.getResult() == PlayerChangeElementEvent.Result.REMOVE || event.getResult() == PlayerChangeElementEvent.Result.PERMAREMOVE) {
-			BendingBoardManager.updateAllSlots(player);
-		}
-	}
-
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onBendingSubElementChange(final PlayerChangeSubElementEvent event) {
-		final Player player = event.getTarget();
-		final BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-		if (bPlayer == null) return;
-
-		if (event.getResult() == PlayerChangeSubElementEvent.Result.REMOVE || event.getResult() == PlayerChangeSubElementEvent.Result.PERMAREMOVE) {
-			BendingBoardManager.updateAllSlots(player);
-		}
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onBindChange(final PlayerBindChangeEvent event) {
-		final Player player = event.getPlayer();
-		if (player == null) return;
-		BendingBoardManager.updateBoard(player, event.getAbility(), false, event.getSlot());
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onCooldownChange(final PlayerCooldownChangeEvent event) {
-		final Player player = event.getPlayer();
-		if (player == null) return;
-		BendingBoardManager.updateBoard(player, event.getAbility(), event.getResult().equals(PlayerCooldownChangeEvent.Result.ADDED), 0);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onLightningStrike(final EntitySpawnEvent event) {
 		if (event.getEntity() instanceof LightningStrike && event.getEntity().hasMetadata(CoreMethods.BOLT_KEY)) {
-			BoltInfo boltInfo = (BoltInfo) event.getEntity().getMetadata(CoreMethods.BOLT_KEY).get(0).value();
+			final BoltInfo boltInfo = (BoltInfo) event.getEntity().getMetadata(CoreMethods.BOLT_KEY).get(0).value();
 			if (boltInfo != null) {
-				if (!Bolt.isNearbyChannel(boltInfo.getLocation(), boltInfo.getAbility().getPlayer()))
-					Bolt.dealDamage(boltInfo);
+				if (!Bolt.isNearbyChannel(boltInfo.getLocation(), boltInfo.getAbility().getPlayer())) Bolt.dealDamage(boltInfo);
 			}
 		}
 	}
@@ -126,9 +93,8 @@ public class CoreListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof Arrow && event.getDamager().hasMetadata(CoreMethods.HOOK_KEY)) {
-			final Arrow arrow = (Arrow) event.getDamager();
 			event.setCancelled(true);
-			MetalHook hook = (MetalHook) event.getDamager().getMetadata(CoreMethods.HOOK_KEY).get(0).value();
+			final MetalHook hook = (MetalHook) event.getDamager().getMetadata(CoreMethods.HOOK_KEY).get(0).value();
 			if (hook != null) hook.remove();
 		}
 	}
@@ -163,9 +129,9 @@ public class CoreListener implements Listener {
 		}
 		final PlayerInventory inventory = (PlayerInventory) event.getClickedInventory();
 		if (inventory.getHolder() instanceof Player) {
-			Player player = ((Player) inventory.getHolder()).getPlayer();
+			final Player player = ((Player) inventory.getHolder()).getPlayer();
 			if (CoreAbility.hasAbility(player, EarthGuard.class)) {
-				EarthGuard guard = CoreAbility.getAbility(player, EarthGuard.class);
+				final EarthGuard guard = CoreAbility.getAbility(player, EarthGuard.class);
 				if (guard.hasActiveArmor()) event.setCancelled(true);
 			}
 		}
@@ -182,38 +148,24 @@ public class CoreListener implements Listener {
 	public void onPlayerDeath(final PlayerDeathEvent event) {
 		if (CoreAbility.hasAbility(event.getEntity(), EarthGuard.class)) {
 			final EarthGuard guard = CoreAbility.getAbility(event.getEntity(), EarthGuard.class);
-			if (!guard.hasActiveArmor()) {
-				return;
+			if (guard.hasActiveArmor()) {
+				event.getDrops().removeIf(item -> guard.getArmor(false).contains(item));
+				event.getDrops().addAll(guard.getArmor(true));
+				guard.remove();
 			}
-			event.getDrops().removeIf(item -> guard.getArmor(false).contains(item));
-			event.getDrops().addAll(guard.getArmor(true));
-			guard.remove();
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onBendingPlayerCreation(final BendingPlayerCreationEvent event) {
-		final Player player = event.getBendingPlayer().getPlayer();
-		BendingBoardManager.canUseScoreboard(player);
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerLogout(final PlayerQuitEvent event) {
-		BendingBoardManager.removeInstance(event.getPlayer());
 		if (CoreAbility.hasAbility(event.getPlayer(), EarthGuard.class)) {
-			EarthGuard guard = CoreAbility.getAbility(event.getPlayer(), EarthGuard.class);
+			final EarthGuard guard = CoreAbility.getAbility(event.getPlayer(), EarthGuard.class);
 			if (guard.hasActiveArmor()) guard.remove();
 		}
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerSlotChange(final PlayerItemHeldEvent event) {
-		if (event.getPreviousSlot() == event.getNewSlot()) return;
-		BendingBoardManager.changeActiveSlot(event.getPlayer(), event.getPreviousSlot(), event.getNewSlot());
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPKReload(final BendingReloadEvent event) {
-		Bukkit.getScheduler().runTaskLater(Hyperion.getPlugin(), Hyperion::reload,  4);
+		Bukkit.getScheduler().runTaskLater(Hyperion.getPlugin(), Hyperion::reload,  1);
 	}
 }

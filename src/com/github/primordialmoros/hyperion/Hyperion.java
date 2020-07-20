@@ -19,8 +19,6 @@
 
 package com.github.primordialmoros.hyperion;
 
-import com.github.primordialmoros.hyperion.board.BendingBoardManager;
-import com.github.primordialmoros.hyperion.commands.BoardCommand;
 import com.github.primordialmoros.hyperion.commands.HyperionCommand;
 import com.github.primordialmoros.hyperion.configuration.ConfigManager;
 import com.github.primordialmoros.hyperion.listeners.AbilityListener;
@@ -49,8 +47,6 @@ public class Hyperion extends JavaPlugin {
 		new MetricsLite(this, 8212);
 		new ConfigManager();
 		new HyperionCommand();
-		new BoardCommand();
-		BendingBoardManager.setup();
 		CoreMethods.loadAbilities();
 
 		getServer().getPluginManager().registerEvents(new AbilityListener(), this);
@@ -63,7 +59,6 @@ public class Hyperion extends JavaPlugin {
 	public void onDisable() {
 		BendingFallingBlock.removeAll();
 		TempArmorStand.removeAll();
-		BendingBoardManager.saveChanges();
 		getServer().getScheduler().cancelTasks(this);
 	}
 
@@ -71,7 +66,6 @@ public class Hyperion extends JavaPlugin {
 		Hyperion.getPlugin().reloadConfig();
 		BendingFallingBlock.removeAll();
 		TempArmorStand.removeAll();
-		BendingBoardManager.reload();
 		CoreMethods.loadAbilities();
 		getLog().info("Hyperion Reloaded.");
 	}
