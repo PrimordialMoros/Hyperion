@@ -35,7 +35,7 @@ public class ConfigManager {
 		config.addDefault("EnableCollisions", true);
 
 		config.addDefault("Abilities.Earth.EarthLine.Enabled", true);
-		config.addDefault("Abilities.Earth.EarthLine.Description", "Tap sneak while looking at an earthbendable block on the ground and then left click in a direction to launch a narrow line of earth towards your target to deal damage and knock them back. Additionally, you can hold sneak to control the direction of the line. Left clicking will cause spikes to erupt at the line's current location. Right click instead to imprison your target without dealing damage.");
+		config.addDefault("Abilities.Earth.EarthLine.Description", "Tap sneak while looking at an earthbendable block on the ground and then left click in a direction to launch a narrow line of earth towards your target to deal damage and knock them back. Additionally, you can hold sneak to control the direction of the line. Left clicking will cause spikes to erupt at the line's current location. Right click (you need an item in your offhand for right click to be detected if you are targeting air) instead to imprison your target without dealing damage.");
 		config.addDefault("Abilities.Earth.EarthLine.Damage", 3.0);
 		config.addDefault("Abilities.Earth.EarthLine.Cooldown", 3000);
 		config.addDefault("Abilities.Earth.EarthLine.Range", 24);
@@ -51,7 +51,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthShot.Cooldown", 1500);
 		config.addDefault("Abilities.Earth.EarthShot.Range", 60);
 		config.addDefault("Abilities.Earth.EarthShot.PrepareRange", 6);
-		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.Enabled", true);
+		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.AllowConvert", true);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.DamageModifier", 2.0);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.PrepareTime", 1500);
 

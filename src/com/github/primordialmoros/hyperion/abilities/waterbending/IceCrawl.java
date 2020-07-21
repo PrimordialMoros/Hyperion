@@ -88,8 +88,8 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 		prepareRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceCrawl.PrepareRange");
 		duration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceCrawl.FreezeDuration");
 
-		damage = getNightFactor(damage, player.getWorld());
 		range = (int) getNightFactor(range, player.getWorld());
+		prepareRange = (int) getNightFactor(prepareRange, player.getWorld());
 		duration = (long) getNightFactor(duration, player.getWorld());
 
 		launched = false;
@@ -177,7 +177,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
 					continue;
 				}
-				DamageHandler.damageEntity(entity, damage, this);
+				DamageHandler.damageEntity(entity, getNightFactor(damage, player.getWorld()), this);
 				if (entity.isValid()) {
 					final MovementHandler mh = new MovementHandler((LivingEntity) entity, CoreAbility.getAbility(IceCrawl.class));
 					mh.stopWithDuration(duration / 50, Element.ICE.getColor() + "* Frozen *");

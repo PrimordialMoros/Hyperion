@@ -80,7 +80,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		metal = false;
 		gold = false;
 
-		Block sourceBlock = getTargetEarthBlock(selectRange);
+		final Block sourceBlock = getTargetEarthBlock(selectRange);
 		if (isEarthbendable(sourceBlock)) {
 			blockData = sourceBlock.getBlockData().clone();
 			if (isMetal(sourceBlock)) {
