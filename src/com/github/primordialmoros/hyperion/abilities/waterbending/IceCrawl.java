@@ -22,6 +22,7 @@ package com.github.primordialmoros.hyperion.abilities.waterbending;
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
+import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.github.primordialmoros.hyperion.util.TempArmorStand;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
@@ -34,7 +35,6 @@ import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
-import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import com.projectkorra.projectkorra.waterbending.ice.PhaseChange;
 import org.bukkit.Location;
@@ -214,7 +214,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 
 	private void summonTrailBlock(final Location spawnLoc) {
 		if (isWater(spawnLoc.getBlock())) {
-			PhaseChange.getFrozenBlocksMap().put(new TempBlock(spawnLoc.getBlock(), Material.ICE.createBlockData(), 5000), player);
+			PhaseChange.getFrozenBlocksMap().put(new RegenTempBlock(spawnLoc.getBlock(), Material.ICE.createBlockData(), 5000), player);
 		}
 		double x = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
 		double z = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);

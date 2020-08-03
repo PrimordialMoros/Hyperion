@@ -23,6 +23,7 @@ import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.abilities.waterbending.IceCrawl;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.MaterialCheck;
+import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.ComboAbility;
@@ -123,9 +124,9 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 			return;
 		}
 		String matName = block.getType().name();
-		TempBlock regenBlock = new TempBlock(block, Material.PACKED_ICE.createBlockData(), duration);
+		TempBlock regenBlock = new RegenTempBlock(block, Material.PACKED_ICE.createBlockData(), duration);
 		if (!matName.equals(Material.WATER.name())) {
-			regenBlock.setRevertTask(() -> new TempBlock(block, Material.AIR.createBlockData(), regenDelay));
+			regenBlock.setRevertTask(() -> new RegenTempBlock(block, Material.AIR.createBlockData(), regenDelay));
 		}
 		PhaseChange.getFrozenBlocksMap().put(regenBlock, player);
 		blocks.add(block);

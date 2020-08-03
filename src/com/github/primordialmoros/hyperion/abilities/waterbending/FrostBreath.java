@@ -23,6 +23,7 @@ import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
 import com.github.primordialmoros.hyperion.util.MaterialCheck;
+import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
@@ -34,7 +35,6 @@ import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
-import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import com.projectkorra.projectkorra.waterbending.ice.PhaseChange;
 import org.bukkit.Color;
@@ -179,7 +179,7 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 					if (!isWater(b) || GeneralMethods.isRegionProtectedFromBuild(this.player, b.getLocation())) {
 						continue;
 					}
-					new TempBlock(b, Material.ICE.createBlockData(), frostDuration);
+					new RegenTempBlock(b, Material.ICE.createBlockData(), frostDuration);
 					break;
 				}
 			}
@@ -272,7 +272,7 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 				final Block testBlock = testLoc.getBlock();
 				if (MaterialCheck.isLeaf(testBlock)) testBlock.breakNaturally();
 				if (MaterialCheck.isAir(testBlock) || isWater(testBlock)) {
-					PhaseChange.getFrozenBlocksMap().put(new TempBlock(testBlock, Material.ICE.createBlockData(), ThreadLocalRandom.current().nextInt(1000) + frostDuration), player);
+					PhaseChange.getFrozenBlocksMap().put(new RegenTempBlock(testBlock, Material.ICE.createBlockData(), ThreadLocalRandom.current().nextInt(1000) + frostDuration), player);
 				}
 			}
 		}
