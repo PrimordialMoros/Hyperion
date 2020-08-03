@@ -19,6 +19,7 @@
 
 package com.github.primordialmoros.hyperion.listeners;
 
+import com.github.primordialmoros.hyperion.abilities.airbending.Evade;
 import com.github.primordialmoros.hyperion.abilities.earthbending.EarthGlove;
 import com.github.primordialmoros.hyperion.abilities.earthbending.EarthGuard;
 import com.github.primordialmoros.hyperion.abilities.earthbending.EarthGuardWall;
@@ -35,6 +36,7 @@ import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.PKListener;
 import com.projectkorra.projectkorra.ability.AddonAbility;
+import com.projectkorra.projectkorra.ability.AirAbility;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.FireAbility;
@@ -123,7 +125,11 @@ public class AbilityListener implements Listener {
 			if (!bPlayer.canCurrentlyBendWithWeapons()) {
 				return;
 			}
-			if (coreAbility instanceof EarthAbility && bPlayer.isElementToggled(Element.EARTH)) {
+			if (coreAbility instanceof AirAbility && bPlayer.isElementToggled(Element.AIR)) {
+				if (abilityName.equalsIgnoreCase("evade")) {
+					new Evade(player);
+				}
+			} else if (coreAbility instanceof EarthAbility && bPlayer.isElementToggled(Element.EARTH)) {
 				if (abilityName.equalsIgnoreCase("earthline")) {
 					EarthLine.shootLine(player);
 				} else if (abilityName.equalsIgnoreCase("earthshot")) {

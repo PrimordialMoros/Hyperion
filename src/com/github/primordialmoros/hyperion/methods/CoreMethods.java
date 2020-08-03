@@ -28,12 +28,14 @@ import com.github.primordialmoros.hyperion.abilities.earthbending.MetalHook;
 import com.github.primordialmoros.hyperion.abilities.firebending.Combustion;
 import com.github.primordialmoros.hyperion.abilities.waterbending.FrostBreath;
 import com.github.primordialmoros.hyperion.util.FastMath;
+import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ProjectKorra;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
+import com.projectkorra.projectkorra.board.BendingBoardManager;
 import com.projectkorra.projectkorra.firebending.FireShield;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import org.bukkit.Location;
@@ -147,6 +149,16 @@ public class CoreMethods {
 
 	public static void loadAbilities() {
 		CoreAbility.registerPluginAbilities(Hyperion.getPlugin(), "com.github.primordialmoros.hyperion.abilities");
+
+		if (Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthGlove.Enabled")) {
+			BendingBoardManager.addCooldownToTrack(EarthGlove.getCooldownForSide(true), Element.EARTH.getColor());
+			BendingBoardManager.addCooldownToTrack(EarthGlove.getCooldownForSide(false), Element.EARTH.getColor());
+		}
+
+		if (Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.Enabled")) {
+			BendingBoardManager.addCooldownToTrack("EarthPrison", Element.EARTH.getColor());
+		}
+
 		if (Hyperion.getPlugin().getConfig().getBoolean("EnableCollisions")) setupCollisions();
 	}
 

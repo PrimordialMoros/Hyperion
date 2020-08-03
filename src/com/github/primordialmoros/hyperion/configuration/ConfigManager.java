@@ -34,6 +34,17 @@ public class ConfigManager {
 
 		config.addDefault("EnableCollisions", true);
 
+		config.addDefault("Abilities.Air.Evade.Enabled", true);
+		config.addDefault("Abilities.Air.Evade.Description", "As an airbender you can manipulate the streams of air around you quickly roll and evade potential attacks. Left click to use, the direction of your evasive maneuver depends on whether you are looking up or down.");
+		config.addDefault("Abilities.Air.Evade.Cooldown", 1000);
+
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.Enabled", true);
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.Description", "Upgrade your airscooter to an airwheel that deals damage and knocks back nearby entities.");
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.Damage", 2.0);
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.Knockback", 1.5);
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.Cooldown", 15000);
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.AffectCooldown", 750);
+
 		config.addDefault("Abilities.Earth.EarthLine.Enabled", true);
 		config.addDefault("Abilities.Earth.EarthLine.Description", "Tap sneak while looking at an earthbendable block on the ground and then left click in a direction to launch a narrow line of earth towards your target to deal damage and knock them back. Additionally, you can hold sneak to control the direction of the line. Left clicking will cause spikes to erupt at the line's current location. Right click (you need an item in your offhand for right click to be detected if you are targeting air) instead to imprison your target without dealing damage.");
 		config.addDefault("Abilities.Earth.EarthLine.Damage", 3.0);

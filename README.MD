@@ -2,6 +2,9 @@
 Addon plugin for ProjectKorra
 
 ## Abilities
+### Air
+* AirWheel (combo)
+* Evade
 ### Earth
 * EarthCling (passive)
 * EarthGlove
