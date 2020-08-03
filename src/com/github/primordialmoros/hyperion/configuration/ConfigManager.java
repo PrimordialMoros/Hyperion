@@ -22,40 +22,11 @@ package com.github.primordialmoros.hyperion.configuration;
 import com.github.primordialmoros.hyperion.Hyperion;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-
-import java.io.File;
-import java.io.IOException;
 
 public class ConfigManager {
-	public static FileConfiguration boardConfig;
-	public static String boardFileName;
 
 	public ConfigManager() {
 		setupMainConfig();
-
-		boardFileName = Hyperion.getPlugin().getDataFolder() + File.separator + "board.yml";
-		File boardFile = new File(boardFileName);
-		try {
-			if (boardFile.createNewFile()) {
-				Hyperion.getLog().info("Generating new file for board.yml");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		boardConfig = YamlConfiguration.loadConfiguration(boardFile);
-		boardConfig.addDefault("Enabled", true);
-		boardConfig.addDefault("DisabledPlayers", new String[]{});
-		saveBoardConfig();
-	}
-
-	public static void saveBoardConfig() {
-		try {
-			boardConfig.options().copyDefaults(true);
-			boardConfig.save(boardFileName);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 
 	public void setupMainConfig() {
@@ -63,12 +34,27 @@ public class ConfigManager {
 
 		config.addDefault("EnableCollisions", true);
 
+		config.addDefault("Abilities.Air.Evade.Enabled", true);
+		config.addDefault("Abilities.Air.Evade.Description", "As an airbender you can manipulate the streams of air around you quickly roll and evade potential attacks. Left click to use, the direction of your evasive maneuver depends on whether you are looking up or down.");
+		config.addDefault("Abilities.Air.Evade.Cooldown", 1000);
+
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.Enabled", true);
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.Description", "Upgrade your airscooter to an airwheel that deals damage and knocks back nearby entities.");
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.Damage", 2.0);
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.Knockback", 1.5);
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.Cooldown", 15000);
+		config.addDefault("Abilities.Air.AirCombo.AirWheel.AffectCooldown", 750);
+
 		config.addDefault("Abilities.Earth.EarthLine.Enabled", true);
-		config.addDefault("Abilities.Earth.EarthLine.Description", "Tap sneak at an earthbendable block on the ground and then left click in a direction to launch a narrow line of earth towards your target to deal damage and knock them back. Additionally, you can hold sneak to control the direction of the line. Left clicking will cause spikes to erupt at the line's current location.");
+		config.addDefault("Abilities.Earth.EarthLine.Description", "Tap sneak while looking at an earthbendable block on the ground and then left click in a direction to launch a narrow line of earth towards your target to deal damage and knock them back. Additionally, you can hold sneak to control the direction of the line. Left clicking will cause spikes to erupt at the line's current location. Right click (you need an item in your offhand for right click to be detected if you are targeting air) instead to imprison your target without dealing damage.");
 		config.addDefault("Abilities.Earth.EarthLine.Damage", 3.0);
 		config.addDefault("Abilities.Earth.EarthLine.Cooldown", 3000);
 		config.addDefault("Abilities.Earth.EarthLine.Range", 24);
 		config.addDefault("Abilities.Earth.EarthLine.PrepareRange", 6);
+		config.addDefault("Abilities.Earth.EarthLine.Prison.Cooldown", 15000);
+		config.addDefault("Abilities.Earth.EarthLine.Prison.Duration", 3000);
+		config.addDefault("Abilities.Earth.EarthLine.Prison.Radius", 0.8);
+		config.addDefault("Abilities.Earth.EarthLine.Prison.Points", 8);
 
 		config.addDefault("Abilities.Earth.EarthShot.Enabled", true);
 		config.addDefault("Abilities.Earth.EarthShot.Description", "EarthShot is an offensive earth projectile move. Tap sneak while looking at a nearby earthbendable block and it will ascend to your eye height. Left click to launch your projectile. Once thrown, you can hold sneak to control its movement. If you are a Lavabender you can hold sneak while looking at your raised source to turn it into a more powerful MagmaShot!");
@@ -76,14 +62,14 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthShot.Cooldown", 1500);
 		config.addDefault("Abilities.Earth.EarthShot.Range", 60);
 		config.addDefault("Abilities.Earth.EarthShot.PrepareRange", 6);
-		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.Enabled", true);
+		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.AllowConvert", true);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.DamageModifier", 2.0);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.PrepareTime", 1500);
 
 		config.addDefault("Abilities.Earth.EarthGlove.Enabled", true);
-		config.addDefault("Abilities.Earth.EarthGlove.Description", "Dai Li agents use this technique for various purposes. Hold sneak and click to launch your glove and attempt to grab your target. If you continue holding sneak, the gloves will attempt to return to you. You can also redirect or destroy other players' gloves.");
+		config.addDefault("Abilities.Earth.EarthGlove.Description", "Dai Li agents use this technique for various purposes. Hold sneak and click to launch your glove and attempt to grab your target. If you continue holding sneak, the gloves will attempt to return to you. You can also destroy other players' gloves by tapping sneak while looking at them.");
 		config.addDefault("Abilities.Earth.EarthGlove.Damage", 1.0);
-		config.addDefault("Abilities.Earth.EarthGlove.Cooldown", 500);
+		config.addDefault("Abilities.Earth.EarthGlove.Cooldown", 5000);
 		config.addDefault("Abilities.Earth.EarthGlove.Range", 24);
 		config.addDefault("Abilities.Earth.EarthGlove.ClingPassive.Enabled", true);
 		config.addDefault("Abilities.Earth.EarthGlove.ClingPassive.Description", "EarthGloves can be used to either slow or stop your descend while opposing a wall made of earthbendable materials. Hold sneak to use.");
@@ -98,14 +84,6 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthGuard.MetalResistance", 3);
 		config.addDefault("Abilities.Earth.EarthGuard.WallDuration", 2000);
 		config.addDefault("Abilities.Earth.EarthGuard.WallCooldown", 3000);
-
-		config.addDefault("Abilities.Earth.EarthPrison.Enabled", true);
-		config.addDefault("Abilities.Earth.EarthPrison.Description", "Trap your target inside a prison of earth blocks.");
-		config.addDefault("Abilities.Earth.EarthPrison.Cooldown", 15000);
-		config.addDefault("Abilities.Earth.EarthPrison.Duration", 3000);
-		config.addDefault("Abilities.Earth.EarthPrison.Range", 8);
-		config.addDefault("Abilities.Earth.EarthPrison.Radius", 0.8);
-		config.addDefault("Abilities.Earth.EarthPrison.Points", 8);
 
 		final String[] meltable = {
 			Material.COBBLESTONE.name(),
@@ -168,12 +146,6 @@ public class ConfigManager {
 		config.addDefault("Abilities.Fire.Combustion.Power", 3);
 		config.addDefault("Abilities.Fire.Combustion.MisfireModifier", -1);
 		config.addDefault("Abilities.Fire.Combustion.RegenBlockTime", 15000);
-
-		config.addDefault("Abilities.Fire.Fireball.Enabled", true);
-		config.addDefault("Abilities.Fire.Fireball.Description", "Left click to shoot a maneuverable fireball at your target which also leaves a trail of fire!");
-		config.addDefault("Abilities.Fire.Fireball.Damage", 3.0);
-		config.addDefault("Abilities.Fire.Fireball.Cooldown", 3000);
-		config.addDefault("Abilities.Fire.Fireball.Range", 30);
 
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Enabled", true);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Description", "Master Jeong Jeong used this advanced technique to cast a great fire wave that grows in size while it advances forward.");

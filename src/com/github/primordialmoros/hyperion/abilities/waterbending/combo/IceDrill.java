@@ -40,7 +40,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -120,7 +124,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 			return;
 		}
 		String matName = block.getType().name();
-		RegenTempBlock regenBlock = new RegenTempBlock(block, Material.PACKED_ICE.createBlockData(), duration);
+		TempBlock regenBlock = new RegenTempBlock(block, Material.PACKED_ICE.createBlockData(), duration);
 		if (!matName.equals(Material.WATER.name())) {
 			regenBlock.setRevertTask(() -> new RegenTempBlock(block, Material.AIR.createBlockData(), regenDelay));
 		}
@@ -135,7 +139,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 		tip = origin.clone().add(direction.clone().multiply(maxLength));
 		final Location targetLocation = origin.clone().add(direction.clone().multiply(maxLength - 1));
 		int radius = (int) Math.ceil(0.2 * maxLength);
-		for (Location testLoc : GeneralMethods.getCircle(origin, radius, 1, false, true, 0)) {
+		for (Location testLoc : GeneralMethods.getCircle(origin, radius, 1, true, true, 0)) {
 			if (!GeneralMethods.isRegionProtectedFromBuild(this, testLoc) && (isWater(testLoc.getBlock()) || isIce(testLoc.getBlock()))) {
 				lines.add(CoreMethods.blockRayTrace(testLoc.getBlock(), targetLocation.getBlock()));
 			}

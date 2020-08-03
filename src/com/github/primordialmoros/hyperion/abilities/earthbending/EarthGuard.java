@@ -27,7 +27,11 @@ import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
-import org.bukkit.*;
+import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
@@ -76,7 +80,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		metal = false;
 		gold = false;
 
-		Block sourceBlock = getTargetEarthBlock(selectRange);
+		final Block sourceBlock = getTargetEarthBlock(selectRange);
 		if (isEarthbendable(sourceBlock)) {
 			blockData = sourceBlock.getBlockData().clone();
 			if (isMetal(sourceBlock)) {
@@ -203,6 +207,10 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		return formed;
 	}
 
+	public boolean isMetalArmor() {
+		return metal;
+	}
+
 	@Override
 	public boolean isEnabled() {
 		return Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthGuard.Enabled");
@@ -258,7 +266,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		if (armorFallingBlock != null) {
 			armorFallingBlock.remove();
 		}
-		if (!player.isDead() && player.isOnline() && formed) {
+		if (player.isValid() && player.isOnline() && formed) {
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 			if (!originalMode.equals(player.getGameMode())) {
 				for (ItemStack armorItem : oldArmor) {

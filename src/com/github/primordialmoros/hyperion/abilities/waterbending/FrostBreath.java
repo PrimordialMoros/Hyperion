@@ -21,27 +21,41 @@ package com.github.primordialmoros.hyperion.abilities.waterbending;
 
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
+import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
 import com.github.primordialmoros.hyperion.util.MaterialCheck;
 import com.github.primordialmoros.hyperion.util.RegenTempBlock;
+import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
+import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.IceAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
+import com.projectkorra.projectkorra.util.MovementHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import com.projectkorra.projectkorra.waterbending.ice.PhaseChange;
-import org.bukkit.*;
+import org.bukkit.Color;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.*;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class FrostBreath extends IceAbility implements AddonAbility {
@@ -178,9 +192,14 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
 					continue;
 				}
-				entity.setVelocity(new Vector());
 				DamageHandler.damageEntity(entity, getNightFactor(damage, player.getWorld()), this);
-				new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOW, (int) (frostDuration / 50), 3));
+				if (entity.isValid()) {
+					final MovementHandler mh = new MovementHandler((LivingEntity) entity, CoreAbility.getAbility(IceCrawl.class));
+					mh.stopWithDuration(frostDuration / 50, Element.ICE.getColor() + "* Frozen *");
+					new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0), Material.PACKED_ICE.createBlockData(), new Vector(), this, false, frostDuration);
+					new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOW, (int) (frostDuration / 50), 3));
+
+				}
 			}
 		}
 	}

@@ -20,9 +20,12 @@
 package com.github.primordialmoros.hyperion.methods;
 
 import com.github.primordialmoros.hyperion.Hyperion;
-import com.github.primordialmoros.hyperion.abilities.earthbending.*;
+import com.github.primordialmoros.hyperion.abilities.earthbending.EarthGlove;
+import com.github.primordialmoros.hyperion.abilities.earthbending.EarthLine;
+import com.github.primordialmoros.hyperion.abilities.earthbending.EarthShot;
+import com.github.primordialmoros.hyperion.abilities.earthbending.LavaDisk;
+import com.github.primordialmoros.hyperion.abilities.earthbending.MetalHook;
 import com.github.primordialmoros.hyperion.abilities.firebending.Combustion;
-import com.github.primordialmoros.hyperion.abilities.firebending.Fireball;
 import com.github.primordialmoros.hyperion.abilities.waterbending.FrostBreath;
 import com.github.primordialmoros.hyperion.util.FastMath;
 import com.projectkorra.projectkorra.GeneralMethods;
@@ -109,10 +112,6 @@ public class CoreMethods {
 	}
 
 	public static BlockIterator blockRayTrace(Block origin, Block target) {
-		if (!origin.getWorld().getName().equals(target.getWorld().getName()) || origin.equals(target)) {
-			return new BlockIterator(origin.getLocation());
-		}
-
 		final Vector OFFSET_VECTOR = new Vector(0.5, 0.5, 0.5);
 		final Vector originVector = origin.getLocation().toVector().add(OFFSET_VECTOR);
 		final Vector targetVector = target.getLocation().toVector().add(OFFSET_VECTOR);
@@ -120,7 +119,7 @@ public class CoreMethods {
 		final Vector direction = targetVector.clone().subtract(originVector);
 		final double length = target.getLocation().distance(origin.getLocation());
 
-		return new BlockIterator(target.getWorld(), originVector, direction, 0, NumberConversions.round(length));
+		return new BlockIterator(origin.getWorld(), originVector, direction, 0, NumberConversions.round(length));
 	}
 
 	public static boolean isAgainstWall(Player player, boolean earthOnly) {
@@ -148,8 +147,8 @@ public class CoreMethods {
 
 	public static void loadAbilities() {
 		CoreAbility.registerPluginAbilities(Hyperion.getPlugin(), "com.github.primordialmoros.hyperion.abilities");
-		boolean collisions = Hyperion.getPlugin().getConfig().getBoolean("EnableCollisions");
-		if (collisions) setupCollisions();
+
+		if (Hyperion.getPlugin().getConfig().getBoolean("EnableCollisions")) setupCollisions();
 	}
 
 	public static void setupCollisions() {
@@ -171,8 +170,6 @@ public class CoreMethods {
 		ProjectKorra.getCollisionInitializer().addLargeAbility(CoreAbility.getAbility(Combustion.class));
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(Combustion.class), CoreAbility.getAbility(FireShield.class), true, false));
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(Combustion.class), CoreAbility.getAbility(AirShield.class), true, false));
-
-		ProjectKorra.getCollisionInitializer().addSmallAbility(CoreAbility.getAbility(Fireball.class));
 
 		Hyperion.getLog().info("Registered collisions.");
 	}

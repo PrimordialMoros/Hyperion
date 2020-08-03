@@ -41,7 +41,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
@@ -187,10 +192,9 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 			if (!isTransparent(block)) {
 				continue;
 			}
-			ParticleEffect.FLAME.display(block.getLocation(), 3, 0.3F, 0.3F, 0.3F);
-			ParticleEffect.SMOKE_NORMAL.display(block.getLocation(), 1, 0.3F, 0.3F, 0.3F);
-
-			if (ThreadLocalRandom.current().nextInt(7) == 0) {
+			playFirebendingParticles(block.getLocation(), 3, 0.3, 0.3, 0.3);
+			ParticleEffect.SMOKE_NORMAL.display(block.getLocation(), 1, 0.3, 0.3, 0.3);
+			if (ThreadLocalRandom.current().nextInt(10) == 0) {
 				playFirebendingSound(block.getLocation());
 			}
 		}

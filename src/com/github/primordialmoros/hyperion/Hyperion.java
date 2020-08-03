@@ -19,14 +19,13 @@
 
 package com.github.primordialmoros.hyperion;
 
-import com.github.primordialmoros.hyperion.board.BendingBoardManager;
-import com.github.primordialmoros.hyperion.commands.BoardCommand;
 import com.github.primordialmoros.hyperion.commands.HyperionCommand;
 import com.github.primordialmoros.hyperion.configuration.ConfigManager;
 import com.github.primordialmoros.hyperion.listeners.AbilityListener;
 import com.github.primordialmoros.hyperion.listeners.CoreListener;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
+import com.github.primordialmoros.hyperion.util.MetricsLite;
 import com.github.primordialmoros.hyperion.util.TempArmorStand;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -45,10 +44,9 @@ public class Hyperion extends JavaPlugin {
 		version = getDescription().getVersion();
 		author = getDescription().getAuthors().get(0);
 
+		new MetricsLite(this, 8212);
 		new ConfigManager();
 		new HyperionCommand();
-		new BoardCommand();
-		BendingBoardManager.setup();
 		CoreMethods.loadAbilities();
 
 		getServer().getPluginManager().registerEvents(new AbilityListener(), this);
@@ -61,7 +59,6 @@ public class Hyperion extends JavaPlugin {
 	public void onDisable() {
 		BendingFallingBlock.removeAll();
 		TempArmorStand.removeAll();
-		BendingBoardManager.saveChanges();
 		getServer().getScheduler().cancelTasks(this);
 	}
 
@@ -69,7 +66,6 @@ public class Hyperion extends JavaPlugin {
 		Hyperion.getPlugin().reloadConfig();
 		BendingFallingBlock.removeAll();
 		TempArmorStand.removeAll();
-		BendingBoardManager.reload();
 		CoreMethods.loadAbilities();
 		getLog().info("Hyperion Reloaded.");
 	}
