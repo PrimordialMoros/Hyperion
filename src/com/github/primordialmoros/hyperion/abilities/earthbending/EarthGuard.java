@@ -207,6 +207,10 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		return formed;
 	}
 
+	public boolean isMetalArmor() {
+		return metal;
+	}
+
 	@Override
 	public boolean isEnabled() {
 		return Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthGuard.Enabled");

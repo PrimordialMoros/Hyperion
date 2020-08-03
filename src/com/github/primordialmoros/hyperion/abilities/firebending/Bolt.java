@@ -20,16 +20,19 @@
 package com.github.primordialmoros.hyperion.abilities.firebending;
 
 import com.github.primordialmoros.hyperion.Hyperion;
+import com.github.primordialmoros.hyperion.abilities.earthbending.EarthGuard;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.MaterialCheck;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
+import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.LightningAbility;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
@@ -190,6 +193,7 @@ public class Bolt extends LightningAbility implements AddonAbility {
 		boolean enhanced = isWater(strikeLocation.getBlock());
 
 		for (final Entity e : GeneralMethods.getEntitiesAroundPoint(strikeLocation, 5)) {
+			if (e instanceof Creeper) ((Creeper) e).setPowered(true);
 			if (e instanceof LivingEntity && !(e instanceof ArmorStand)) {
 				if ((e instanceof Player && Commands.invincible.contains((e).getName()))) {
 					continue;
@@ -197,8 +201,15 @@ public class Bolt extends LightningAbility implements AddonAbility {
 				final double distance = e.getLocation().distance(strikeLocation);
 				if (distance > 5) continue;
 
-				double calculatedDamage = info.getDamage() - (distance / 2);
-				info.getAbility().dealDamage((LivingEntity) e, enhanced ? calculatedDamage * 2 : calculatedDamage);
+				boolean vulnerable = enhanced;
+				if (e instanceof Player && CoreAbility.hasAbility((Player) e, EarthGuard.class)) {
+					final EarthGuard armorAbility = CoreAbility.getAbility((Player) e, EarthGuard.class);
+					if (armorAbility.hasActiveArmor() && armorAbility.isMetalArmor()) vulnerable = true;
+				}
+
+				double baseDamage = vulnerable ? info.getDamage() * 2 : info.getDamage();
+				double distanceModifier = enhanced ? distance / 3 : distance / 2;
+				info.getAbility().dealDamage((LivingEntity) e, (distance < 1.5) ? baseDamage : baseDamage - distanceModifier);
 				AirAbility.breakBreathbendingHold(e);
 			}
 		}
