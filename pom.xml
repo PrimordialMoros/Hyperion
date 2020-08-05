@@ -47,7 +47,7 @@
             <artifactId>projectkorra</artifactId>
             <version>1.8.9</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/ProjectKorra-1.8.9.jar</systemPath>
+            <systemPath>${project.basedir}/lib/ProjectKorra-1.9.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>

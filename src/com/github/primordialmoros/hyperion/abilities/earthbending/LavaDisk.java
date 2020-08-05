@@ -21,10 +21,14 @@ package com.github.primordialmoros.hyperion.abilities.earthbending;
 
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
-import com.github.primordialmoros.hyperion.util.RegenTempBlock;
+import com.github.primordialmoros.hyperion.util.MaterialCheck;
+import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.LavaAbility;
+import com.projectkorra.projectkorra.ability.MultiAbility;
+import com.projectkorra.projectkorra.ability.util.MultiAbilityManager;
+import com.projectkorra.projectkorra.ability.util.MultiAbilityManager.MultiAbilityInfoSub;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -33,7 +37,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -41,26 +44,27 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class LavaDisk extends LavaAbility implements AddonAbility {
-	private static List<String> meltables = new ArrayList<>();
+public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility {
+	private enum LavaDiskMode {
+		FOLLOW, ADVANCE, RETURN, ROTATE, SHATTER
+	}
+
+	private static Set<String> materials;
 	private Location location;
-	private Vector direction;
-	private long time;
-	private boolean isTraveling;
-	private int recallCount;
-	private int angle;
+	private LavaDiskMode mode;
+
 	private double damage;
 	private long cooldown;
-	private long duration;
+	private int range;
 	private long regen;
-	private boolean lavaOnly;
 	private boolean passHit;
-	private boolean damageBlocks;
-	private boolean lavaTrail;
-	private int recall;
+
+	private double distance;
+	private int angle;
 
 	public LavaDisk(Player player) {
 		super(player);
@@ -71,69 +75,81 @@ public class LavaDisk extends LavaAbility implements AddonAbility {
 
 		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.LavaDisk.Damage");
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.LavaDisk.Cooldown");
-		duration = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.LavaDisk.Duration");
+		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.LavaDisk.Range");
 		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.LavaDisk.Regen");
-		recall = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.LavaDisk.RecallLimit") - 1;
-		lavaOnly = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.LavaDisk.LavaSourceOnly");
 		passHit = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.LavaDisk.PassThroughEntities");
-		damageBlocks = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.LavaDisk.BlockDamage");
-		lavaTrail = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.LavaDisk.LavaTrail");
-		meltables = Hyperion.getPlugin().getConfig().getStringList("Abilities.Earth.LavaDisk.AdditionalMeltableBlocks");
+		materials = new HashSet<>(Hyperion.getPlugin().getConfig().getStringList("Abilities.Earth.LavaDisk.AdditionalMeltableBlocks"));
 
-		time = System.currentTimeMillis();
-		isTraveling = false;
+		angle = 0;
+		mode = LavaDiskMode.FOLLOW;
 
 		if (prepare()) {
+			MultiAbilityManager.bindMultiAbility(player, "LavaDisk");
 			start();
 		}
 	}
 
 	@Override
 	public void progress() {
-		if (!bPlayer.canBendIgnoreCooldowns(this) || isWater(location.getBlock())) {
+		if (!bPlayer.canBendIgnoreBindsCooldowns(this) || !isLocationSafe() || location.distanceSquared(player.getEyeLocation()) > range * range) {
 			remove();
 			return;
 		}
 
-		if (player.isSneaking() && !isTraveling) {
-			location = player.getEyeLocation();
-			Vector dV = location.getDirection().normalize();
-			location.add(new Vector(dV.getX(), dV.getY(), dV.getZ()).multiply(3));
-			while (!isLocationSafe()) {
-				location.subtract(new Vector(dV.getX(), dV.getY(), dV.getZ()).multiply(0.1));
-				if (location.distanceSquared(player.getEyeLocation()) > 3 * 3) {
-					break;
+		final Vector dir = player.getEyeLocation().getDirection();
+		switch (player.getInventory().getHeldItemSlot()) {
+			case 1:
+				mode = LavaDiskMode.ADVANCE;
+				distance = location.distance(player.getEyeLocation());
+				dir.multiply(range);
+				break;
+			case 2:
+				mode = LavaDiskMode.RETURN;
+				distance = location.distance(player.getEyeLocation());
+				dir.multiply(3);
+				break;
+			case 3:
+				mode = LavaDiskMode.ROTATE;
+				angle = player.isSneaking() ? angle + 4 : angle - 4;
+				angle = angle % 360;
+				dir.multiply(distance);
+				break;
+			case 4:
+				mode = LavaDiskMode.SHATTER;
+				for (int i = 0; i < 10; i++) {
+					ParticleEffect.BLOCK_CRACK.display(location, 2, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), Material.DIRT.createBlockData());
 				}
-			}
-			displayLavaDisk(false);
-			time = System.currentTimeMillis();
-			location.setPitch(0);
-			direction = location.getDirection().normalize();
-		} else if (player.isSneaking() && isTraveling && isLocationSafe()) {
-			if (recallCount <= recall) {
-				returnToSender();
-				advanceLocation();
-				displayLavaDisk(true);
-			}
-		} else if (System.currentTimeMillis() < time + duration && isLocationSafe()) {
-			isTraveling = true;
-			alterPitch();
-			advanceLocation();
-			displayLavaDisk(true);
-		} else {
-			remove();
+				ParticleEffect.LAVA.display(location, 2, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.2);
+				remove();
+				return;
+			case 0:
+			default:
+				mode = LavaDiskMode.FOLLOW;
+				dir.multiply(distance);
+				break;
+		}
+
+		final Location targetLocation = player.getEyeLocation().add(dir);
+		final Vector direction = GeneralMethods.getDirection(location, targetLocation);
+		int times = (mode == LavaDiskMode.ADVANCE || mode == LavaDiskMode.RETURN) ? 3 : 2;
+		for (int i = 0; i < times; i++) {
+			if (location.distanceSquared(targetLocation) < 0.5 * 0.5) break;
+			location.add(direction.clone().normalize().multiply(0.4));
+		}
+		displayLavaDisk();
+		if (getCurrentTick() % 4 == 0) {
+			checkDamage();
 		}
 	}
 
-	private void advanceLocation() {
-		location = location.add(direction.clone().multiply(0.8));
+	private void checkDamage() {
 		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, 2)) {
 			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
 					continue;
 				}
 				DamageHandler.damageEntity(entity, damage, this);
-				ParticleEffect.LAVA.display(entity.getLocation(), 10, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.1F);
+				ParticleEffect.LAVA.display(entity.getLocation(), 4, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.1);
 				if (!passHit) {
 					remove();
 					return;
@@ -142,89 +158,50 @@ public class LavaDisk extends LavaAbility implements AddonAbility {
 		}
 	}
 
-	private void alterPitch() {
-		Location loc = player.getLocation().clone();
-		if (loc.getPitch() < -20) {
-			loc.setPitch(-20);
-		}
-		if (loc.getPitch() > 20) {
-			loc.setPitch(20);
-		}
-		direction = loc.getDirection().normalize();
-	}
-
-	private void damageBlock(Location l) {
-		if (GeneralMethods.isRegionProtectedFromBuild(this, l) && TempBlock.isTempBlock(l.getBlock())) {
-			return;
-		}
-		if (meltables.contains(l.getBlock().getType().name()) || isEarthbendable(l.getBlock())) {
-			if (lavaTrail) {
-				new RegenTempBlock(l.getBlock(), Material.LAVA.createBlockData(d -> ((Levelled) d).setLevel(4)), regen);
-			} else {
-				new RegenTempBlock(l.getBlock(), Material.AIR.createBlockData(), regen);
-			}
-			ParticleEffect.LAVA.display(location, 1, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.2F);
+	private void damageBlock(Block block) {
+		if (TempBlock.isTempBlock(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation())) return;
+		if (MaterialCheck.isLeaf(block) || isPlant(block) || materials.contains(block.getType().name()) || isEarthbendable(block)) {
+			new TempBlock(block, Material.AIR.createBlockData(), regen);
+			ParticleEffect.LAVA.display(location, 1, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.2);
 		}
 	}
 
-	private void displayLavaDisk(boolean largeLava) {
-		if (largeLava) {
-			ParticleEffect.LAVA.display(location, 6, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.1F);
-		} else {
-			ParticleEffect.LAVA.display(location, 1, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.1F);
-		}
-		angle++;
-		for (Location loc : CoreMethods.getCirclePoints(location, 20, 1, angle)) {
-			GeneralMethods.displayColoredParticle("#C45D00", loc);
-			if (largeLava && damageBlocks) {
-				damageBlock(loc);
+	private void displayLavaDisk() {
+		ParticleEffect.LAVA.display(location, 1, ThreadLocalRandom.current().nextFloat() / 8, ThreadLocalRandom.current().nextFloat() / 8, ThreadLocalRandom.current().nextFloat() / 8, 0.01);
+		int angle2 = (int) player.getLocation().getYaw() + 90;
+		for (Location loc : CoreMethods.getCirclePoints(location, 20, 1, angle, angle2)) {
+			GeneralMethods.displayColoredParticle(ThreadLocalRandom.current().nextBoolean() ? "#C45D00" : "#B05300", loc);
+			if (!MaterialCheck.isAir(loc.getBlock())) {
+				damageBlock(loc.getBlock());
 			}
 		}
-		for (Location loc : CoreMethods.getCirclePoints(location, 10, 0.5, angle)) {
-			ParticleEffect.FLAME.display(loc, 1, 0.0F, 0.0F, 0.0F, 0.01F);
-			ParticleEffect.SMOKE_NORMAL.display(loc, 1, 0.0F, 0.0F, 0.0F, 0.03F);
-			if (largeLava && damageBlocks) {
-				damageBlock(loc);
+		for (Location loc : CoreMethods.getCirclePoints(location, 10, 0.5, angle, angle2)) {
+			GeneralMethods.displayColoredParticle(ThreadLocalRandom.current().nextBoolean() ? "#333333" : "#444444", loc);
+			if (!MaterialCheck.isAir(loc.getBlock())) {
+				damageBlock(loc.getBlock());
 			}
 		}
 	}
 
 	private boolean isLocationSafe() {
-		if (location == null || location.getY() < 2 || location.getY() > 255) {
-			return false;
-		}
-		Block block = location.getBlock();
-		return isTransparent(block);
+		if (location == null || location.getY() <= 2 || location.getY() >= location.getWorld().getMaxHeight() || isWater(location.getBlock())) return false;
+		return isTransparent(location.getBlock());
 	}
 
 	private boolean prepare() {
-		Block block = getLavaSourceBlock(4);
-		if (lavaOnly && block == null) {
-			return false;
-		}
-		if (block == null) {
-			block = getEarthSourceBlock(4);
-		}
-		if (block != null && !isWater(block.getRelative(BlockFace.UP))) {
-			new RegenTempBlock(block, Material.LAVA.createBlockData(d -> ((Levelled) d).setLevel(4)), regen);
-			location = block.getLocation();
-			return true;
-		}
-		return false;
-	}
+		Block source = getLavaSourceBlock(5);
+		if (source == null) source = getEarthSourceBlock(5);
+		if (source == null) return false;
 
-	private void returnToSender() {
-		Location loc = player.getEyeLocation();
-		Vector dV = loc.getDirection().normalize();
-		loc.add(new Vector(dV.getX(), dV.getY(), dV.getZ()).multiply(3));
-
-		Vector vector = loc.toVector().subtract(location.toVector());
-		direction = loc.setDirection(vector).getDirection().normalize();
-
-		if (location.distanceSquared(loc) < 0.5 * 0.5) {
-			isTraveling = false;
-			recallCount += 1;
+		for (int i = 1; i < 3; i++) {
+			Block temp = source.getRelative(BlockFace.UP, i);
+			if (isPlant(temp)) temp.breakNaturally();
+			if (temp.isLiquid() || !isTransparent(temp)) return false;
 		}
+		new TempBlock(source, Material.AIR.createBlockData(), regen);
+		location = source.getLocation();
+		distance = location.distance(player.getEyeLocation());
+		return true;
 	}
 
 	@Override
@@ -274,7 +251,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility {
 
 	@Override
 	public boolean isCollidable() {
-		return isTraveling;
+		return true;
 	}
 
 	@Override
@@ -293,6 +270,18 @@ public class LavaDisk extends LavaAbility implements AddonAbility {
 	@Override
 	public void remove() {
 		bPlayer.addCooldown(this);
+		MultiAbilityManager.unbindMultiAbility(this.player);
 		super.remove();
+	}
+
+	@Override
+	public ArrayList<MultiAbilityInfoSub> getMultiAbilities() {
+		final ArrayList<MultiAbilityInfoSub> abils = new ArrayList<>();
+		abils.add(new MultiAbilityInfoSub("Follow", Element.LAVA));
+		abils.add(new MultiAbilityInfoSub("Advance", Element.LAVA));
+		abils.add(new MultiAbilityInfoSub("Return", Element.LAVA));
+		abils.add(new MultiAbilityInfoSub("Rotate", Element.LAVA));
+		abils.add(new MultiAbilityInfoSub("Shatter", Element.LAVA));
+		return abils;
 	}
 }

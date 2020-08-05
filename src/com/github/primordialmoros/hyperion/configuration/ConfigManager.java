@@ -85,14 +85,8 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthGuard.WallDuration", 2000);
 		config.addDefault("Abilities.Earth.EarthGuard.WallCooldown", 3000);
 
-		final String[] meltable = {
+		final String[] materials = {
 			Material.COBBLESTONE.name(),
-			Material.ACACIA_LEAVES.name(),
-			Material.BIRCH_LEAVES.name(),
-			Material.DARK_OAK_LEAVES.name(),
-			Material.JUNGLE_LEAVES.name(),
-			Material.OAK_LEAVES.name(),
-			Material.SPRUCE_LEAVES.name(),
 			Material.ACACIA_LOG.name(),
 			Material.BIRCH_LOG.name(),
 			Material.DARK_OAK_LOG.name(),
@@ -106,14 +100,10 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.LavaDisk.Description", "Hold sneak while targeting a lava source block to generate a disk of lava. Release sneak to shoot the disk forward. Tap and hold sneak again to attempt and bring the lava disk back to you.");
 		config.addDefault("Abilities.Earth.LavaDisk.Damage", 2.0);
 		config.addDefault("Abilities.Earth.LavaDisk.Cooldown", 7000);
-		config.addDefault("Abilities.Earth.LavaDisk.Duration", 3000);
+		config.addDefault("Abilities.Earth.LavaDisk.Range", 16);
 		config.addDefault("Abilities.Earth.LavaDisk.Regen", 10000);
-		config.addDefault("Abilities.Earth.LavaDisk.RecallLimit", 3);
-		config.addDefault("Abilities.Earth.LavaDisk.LavaSourceOnly", false);
 		config.addDefault("Abilities.Earth.LavaDisk.PassThroughEntities", true);
-		config.addDefault("Abilities.Earth.LavaDisk.BlockDamage", true);
-		config.addDefault("Abilities.Earth.LavaDisk.LavaTrail", false);
-		config.addDefault("Abilities.Earth.LavaDisk.AdditionalMeltableBlocks", meltable);
+		config.addDefault("Abilities.Earth.LavaDisk.AdditionalMeltableBlocks", materials);
 
 		config.addDefault("Abilities.Earth.MetalHook.Enabled", true);
 		config.addDefault("Abilities.Earth.MetalHook.Description", "This ability is used by Metalbenders to launch metal grappling hooks, allowing them to easily maneuver terrain. To use this ability, you must have some form of iron in your inventory. Left click to launch a grappling hook, once attached it will automatically pull you towards it. Hold sneak or switch slots to disengage the hook.");
@@ -155,7 +145,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Duration", 5000);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.MoveRate", 250);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.MaxHeight", 6);
-		config.addDefault("Abilities.Fire.FireCombo.FireWave.Width", 3);
+		config.addDefault("Abilities.Fire.FireCombo.FireWave.Width", 2);
 
 		config.addDefault("Abilities.Water.FrostBreath.Enabled", true);
 		config.addDefault("Abilities.Water.FrostBreath.Description", "As demonstrated by Katara, a Waterbender is able to freeze their breath, causing anything it touches to be frozen! With this ability bound, simply hold sneak to start breathing frost!");

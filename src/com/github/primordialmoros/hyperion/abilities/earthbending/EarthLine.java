@@ -168,7 +168,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				return;
 			}
 			bPlayer.addCooldown("EarthPrison", prisonCooldown);
-			for (Location loc : CoreMethods.getCirclePoints(location.clone().add(0, -1.05, 0), prisonPoints, prisonRadius, 0)) {
+			for (Location loc : CoreMethods.getCirclePoints(location.clone().add(0, -1.05, 0), prisonPoints, prisonRadius)) {
 				new TempArmorStand(this, loc, material, prisonDuration, true);
 				new TempArmorStand(this, loc.add(0, -0.6, 0), material, prisonDuration, true);
 			}

@@ -26,6 +26,7 @@ import com.github.primordialmoros.hyperion.abilities.earthbending.EarthShot;
 import com.github.primordialmoros.hyperion.abilities.earthbending.LavaDisk;
 import com.github.primordialmoros.hyperion.abilities.earthbending.MetalHook;
 import com.github.primordialmoros.hyperion.abilities.firebending.Combustion;
+import com.github.primordialmoros.hyperion.abilities.firebending.combo.FireWave;
 import com.github.primordialmoros.hyperion.abilities.waterbending.FrostBreath;
 import com.github.primordialmoros.hyperion.util.FastMath;
 import com.projectkorra.projectkorra.GeneralMethods;
@@ -36,6 +37,8 @@ import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.firebending.FireShield;
 import com.projectkorra.projectkorra.util.ParticleEffect;
+import com.projectkorra.projectkorra.waterbending.SurgeWall;
+import com.projectkorra.projectkorra.waterbending.SurgeWave;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -60,14 +63,37 @@ public class CoreMethods {
 	public static final String HOOK_KEY = "BENDING_HYPERION_METAL_HOOK_KEY";
 	public static final String BOLT_KEY = "BENDING_HYPERION_LIGHTNING_KEY";
 
-	public static List<Location> getCirclePoints(Location location, int points, double size, int angleOffset) {
+	public static List<Location> getCirclePoints(Location location, int points, double size) {
+		return getCirclePoints(location, points, size, 0, 0);
+	}
+
+	public static List<Location> getCirclePoints(Location location, int points, double size, int angle, int angle2) {
 		List<Location> locations = new ArrayList<>();
+		float cos = FastMath.cos(angle);
+		float sin = FastMath.sin(angle);
+		float cos2 = FastMath.cos(-angle2);
+		float sin2 = FastMath.sin(-angle2);
 		for (int i = 0; i < 360; i += 360 / points) {
-			double x = size * FastMath.cos(i + angleOffset);
-			double z = size * FastMath.sin(i + angleOffset);
-			locations.add(location.clone().add(x, 0, z));
+			double x = size * FastMath.cos(i);
+			double z = size * FastMath.sin(i);
+			final Vector temp = new Vector(x, 0, z);
+			if (angle != 0) rotateAroundAxisX(temp, cos, sin);
+			if (angle2 != 0) rotateAroundAxisY(temp, cos2, sin2);
+			locations.add(location.clone().add(temp));
 		}
 		return locations;
+	}
+
+	private static void rotateAroundAxisX(Vector v, float cos, float sin) {
+		double y = v.getY() * cos - v.getZ() * sin;
+		double z = v.getY() * sin + v.getZ() * cos;
+		v.setY(y).setZ(z);
+	}
+
+	private static void rotateAroundAxisY(Vector v, float cos, float sin) {
+		double x = v.getX() * cos + v.getZ() * sin;
+		double z = v.getX() * -sin + v.getZ() * cos;
+		v.setX(x).setZ(z);
 	}
 
 	public static void playFocusParticles(final Player player) {
@@ -170,6 +196,9 @@ public class CoreMethods {
 		ProjectKorra.getCollisionInitializer().addLargeAbility(CoreAbility.getAbility(Combustion.class));
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(Combustion.class), CoreAbility.getAbility(FireShield.class), true, false));
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(Combustion.class), CoreAbility.getAbility(AirShield.class), true, false));
+
+		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(FireWave.class), CoreAbility.getAbility(SurgeWave.class), false, true));
+		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(FireWave.class), CoreAbility.getAbility(SurgeWall.class), false, true));
 
 		Hyperion.getLog().info("Registered collisions.");
 	}

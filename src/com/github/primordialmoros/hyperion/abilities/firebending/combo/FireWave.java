@@ -20,11 +20,13 @@
 package com.github.primordialmoros.hyperion.abilities.firebending.combo;
 
 import com.github.primordialmoros.hyperion.Hyperion;
+import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
 import com.projectkorra.projectkorra.ability.ComboAbility;
 import com.projectkorra.projectkorra.ability.FireAbility;
+import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.ability.util.ComboManager.AbilityInformation;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.firebending.WallOfFire;
@@ -32,6 +34,8 @@ import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
 import com.projectkorra.projectkorra.util.ClickType;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
+import com.projectkorra.projectkorra.waterbending.SurgeWall;
+import com.projectkorra.projectkorra.waterbending.SurgeWave;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
@@ -54,7 +58,8 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 	private final Set<Block> blocks = new HashSet<>();
 	private ListIterator<Block> waveIterator;
 	private Location origin;
-	private Vector direction;
+	private Vector vertical;
+	private Vector horizontal;
 
 	private double damage;
 	private long cooldown;
@@ -63,9 +68,6 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 	private int maxHeight;
 	private int width;
 	private int height;
-
-	private int damageTick;
-	private int moveTick;
 
 	public FireWave(Player player) {
 		super(player);
@@ -89,7 +91,10 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 		duration = (long) getDayFactor(duration, player.getWorld());
 
 		origin = GeneralMethods.getTargetedLocation(player, 3);
-		direction = player.getEyeLocation().getDirection().clone().setY(0).normalize();
+		final Vector direction = player.getEyeLocation().getDirection().setY(0);
+		vertical = GeneralMethods.getOrthogonalVector(direction, 0, 1).normalize();
+		horizontal = GeneralMethods.getOrthogonalVector(direction, 90, 1).normalize();
+
 		final BlockIterator tempBlockIterator = new BlockIterator(origin.getWorld(), origin.toVector(), direction, 0, range);
 		final List<Block> blockList = new LinkedList<>();
 		tempBlockIterator.forEachRemaining(blockList::add);
@@ -114,20 +119,16 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 			getAbility(player, WallOfFire.class).remove();
 		}
 
-		final long time = System.currentTimeMillis();
-
-		if (time > getStartTime() + duration) {
+		if (System.currentTimeMillis() > getStartTime() + duration) {
 			remove();
 			return;
 		}
 
-		if (time - getStartTime() > damageTick * 500) {
-			damageTick++;
+		if (getCurrentTick() % 10 == 0) {
 			checkDamage();
 		}
 
-		if (time - getStartTime() > moveTick * moveRate) {
-			moveTick++;
+		if (getCurrentTick() % (moveRate / 50) == 0) {
 			if (waveIterator.hasNext()) {
 				Location tempLoc = waveIterator.next().getLocation();
 				if (!prepare(tempLoc.getBlock())) {
@@ -159,41 +160,31 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 		}
 	}
 
-	private void initializeBlocks() {
-		blocks.clear();
-		final Vector orthoLR = GeneralMethods.getOrthogonalVector(direction, 0, 1).normalize();
-		final Vector orthoUD = GeneralMethods.getOrthogonalVector(direction, 90, 1).normalize();
-
-		if (height < maxHeight) height++;
-
-		for (double i = -height; i <= height; i++) {
-			for (double j = -width; j <= width; j++) {
-				final Location loc = origin.clone().add(orthoUD.clone().multiply(j));
-				loc.add(orthoLR.clone().multiply(i));
-				if (GeneralMethods.isRegionProtectedFromBuild(this, loc)) {
-					continue;
-				}
-				blocks.add(loc.getBlock());
-			}
-		}
-	}
-
 	private boolean prepare(Block block) {
 		if (block.isLiquid() || GeneralMethods.isSolid(block)) {
 			return false;
 		}
 		origin = block.getLocation();
-		initializeBlocks();
+		blocks.clear();
+		if (height < maxHeight) height++;
+		for (double i = -height; i <= height; i++) {
+			for (double j = -width; j <= width; j++) {
+				final Location loc = origin.clone().add(vertical.clone().multiply(i)).add(horizontal.clone().multiply(j));
+				if (!isTransparent(block)) {
+					continue;
+				}
+				blocks.add(loc.getBlock());
+			}
+		}
 		return !blocks.isEmpty();
 	}
 
 	private void visualiseWall() {
 		for (Block block : blocks) {
-			if (!isTransparent(block)) {
-				continue;
+			playFirebendingParticles(block.getLocation(), 3, 0.5, 0.5, 0.5);
+			if (ThreadLocalRandom.current().nextInt(3) == 0) {
+				ParticleEffect.SMOKE_NORMAL.display(block.getLocation(), 1, 0.5, 0.5, 0.5);
 			}
-			playFirebendingParticles(block.getLocation(), 3, 0.3, 0.3, 0.3);
-			ParticleEffect.SMOKE_NORMAL.display(block.getLocation(), 1, 0.3, 0.3, 0.3);
 			if (ThreadLocalRandom.current().nextInt(10) == 0) {
 				playFirebendingSound(block.getLocation());
 			}
@@ -269,6 +260,25 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 	@Override
 	public String getInstructions() {
 		return "HeatControl (Tap Sneak) > HeatControl (Tap Sneak) > WallOfFire (Hold Sneak)";
+	}
+
+	@Override
+	public boolean isCollidable() {
+		return true;
+	}
+
+	@Override
+	public double getCollisionRadius() {
+		return 0.5;
+	}
+
+	@Override
+	public void handleCollision(Collision collision) {
+		if (!bPlayer.canUseSubElement(Element.BLUE_FIRE)) return;
+		if (collision.getAbilitySecond() instanceof SurgeWave || (collision.getAbilitySecond() instanceof SurgeWall && !((SurgeWall) collision.getAbilitySecond()).isFrozen())) {
+			collision.getAbilitySecond().getLocations().forEach(l -> ParticleEffect.CLOUD.display(l, 2, 0.5, 0.5, 0.5));
+		}
+		super.handleCollision(collision);
 	}
 
 	@Override
