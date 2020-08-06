@@ -36,6 +36,7 @@ import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ArmorStand;
@@ -175,10 +176,14 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	}
 
 	private boolean damageBlock(Block block) {
-		if (MaterialCheck.isAir(block) || TempBlock.isTempBlock(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation())) return false;
+		if (MaterialCheck.isAir(block) || block.isLiquid() || TempBlock.isTempBlock(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation())) return false;
 		if (MaterialCheck.isLeaf(block) || isPlant(block) || materials.contains(block.getType().name()) || isEarthbendable(block)) {
 			new TempBlock(block, Material.AIR.createBlockData(), regen);
 			ParticleEffect.LAVA.display(block.getLocation(), 1, 0.5, 0.5, 0.5, 0.2);
+			if (ThreadLocalRandom.current().nextInt(5) == 0) {
+				location.getWorld().playSound(location, Sound.BLOCK_GRINDSTONE_USE, 0.3f, 0.3f);
+				location.getWorld().playSound(location, Sound.BLOCK_FIRE_AMBIENT, 0.3f, 1.5f);
+			}
 			return true;
 		}
 		return false;
@@ -214,6 +219,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 			for (int i = 0; i < 10; i++) {
 				ParticleEffect.CLOUD.display(location, 2, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble());
 			}
+			location.getWorld().playSound(location, Sound.BLOCK_LAVA_EXTINGUISH, 1, 1);
 			return false;
 		}
 		return isTransparent(location.getBlock()) || damageBlock(location.getBlock());
@@ -304,6 +310,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 		for (int i = 0; i < 10; i++) {
 			ParticleEffect.BLOCK_CRACK.display(location, 2, 0, 0, 0, Material.MAGMA_BLOCK.createBlockData());
 		}
+		location.getWorld().playSound(location, Sound.BLOCK_BASALT_BREAK, 1, 0.5f);
 		ParticleEffect.LAVA.display(location, 2);
 		bPlayer.addCooldown(this);
 		MultiAbilityManager.unbindMultiAbility(this.player);
