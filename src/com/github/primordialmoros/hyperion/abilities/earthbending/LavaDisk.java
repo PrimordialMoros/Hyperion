@@ -192,24 +192,30 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 		double cos2 = FastMath.cos(-angle2);
 		double sin2 = FastMath.sin(-angle2);
 		int offset = 0;
+		int index = 0;
+		float size = 0.8f;
 		for (double pos = 0.1; pos <= 0.8; pos += 0.1) {
-			offset += 4;
 			for (int j = 0; j <= 288; j += 72) {
 				final Vector temp = new Vector(pos * FastMath.cos(rotationAngle + j + offset), 0, pos * FastMath.sin(rotationAngle + j + offset));
 				if (angle != 0) rotateAroundAxisX(temp, cos, sin);
 				if (angle2 != 0) rotateAroundAxisY(temp, cos2, sin2);
-				int index = Math.max(0, Math.min(colors.length - 1, (int) (10 * pos) - 1));
-				float size = 0.9f - ((float) pos / 2);
 				CoreMethods.displayColoredParticle(colors[index], location.clone().add(temp), 1, 0, 0, 0, size);
-				if (pos > 0.5) {
-					damageBlock(location.clone().add(temp).getBlock());
-				}
+				if (pos > 0.5) damageBlock(location.clone().add(temp).getBlock());
 			}
+			offset += 4;
+			index = Math.max(0, Math.min(colors.length - 1, ++index));
+			size -= 0.05;
 		}
 	}
 
 	private boolean isLocationSafe() {
-		if (location == null || location.getY() <= 2 || location.getY() >= location.getWorld().getMaxHeight() || isWater(location.getBlock())) return false;
+		if (location == null || location.getY() <= 2 || location.getY() >= location.getWorld().getMaxHeight()) return false;
+		if (isWater(location.getBlock())) {
+			for (int i = 0; i < 10; i++) {
+				ParticleEffect.CLOUD.display(location, 2, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble());
+			}
+			return false;
+		}
 		return isTransparent(location.getBlock()) || damageBlock(location.getBlock());
 	}
 
