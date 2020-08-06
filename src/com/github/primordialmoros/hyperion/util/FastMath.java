@@ -20,20 +20,20 @@
 package com.github.primordialmoros.hyperion.util;
 
 public class FastMath {
-	static final float[] sin = new float[360];
+	static final double[] sin = new double[360];
 
 	static {
 		for (int i = 0; i < sin.length; i++) {
-			sin[i] = (float) Math.sin(Math.toRadians(i));
+			sin[i] = Math.sin(Math.toRadians(i));
 		}
 	}
 
-	public static float sin(int angle) {
-		float result = sin[Math.abs(angle) % 360];
+	public static double sin(int angle) {
+		double result = sin[Math.abs(angle) % 360];
 		return angle >= 0 ? result : -result;
 	}
 
-	public static float cos(int angle) {
+	public static double cos(int angle) {
 		return sin(angle+90);
 	}
 }

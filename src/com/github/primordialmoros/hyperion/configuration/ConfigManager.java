@@ -97,10 +97,11 @@ public class ConfigManager {
 			Material.PACKED_ICE.name()
 		};
 		config.addDefault("Abilities.Earth.LavaDisk.Enabled", true);
-		config.addDefault("Abilities.Earth.LavaDisk.Description", "Hold sneak while targeting a lava source block to generate a disk of lava. Release sneak to shoot the disk forward. Tap and hold sneak again to attempt and bring the lava disk back to you.");
-		config.addDefault("Abilities.Earth.LavaDisk.Damage", 2.0);
+		config.addDefault("Abilities.Earth.LavaDisk.Description", "Tap sneak to select a nearby earth or lava source. This disk made of molten earth will destroy any earthbendable and any soft materials it comes in contact with. The closer you are to the LavaDisk the faster it spins and the more damage it deals.");
+		config.addDefault("Abilities.Earth.LavaDisk.MaxDamage", 6.0);
+		config.addDefault("Abilities.Earth.LavaDisk.MinDamage", 1.0);
 		config.addDefault("Abilities.Earth.LavaDisk.Cooldown", 7000);
-		config.addDefault("Abilities.Earth.LavaDisk.Range", 16);
+		config.addDefault("Abilities.Earth.LavaDisk.Range", 24);
 		config.addDefault("Abilities.Earth.LavaDisk.Regen", 10000);
 		config.addDefault("Abilities.Earth.LavaDisk.PassThroughEntities", true);
 		config.addDefault("Abilities.Earth.LavaDisk.AdditionalMeltableBlocks", materials);

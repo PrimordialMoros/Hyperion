@@ -166,11 +166,11 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 
 		hasExploded = true;
 
-		ParticleEffect.FLAME.display(center, 20, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.5f, 20);
-		ParticleEffect.SMOKE_LARGE.display(center, 20, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.5f);
-		ParticleEffect.FIREWORKS_SPARK.display(center, 20, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.5f);
-		ParticleEffect.SMOKE_LARGE.display(center, 20, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.5f);
-		ParticleEffect.EXPLOSION_HUGE.display(center, 5, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.5f);
+		ParticleEffect.FLAME.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f, 20);
+		ParticleEffect.SMOKE_LARGE.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
+		ParticleEffect.FIREWORKS_SPARK.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
+		ParticleEffect.SMOKE_LARGE.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
+		ParticleEffect.EXPLOSION_HUGE.display(center, 5, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
 		center.getWorld().playSound(center, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		if (regenBlockTime > 0 && !center.getBlock().isLiquid()) {

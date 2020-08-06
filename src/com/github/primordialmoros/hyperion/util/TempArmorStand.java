@@ -73,8 +73,8 @@ public class TempArmorStand {
 
 	public void showParticles(boolean show) {
 		if (show) {
-			ParticleEffect.BLOCK_CRACK.display(armorStand.getEyeLocation().add(0, 0.2, 0), 4, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 8, ThreadLocalRandom.current().nextFloat() / 4, 0, headMaterial.createBlockData());
-			ParticleEffect.BLOCK_DUST.display(armorStand.getEyeLocation().add(0, 0.2, 0), 6, ThreadLocalRandom.current().nextFloat() / 4, ThreadLocalRandom.current().nextFloat() / 8, ThreadLocalRandom.current().nextFloat() / 4, 0, headMaterial.createBlockData());
+			ParticleEffect.BLOCK_CRACK.display(armorStand.getEyeLocation().add(0, 0.2, 0), 4, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, headMaterial.createBlockData());
+			ParticleEffect.BLOCK_DUST.display(armorStand.getEyeLocation().add(0, 0.2, 0), 6, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, headMaterial.createBlockData());
 		}
 	}
 

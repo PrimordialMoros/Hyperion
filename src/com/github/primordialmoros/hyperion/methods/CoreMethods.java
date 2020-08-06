@@ -36,9 +36,11 @@ import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.firebending.FireShield;
+import com.projectkorra.projectkorra.util.ColoredParticle;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.waterbending.SurgeWall;
 import com.projectkorra.projectkorra.waterbending.SurgeWave;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -64,36 +66,23 @@ public class CoreMethods {
 	public static final String BOLT_KEY = "BENDING_HYPERION_LIGHTNING_KEY";
 
 	public static List<Location> getCirclePoints(Location location, int points, double size) {
-		return getCirclePoints(location, points, size, 0, 0);
-	}
-
-	public static List<Location> getCirclePoints(Location location, int points, double size, int angle, int angle2) {
 		List<Location> locations = new ArrayList<>();
-		float cos = FastMath.cos(angle);
-		float sin = FastMath.sin(angle);
-		float cos2 = FastMath.cos(-angle2);
-		float sin2 = FastMath.sin(-angle2);
 		for (int i = 0; i < 360; i += 360 / points) {
-			double x = size * FastMath.cos(i);
-			double z = size * FastMath.sin(i);
-			final Vector temp = new Vector(x, 0, z);
-			if (angle != 0) rotateAroundAxisX(temp, cos, sin);
-			if (angle2 != 0) rotateAroundAxisY(temp, cos2, sin2);
-			locations.add(location.clone().add(temp));
+			locations.add(location.clone().add(size * FastMath.cos(i), 0, size * FastMath.sin(i)));
 		}
 		return locations;
 	}
 
-	private static void rotateAroundAxisX(Vector v, float cos, float sin) {
-		double y = v.getY() * cos - v.getZ() * sin;
-		double z = v.getY() * sin + v.getZ() * cos;
-		v.setY(y).setZ(z);
-	}
-
-	private static void rotateAroundAxisY(Vector v, float cos, float sin) {
-		double x = v.getX() * cos + v.getZ() * sin;
-		double z = v.getX() * -sin + v.getZ() * cos;
-		v.setX(x).setZ(z);
+	public static void displayColoredParticle(String hexVal, final Location loc, final int amount, final double offsetX, final double offsetY, final double offsetZ, float size) {
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		if (hexVal.length() <= 6) {
+			r = Integer.valueOf(hexVal.substring(0, 2), 16);
+			g = Integer.valueOf(hexVal.substring(2, 4), 16);
+			b = Integer.valueOf(hexVal.substring(4, 6), 16);
+		}
+		new ColoredParticle(Color.fromRGB(r, g, b), size).display(loc, amount, offsetX, offsetY, offsetZ);
 	}
 
 	public static void playFocusParticles(final Player player) {
