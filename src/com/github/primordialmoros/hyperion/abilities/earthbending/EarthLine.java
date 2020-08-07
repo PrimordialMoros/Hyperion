@@ -21,6 +21,8 @@ package com.github.primordialmoros.hyperion.abilities.earthbending;
 
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
+import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
+import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.github.primordialmoros.hyperion.util.TempArmorStand;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
@@ -30,10 +32,14 @@ import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.earthbending.RaiseEarth;
 import com.projectkorra.projectkorra.earthbending.passive.DensityShift;
+import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
+import com.projectkorra.projectkorra.util.ParticleEffect;
+import com.projectkorra.projectkorra.util.TempBlock;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
@@ -43,16 +49,23 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EarthLine extends EarthAbility implements AddonAbility {
+	private enum EarthLineMode {
+		NORMAL, PRISON, MAGMA
+	}
+
+	private final List<Block> collapseBlocks = new ArrayList<>();
 	private Location location;
 	private Location endLocation;
 	private LivingEntity target;
 	private Vector direction;
-	private Block sourceBlock;
-	private BlockData sourceData;
+	private TempBlock sourceBlock;
+	private EarthLineMode mode;
 
 	private double damage;
 	private long cooldown;
@@ -64,10 +77,12 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	private double prisonRadius;
 	private int prisonPoints;
 
+	private double magmaModifier;
+	private long regen;
+
 	private boolean launched;
-	private boolean started;
-	private boolean prison;
 	private boolean targetLocked;
+	private boolean collapsing;
 
 	private int ticks;
 
@@ -84,17 +99,21 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		}
 
 		launched = false;
-		started = false;
-		prison = false;
 		targetLocked = false;
+		collapsing = false;
 
 		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Damage");
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.Range");
 		prepareRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.PrepareRange");
+		magmaModifier = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Magma.DamageModifier");
+		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Magma.Regen");
+		prisonCooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Prison.Cooldown");
+		prisonDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Prison.Duration");
+		prisonRadius = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Prison.Radius");
+		prisonPoints = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.Prison.Points");
 
 		if (prepare()) {
-			started = true;
 			start();
 		}
 	}
@@ -107,27 +126,45 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				return;
 			}
 
-			if (prison) {
-				if (targetLocked) {
-					if (target == null || !target.isValid() || ticks > 20) {
-						remove();
-					} else {
-						imprisonTarget();
-					}
-					return;
-				}
-			}
-
-			if (player.isSneaking()) {
+			if (player.isSneaking() && mode != EarthLineMode.MAGMA) {
 				endLocation = GeneralMethods.getTargetedLocation(player, range + prepareRange);
 				direction = CoreMethods.calculateFlatVector(sourceBlock.getLocation(), endLocation);
 			}
-			if (ThreadLocalRandom.current().nextInt(5) == 0) {
-				playEarthbendingSound(location);
+
+			switch (mode) {
+				case PRISON:
+					if (targetLocked) {
+						if (target == null || !target.isValid() || ticks > 20) {
+							remove();
+						} else {
+							imprisonTarget();
+						}
+						return;
+					}
+					break;
+				case MAGMA:
+					if (collapsing) {
+						for (int i = 0; i < 2; i++) {
+							if (collapseBlocks.isEmpty()) {
+								remove();
+								return;
+							}
+							int randomIndex = ThreadLocalRandom.current().nextInt(collapseBlocks.size());
+							Block block = collapseBlocks.get(randomIndex);
+							collapseBlocks.remove(randomIndex);
+							final Vector velocity = new Vector(ThreadLocalRandom.current().nextDouble(-0.2, 0.2), ThreadLocalRandom.current().nextDouble(0.1), ThreadLocalRandom.current().nextDouble(-0.2, 0.2));
+							new RegenTempBlock(block, Material.AIR.createBlockData(), regen);
+							new BendingFallingBlock(block.getLocation().add(0.5, 0, 0.5), Material.MAGMA_BLOCK.createBlockData(), velocity, this, true);
+						}
+					}
+					break;
+				case NORMAL:
+				default:
 			}
 			summonTrailBlock(location.clone().add(0, -1, 0));
 			checkDamage();
 			advanceLocation();
+			if (ThreadLocalRandom.current().nextInt(5) == 0) playEarthbendingSound(location);
 		} else {
 			if (!bPlayer.canBendIgnoreCooldowns(this) || sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(prepareRange + 5, 2)) {
 				remove();
@@ -135,14 +172,24 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		}
 	}
 
+	private void collapseWall(final Location center) {
+		if (collapsing) return;
+		collapsing = true;
+		center.getWorld().playSound(center, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
+		ParticleEffect.EXPLOSION_NORMAL.display(center, 1, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
+		for (final Block block : GeneralMethods.getBlocksAroundPoint(center, 3)) {
+			if (block.getY() < center.getBlockY() || !isEarthbendable(block)) continue;
+			collapseBlocks.add(block);
+		}
+		if (collapseBlocks.isEmpty()) {
+			remove();
+		}
+	}
+
 	public void setPrisonMode() {
-		if (prison) return;
-		prisonCooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Prison.Cooldown");
-		prisonDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Prison.Duration");
-		prisonRadius = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Prison.Radius");
-		prisonPoints = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.Prison.Points");
+		if (mode != EarthLineMode.NORMAL) return;
 		ticks = 0;
-		prison = true;
+		mode = EarthLineMode.PRISON;
 	}
 
 	private void imprisonTarget() {
@@ -168,7 +215,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				return;
 			}
 			bPlayer.addCooldown("EarthPrison", prisonCooldown);
-			for (Location loc : CoreMethods.getCirclePoints(location.clone().add(0, -1.05, 0), prisonPoints, prisonRadius, 0)) {
+			for (Location loc : CoreMethods.getCirclePoints(location.clone().add(0, -1.05, 0), prisonPoints, prisonRadius)) {
 				new TempArmorStand(this, loc, material, prisonDuration, true);
 				new TempArmorStand(this, loc.add(0, -0.6, 0), material, prisonDuration, true);
 			}
@@ -179,6 +226,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	}
 
 	private void raiseSpikes() {
+		if (mode != EarthLineMode.NORMAL) return;
 		final Location spikeLocation = location.clone().add(0, -1, 0);
 		RaiseEarth pillar1 = new RaiseEarth(player, spikeLocation, 1);
 		pillar1.setCooldown(0);
@@ -190,13 +238,28 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	}
 
 	private void advanceLocation() {
-		location.add(direction.clone().multiply(0.7));
+		location.add(direction.clone().multiply(mode == EarthLineMode.MAGMA ? 0.4 : 0.7));
 		Block below = location.getBlock().getRelative(BlockFace.DOWN);
 		if (isEarthbendable(location.getBlock())) {
 			location.add(0, 1, 0);
 		} else if (isEarthbendable(below.getRelative(BlockFace.DOWN)) && isTransparent(below)) {
 			location.add(0, -1, 0);
 		}
+		if (mode == EarthLineMode.MAGMA) {
+			if (isMetal(location.getBlock()) || isMetal(location.getBlock().getRelative(BlockFace.UP))) {
+				remove();
+				return;
+			}
+			if (isWater(location.getBlock()) || isWater(location.getBlock().getRelative(BlockFace.UP))) {
+				for (int i = 0; i < 10; i++) {
+					ParticleEffect.CLOUD.display(location, 2, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble());
+				}
+				location.getWorld().playSound(location, Sound.BLOCK_LAVA_EXTINGUISH, 1, 1);
+				remove();
+				return;
+			}
+		}
+		GeneralMethods.displayColoredParticle("444444", location);
 		if (GeneralMethods.isRegionProtectedFromBuild(this, location) || location.distanceSquared(sourceBlock.getLocation()) > Math.pow(range, 2)) {
 			remove();
 		}
@@ -204,60 +267,87 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	private void checkDamage() {
 		boolean hasHit = false;
+		double appliedDamage = (mode == EarthLineMode.NORMAL && isMetalbendable(location.getBlock())) ? getMetalAugment(damage) : damage;
 		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, 1)) {
 			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
 					continue;
 				}
-				if (!hasHit && prison) {
+				if (!hasHit && mode == EarthLineMode.PRISON) {
 					target = (LivingEntity) entity;
 					target.setVelocity(new Vector(0, -2, 0));
 					targetLocked = true;
 					return;
 				}
-				DamageHandler.damageEntity(entity, damage, this);
+				DamageHandler.damageEntity(entity, appliedDamage, this);
+				if (mode == EarthLineMode.MAGMA) {
+					entity.setFireTicks(40);
+					new FireDamageTimer(entity, player);
+				}
 				hasHit = true;
 			}
 		}
+
 		if (hasHit) {
-			raiseSpikes();
+			if (mode == EarthLineMode.NORMAL) {
+				raiseSpikes();
+			} else {
+				remove();
+			}
 		}
 	}
 
 	public boolean prepare() {
 		if (launched) return false;
-		final Block block = getEarthSourceBlock(prepareRange);
+		Block block = getLavaSourceBlock(prepareRange);
+		if (block == null || !bPlayer.canLavabend()) {
+			block = getEarthSourceBlock(prepareRange);
+		}
 		if (block == null || block.getRelative(BlockFace.UP).isLiquid() || !isTransparent(block.getRelative(BlockFace.UP))) {
-			if (started) remove();
+			if (isStarted()) remove();
 			return false;
 		}
-		if (sourceBlock != null) sourceBlock.setBlockData(sourceData);
-		sourceBlock = block;
-		if (DensityShift.isPassiveSand(sourceBlock)) {
-			DensityShift.revertSand(sourceBlock);
+		if (sourceBlock != null) {
+			if (block == sourceBlock.getBlock()) return false;
+			sourceBlock.revertBlock();
 		}
-		sourceData = sourceBlock.getBlockData();
-		if (sourceBlock.getType() == Material.SAND) {
-			sourceBlock.setType(Material.SANDSTONE);
-		} else if (sourceBlock.getType() == Material.RED_SAND) {
-			sourceBlock.setType(Material.RED_SANDSTONE);
-		} else if (sourceBlock.getType() == Material.STONE) {
-			sourceBlock.setType(Material.COBBLESTONE);
-		} else {
-			sourceBlock.setType(Material.STONE);
+		mode = EarthLineMode.NORMAL;
+		if (DensityShift.isPassiveSand(block)) DensityShift.revertSand(block);
+		final BlockData sourceData;
+		switch (block.getType()) {
+			case SAND:
+				sourceData = Material.SANDSTONE.createBlockData();
+				break;
+			case RED_SAND:
+				sourceData = Material.RED_SANDSTONE.createBlockData();
+				break;
+			case STONE:
+				sourceData = Material.COBBLESTONE.createBlockData();
+				break;
+			case LAVA:
+				sourceData = Material.MAGMA_BLOCK.createBlockData();
+				break;
+			case GRAVEL:
+			default:
+				sourceData = Material.STONE.createBlockData();
 		}
+		sourceBlock = new TempBlock(block, sourceData);
 		location = sourceBlock.getLocation().clone();
 		return true;
 	}
 
 	private void summonTrailBlock(Location spawnLoc) {
 		if (!isEarthbendable(spawnLoc.getBlock()) || !isTransparent(spawnLoc.getBlock().getRelative(BlockFace.UP))) {
+			if (mode == EarthLineMode.MAGMA) {
+				collapseWall(spawnLoc);
+				return;
+			}
 			remove();
 			return;
 		}
 		double x = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
 		double z = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
-		new TempArmorStand(this, spawnLoc.clone().add(0.5 + x, -0.75, 0.5 + z), spawnLoc.getBlock().getType(), 700);
+		new TempArmorStand(this, spawnLoc.clone().add(0.5 + x, -0.75, 0.5 + z), mode == EarthLineMode.MAGMA ? Material.MAGMA_BLOCK : spawnLoc.getBlock().getType(), 700);
 	}
 
 	@Override
@@ -325,7 +415,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	@Override
 	public void remove() {
-		sourceBlock.setBlockData(sourceData);
+		sourceBlock.revertBlock();
 		super.remove();
 	}
 
@@ -340,7 +430,10 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 			raiseSpikes();
 			return;
 		}
-		if (!isEarthbendable(player, sourceBlock)) {
+		if (sourceBlock.getBlock().getType() == Material.MAGMA_BLOCK) {
+			mode = EarthLineMode.MAGMA;
+			damage = magmaModifier * damage;
+		} else if (!isEarthbendable(player, sourceBlock.getBlock())) {
 			return;
 		}
 
@@ -350,7 +443,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		} else {
 			endLocation = GeneralMethods.getTargetedLocation(player, range);
 		}
-		sourceBlock.setBlockData(sourceData);
+		sourceBlock.revertBlock();
 		summonTrailBlock(sourceBlock.getLocation());
 		location = sourceBlock.getLocation().clone().add(0, 1, 0);
 		direction = CoreMethods.calculateFlatVector(location, endLocation);

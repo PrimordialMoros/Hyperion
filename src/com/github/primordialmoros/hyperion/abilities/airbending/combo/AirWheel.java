@@ -37,7 +37,6 @@ import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,18 +76,19 @@ public class AirWheel extends AirAbility implements AddonAbility, ComboAbility {
 			remove();
 			return;
 		}
-		if (getCurrentTick() % 100 == 0) affectedEntities.keySet().removeIf(Entity::isDead); // Cleanup every 100 ticks
+		if (getCurrentTick() % 200 == 0) affectedEntities.keySet().removeIf(Entity::isDead); // Cleanup every 200 ticks
 		if (getCurrentTick() % 2 == 0) return;
 
-		final Vector direction = player.getEyeLocation().getDirection().multiply(2.2*scooterSpeed);
-		direction.setY(0);
-		Location tempLoc = player.getLocation().add(0, 0.8, 0).add(direction);
+		int limit = (getCurrentTick() % 3 == 0) ? 270 : 90;
+		final Location tempLoc = player.getLocation();
+		tempLoc.setPitch(0);
+		tempLoc.add(0, 0.8, 0).add(tempLoc.getDirection().multiply(2.2*scooterSpeed));
 		wheelLocations.clear();
-		for (int i = -180; i <= 180; i += 16) {
+		for (int i = -90; i <= limit; i += 12) {
 			final Location particleLocation = tempLoc.clone();
-			particleLocation.add(particleLocation.getDirection().setY(0).multiply(1.6 * FastMath.cos(i)));
+			particleLocation.add(particleLocation.getDirection().multiply(1.6 * FastMath.cos(i)));
 			particleLocation.setY(particleLocation.getY() + (1.6 * FastMath.sin(i)));
-			playAirbendingParticles(particleLocation, 1, 0, 0, 0);
+			CoreMethods.displayColoredParticle("ffffff", particleLocation, 1, 0, 0, 0, 2f);
 		}
 
 		final long time = System.currentTimeMillis();

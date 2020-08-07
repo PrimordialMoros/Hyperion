@@ -153,7 +153,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 	public boolean prepare() {
 		if (launched) return false;
 		Block block = getLavaSourceBlock(selectRange);
-		if (block == null) {
+		if (block == null || !bPlayer.canLavabend()) {
 			block = getEarthSourceBlock(selectRange);
 			if (block == null) return false;
 		}
@@ -303,11 +303,11 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 	public void remove() {
 		if (launched && projectile.getFallingBlock() != null) {
 			final Location tempLocation = projectile.getFallingBlock().getLocation().clone();
-			ParticleEffect.BLOCK_CRACK.display(tempLocation, 6, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0, projectile.getFallingBlock().getBlockData());
-			ParticleEffect.BLOCK_DUST.display(tempLocation, 4, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0, projectile.getFallingBlock().getBlockData());
+			ParticleEffect.BLOCK_CRACK.display(tempLocation, 6, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0, projectile.getFallingBlock().getBlockData());
+			ParticleEffect.BLOCK_DUST.display(tempLocation, 4, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0, projectile.getFallingBlock().getBlockData());
 			if (convertedMagma) {
-				ParticleEffect.SMOKE_LARGE.display(tempLocation, 16, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.05);
-				ParticleEffect.FIREWORKS_SPARK.display(tempLocation, 8, ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), ThreadLocalRandom.current().nextFloat(), 0.05);
+				ParticleEffect.SMOKE_LARGE.display(tempLocation, 16, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.05);
+				ParticleEffect.FIREWORKS_SPARK.display(tempLocation, 8, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.05);
 				tempLocation.getWorld().playSound(tempLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0);
 			} else {
 				if (isMetal(projectile.getFallingBlock().getBlockData().getMaterial())) {
@@ -349,8 +349,8 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 	}
 
 	public void playParticles(Location loc) {
-		ParticleEffect.LAVA.display(loc, 2, ThreadLocalRandom.current().nextFloat() / 2, ThreadLocalRandom.current().nextFloat() / 2, ThreadLocalRandom.current().nextFloat() / 2);
-		ParticleEffect.SMOKE_NORMAL.display(loc, 2, ThreadLocalRandom.current().nextFloat() / 2, ThreadLocalRandom.current().nextFloat() / 2, ThreadLocalRandom.current().nextFloat() / 2);
+		ParticleEffect.LAVA.display(loc, 2, ThreadLocalRandom.current().nextDouble() / 2, ThreadLocalRandom.current().nextDouble() / 2, ThreadLocalRandom.current().nextDouble() / 2);
+		ParticleEffect.SMOKE_NORMAL.display(loc, 2, ThreadLocalRandom.current().nextDouble() / 2, ThreadLocalRandom.current().nextDouble() / 2, ThreadLocalRandom.current().nextDouble() / 2);
 		for (int i = 0; i < 8; i++) {
 			GeneralMethods.displayColoredParticle("#FFA400", CoreMethods.getRandomOffsetLocation(loc, 1));
 			GeneralMethods.displayColoredParticle("#FF8C00", CoreMethods.getRandomOffsetLocation(loc, 1));

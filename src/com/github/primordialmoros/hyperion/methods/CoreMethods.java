@@ -26,6 +26,7 @@ import com.github.primordialmoros.hyperion.abilities.earthbending.EarthShot;
 import com.github.primordialmoros.hyperion.abilities.earthbending.LavaDisk;
 import com.github.primordialmoros.hyperion.abilities.earthbending.MetalHook;
 import com.github.primordialmoros.hyperion.abilities.firebending.Combustion;
+import com.github.primordialmoros.hyperion.abilities.firebending.combo.FireWave;
 import com.github.primordialmoros.hyperion.abilities.waterbending.FrostBreath;
 import com.github.primordialmoros.hyperion.util.FastMath;
 import com.projectkorra.projectkorra.GeneralMethods;
@@ -35,7 +36,11 @@ import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.firebending.FireShield;
+import com.projectkorra.projectkorra.util.ColoredParticle;
 import com.projectkorra.projectkorra.util.ParticleEffect;
+import com.projectkorra.projectkorra.waterbending.SurgeWall;
+import com.projectkorra.projectkorra.waterbending.SurgeWave;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -60,14 +65,24 @@ public class CoreMethods {
 	public static final String HOOK_KEY = "BENDING_HYPERION_METAL_HOOK_KEY";
 	public static final String BOLT_KEY = "BENDING_HYPERION_LIGHTNING_KEY";
 
-	public static List<Location> getCirclePoints(Location location, int points, double size, int angleOffset) {
+	public static List<Location> getCirclePoints(Location location, int points, double size) {
 		List<Location> locations = new ArrayList<>();
 		for (int i = 0; i < 360; i += 360 / points) {
-			double x = size * FastMath.cos(i + angleOffset);
-			double z = size * FastMath.sin(i + angleOffset);
-			locations.add(location.clone().add(x, 0, z));
+			locations.add(location.clone().add(size * FastMath.cos(i), 0, size * FastMath.sin(i)));
 		}
 		return locations;
+	}
+
+	public static void displayColoredParticle(String hexVal, final Location loc, final int amount, final double offsetX, final double offsetY, final double offsetZ, float size) {
+		int r = 0;
+		int g = 0;
+		int b = 0;
+		if (hexVal.length() <= 6) {
+			r = Integer.valueOf(hexVal.substring(0, 2), 16);
+			g = Integer.valueOf(hexVal.substring(2, 4), 16);
+			b = Integer.valueOf(hexVal.substring(4, 6), 16);
+		}
+		new ColoredParticle(Color.fromRGB(r, g, b), size).display(loc, amount, offsetX, offsetY, offsetZ);
 	}
 
 	public static void playFocusParticles(final Player player) {
@@ -170,6 +185,9 @@ public class CoreMethods {
 		ProjectKorra.getCollisionInitializer().addLargeAbility(CoreAbility.getAbility(Combustion.class));
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(Combustion.class), CoreAbility.getAbility(FireShield.class), true, false));
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(Combustion.class), CoreAbility.getAbility(AirShield.class), true, false));
+
+		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(FireWave.class), CoreAbility.getAbility(SurgeWave.class), false, true));
+		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(FireWave.class), CoreAbility.getAbility(SurgeWall.class), false, true));
 
 		Hyperion.getLog().info("Registered collisions.");
 	}
