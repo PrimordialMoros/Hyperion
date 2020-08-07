@@ -20,7 +20,6 @@
 package com.github.primordialmoros.hyperion.abilities.firebending.combo;
 
 import com.github.primordialmoros.hyperion.Hyperion;
-import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
@@ -274,9 +273,14 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 
 	@Override
 	public void handleCollision(Collision collision) {
-		if (!bPlayer.canUseSubElement(Element.BLUE_FIRE)) return;
-		if (collision.getAbilitySecond() instanceof SurgeWave || (collision.getAbilitySecond() instanceof SurgeWall && !((SurgeWall) collision.getAbilitySecond()).isFrozen())) {
-			collision.getAbilitySecond().getLocations().forEach(l -> ParticleEffect.CLOUD.display(l, 2, 0.5, 0.5, 0.5));
+		if (collision.getAbilitySecond() instanceof SurgeWave || collision.getAbilitySecond() instanceof SurgeWall) {
+			collision.setRemovingFirst(true); // TODO update to not remove if bPlayer.canUseSubElement(Element.BLUE_FIRE)
+			if (collision.getAbilitySecond() instanceof SurgeWall && ((SurgeWall) collision.getAbilitySecond()).isFrozen()) {
+				collision.setRemovingSecond(false);
+			}
+			if (collision.isRemovingSecond()) {
+				collision.getAbilitySecond().getLocations().forEach(l -> ParticleEffect.CLOUD.display(l, 2, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble()));
+			}
 		}
 		super.handleCollision(collision);
 	}

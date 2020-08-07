@@ -23,6 +23,7 @@ import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.FastMath;
 import com.github.primordialmoros.hyperion.util.MaterialCheck;
+import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
@@ -178,7 +179,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	private boolean damageBlock(Block block) {
 		if (MaterialCheck.isAir(block) || block.isLiquid() || TempBlock.isTempBlock(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation())) return false;
 		if (MaterialCheck.isLeaf(block) || isPlant(block) || materials.contains(block.getType().name()) || isEarthbendable(block)) {
-			new TempBlock(block, Material.AIR.createBlockData(), regen);
+			new RegenTempBlock(block, Material.AIR.createBlockData(), regen);
 			ParticleEffect.LAVA.display(block.getLocation(), 1, 0.5, 0.5, 0.5, 0.2);
 			if (ThreadLocalRandom.current().nextInt(5) == 0) {
 				location.getWorld().playSound(location, Sound.BLOCK_GRINDSTONE_USE, 0.3f, 0.3f);
