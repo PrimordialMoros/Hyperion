@@ -51,6 +51,8 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthLine.Cooldown", 3000);
 		config.addDefault("Abilities.Earth.EarthLine.Range", 24);
 		config.addDefault("Abilities.Earth.EarthLine.PrepareRange", 6);
+		config.addDefault("Abilities.Earth.EarthLine.Magma.DamageModifier", 2.0);
+		config.addDefault("Abilities.Earth.EarthLine.Magma.Regen", 20000);
 		config.addDefault("Abilities.Earth.EarthLine.Prison.Cooldown", 15000);
 		config.addDefault("Abilities.Earth.EarthLine.Prison.Duration", 3000);
 		config.addDefault("Abilities.Earth.EarthLine.Prison.Radius", 0.8);

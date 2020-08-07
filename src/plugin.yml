@@ -3,7 +3,7 @@ author: ${authorName}
 version: ${project.version}
 main: ${project.groupId}.${main}
 depend: [ProjectKorra]
-api-version: 1.16
+api-version: 1.14
 permissions:
   bending.command.hyperion:
     default: true

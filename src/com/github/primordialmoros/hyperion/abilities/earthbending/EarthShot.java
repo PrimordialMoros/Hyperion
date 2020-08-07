@@ -153,7 +153,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 	public boolean prepare() {
 		if (launched) return false;
 		Block block = getLavaSourceBlock(selectRange);
-		if (block == null) {
+		if (block == null || !bPlayer.canLavabend()) {
 			block = getEarthSourceBlock(selectRange);
 			if (block == null) return false;
 		}
