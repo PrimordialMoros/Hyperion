@@ -28,6 +28,7 @@ import com.github.primordialmoros.hyperion.abilities.earthbending.MetalHook;
 import com.github.primordialmoros.hyperion.abilities.firebending.Combustion;
 import com.github.primordialmoros.hyperion.abilities.firebending.combo.FireWave;
 import com.github.primordialmoros.hyperion.abilities.waterbending.FrostBreath;
+import com.github.primordialmoros.hyperion.abilities.waterbending.IceCrawl;
 import com.github.primordialmoros.hyperion.util.FastMath;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ProjectKorra;
@@ -43,6 +44,7 @@ import com.projectkorra.projectkorra.waterbending.SurgeWave;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -88,6 +90,14 @@ public class CoreMethods {
 	public static void playFocusParticles(final Player player) {
 		final Location smokeLoc = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(1.2)).add(0, 0.3, 0);
 		ParticleEffect.SMOKE_NORMAL.display(smokeLoc, 2, 0.05, 0.05, 0.05);
+	}
+
+	public static void playExtinguishEffect(Location location, int amount) {
+		if (location == null) return;
+		for (int i = 0; i < amount; i++) {
+			ParticleEffect.CLOUD.display(location, 1, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble());
+		}
+		location.getWorld().playSound(location, Sound.BLOCK_LAVA_EXTINGUISH, 1, 1);
 	}
 
 	public static BlockFace getLeftBlockFace(BlockFace forward) {
@@ -181,6 +191,8 @@ public class CoreMethods {
 		ProjectKorra.getCollisionInitializer().addSmallAbility(CoreAbility.getAbility(MetalHook.class));
 
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(EarthLine.class), CoreAbility.getAbility(AirShield.class), false, true));
+
+		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(IceCrawl.class), CoreAbility.getAbility(AirShield.class), false, true));
 
 		ProjectKorra.getCollisionInitializer().addLargeAbility(CoreAbility.getAbility(Combustion.class));
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(Combustion.class), CoreAbility.getAbility(FireShield.class), true, false));

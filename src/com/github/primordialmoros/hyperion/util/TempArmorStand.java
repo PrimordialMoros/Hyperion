@@ -54,9 +54,8 @@ public class TempArmorStand {
 	}
 
 	public TempArmorStand(CoreAbility abilityInstance, Location location, Material material, long delay, boolean showRemoveParticles) {
-		Location spawnLocation = location.clone();
 		headMaterial = material;
-		armorStand = spawnLocation.getWorld().spawn(spawnLocation, ArmorStand.class, entity -> {
+		armorStand = location.getWorld().spawn(location, ArmorStand.class, entity -> {
 			entity.setInvulnerable(true);
 			entity.setVisible(false);
 			entity.setGravity(false);

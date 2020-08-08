@@ -61,7 +61,6 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 
 	private static Set<String> materials;
 	private Location location;
-	private TempBlock sourceBlock;
 	private LavaDiskMode mode;
 
 	private double maxDamage, minDamage;
@@ -177,7 +176,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	}
 
 	private boolean damageBlock(Block block) {
-		if (MaterialCheck.isAir(block) || block.isLiquid() || TempBlock.isTempBlock(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation())) return false;
+		if (isMetal(block) || block.isLiquid() || TempBlock.isTempBlock(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation())) return false;
 		if (MaterialCheck.isLeaf(block) || isPlant(block) || materials.contains(block.getType().name()) || isEarthbendable(block)) {
 			new RegenTempBlock(block, Material.AIR.createBlockData(), regen);
 			ParticleEffect.LAVA.display(block.getLocation(), 1, 0.5, 0.5, 0.5, 0.2);
@@ -229,14 +228,14 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	private boolean prepare() {
 		Block source = getLavaSourceBlock(5);
 		if (source == null) source = getEarthSourceBlock(5);
-		if (source == null) return false;
+		if (source == null || isMetal(source)) return false;
 
 		for (int i = 1; i < 3; i++) {
 			Block temp = source.getRelative(BlockFace.UP, i);
 			if (isPlant(temp)) temp.breakNaturally();
 			if (temp.isLiquid() || !isTransparent(temp)) return false;
 		}
-		sourceBlock = new TempBlock(source, Material.AIR);
+		if (!isLava(source)) new RegenTempBlock(source, Material.AIR.createBlockData(), regen);
 		location = source.getLocation().add(0.5, 0.5, 0.5);
 		distance = location.distance(player.getEyeLocation());
 		return true;
@@ -307,11 +306,10 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 
 	@Override
 	public void remove() {
-		if (sourceBlock != null) sourceBlock.setRevertTime(regen);
 		for (int i = 0; i < 10; i++) {
 			ParticleEffect.BLOCK_CRACK.display(location, 2, 0, 0, 0, Material.MAGMA_BLOCK.createBlockData());
 		}
-		location.getWorld().playSound(location, Sound.BLOCK_BASALT_BREAK, 1, 0.5f);
+		location.getWorld().playSound(location, Sound.BLOCK_STONE_BREAK, 1, 1.5f);
 		ParticleEffect.LAVA.display(location, 2);
 		bPlayer.addCooldown(this);
 		MultiAbilityManager.unbindMultiAbility(this.player);

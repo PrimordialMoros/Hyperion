@@ -51,6 +51,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthLine.Cooldown", 3000);
 		config.addDefault("Abilities.Earth.EarthLine.Range", 24);
 		config.addDefault("Abilities.Earth.EarthLine.PrepareRange", 6);
+		config.addDefault("Abilities.Earth.EarthLine.AllowUnderWater", true);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.DamageModifier", 2.0);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.Regen", 20000);
 		config.addDefault("Abilities.Earth.EarthLine.Prison.Cooldown", 15000);
@@ -165,6 +166,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Water.IceCrawl.Range", 24);
 		config.addDefault("Abilities.Water.IceCrawl.PrepareRange", 8);
 		config.addDefault("Abilities.Water.IceCrawl.FreezeDuration", 2000);
+		config.addDefault("Abilities.Water.IceCrawl.IceDuration", 8000);
 
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Enabled", true);
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Description", "Given a large enough source of water or ice, a master waterbender is able to form a vast spike of ice capable of drilling through blocks.");

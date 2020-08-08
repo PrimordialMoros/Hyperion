@@ -166,6 +166,6 @@ public class CoreListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPKReload(final BendingReloadEvent event) {
-		Bukkit.getScheduler().runTaskLater(Hyperion.getPlugin(), Hyperion::reload,  1);
+		Bukkit.getScheduler().runTaskLater(Hyperion.getPlugin(), Hyperion::reload, 1);
 	}
 }
