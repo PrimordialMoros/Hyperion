@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+}
+
+group 'com.github.primordialmoros'
+version '1.4.0'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name 'papermc'
+        url 'https://papermc.io/repo/repository/maven-public/'
+    }
+    maven {
+        name 'jitpack'
+        url "https://jitpack.io"
+    }
+}
+
+processResources {
+    filter { String line -> line.replace('${project.version}', project.version) }
+}
+
+dependencies {
+    implementation 'com.github.ProjectKorra:ProjectKorra:c12e0daebb664d695f14191c597ab674764f8292'
+    implementation 'com.destroystokyo.paper:paper-api:1.16.1-R0.1-SNAPSHOT'
+}

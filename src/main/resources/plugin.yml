@@ -1,7 +1,8 @@
-name: ${project.name}
-author: ${authorName}
+name: Hyperion
+description: Addon plugin for ProjectKorra
+author: Moros
 version: ${project.version}
-main: ${project.groupId}.${main}
+main: com.github.primordialmoros.hyperion.Hyperion
 depend: [ProjectKorra]
 api-version: 1.14
 permissions:
