@@ -15,7 +15,6 @@ Addon plugin for ProjectKorra with an emphasis on intricate mechanics
 * EarthGlove
 * EarthGuard
 * EarthLine
-* EarthPrison
 * EarthShot
 * LavaDisk
 * MetalHook

@@ -161,7 +161,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 				location.add(0, -1, 0);
 			}
 		}
-		if (GeneralMethods.isRegionProtectedFromBuild(this, location) || location.distanceSquared(sourceBlock.getLocation()) > Math.pow(range, 2)) {
+		if (GeneralMethods.isRegionProtectedFromBuild(this, location) || location.distanceSquared(sourceBlock.getLocation()) > range * range) {
 			remove();
 		}
 	}

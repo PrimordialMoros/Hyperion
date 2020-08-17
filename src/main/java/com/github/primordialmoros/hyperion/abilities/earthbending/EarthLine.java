@@ -272,7 +272,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				return;
 			}
 		}
-		if (GeneralMethods.isRegionProtectedFromBuild(this, location) || location.distanceSquared(sourceBlock.getLocation()) > Math.pow(range, 2)) {
+		if (GeneralMethods.isRegionProtectedFromBuild(this, location) || location.distanceSquared(sourceBlock.getLocation()) > range * range) {
 			remove();
 		}
 	}
