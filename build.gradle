@@ -17,11 +17,11 @@ repositories {
 }
 
 processResources {
-    filter { String line -> line.replace("${project.version}", project.version) }
+    filter { String line -> line.replace('${project.version}', project.version) }
 }
 
 dependencies {
-    compileOnly("com.github.ProjectKorra:ProjectKorra:c12e0daebb664d695f14191c597ab674764f8292")
+    compileOnly("com.github.ProjectKorra:ProjectKorra:3c1d6b7b8523eacb8cdef7a246bc7ddf9a35038b")
     compileOnly("org.spigotmc:spigot-api:1.16.1-R0.1-SNAPSHOT")
 }
 

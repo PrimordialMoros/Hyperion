@@ -73,6 +73,8 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	private int angle;
 	private int rotationAngle;
 
+	private int ticks = 0;
+
 	public LavaDisk(Player player) {
 		super(player);
 
@@ -148,7 +150,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 		rotationAngle += (deltaSpeed % 2 == 0) ? deltaSpeed : ++deltaSpeed;
 		if (rotationAngle >= 360) rotationAngle = 0;
 		displayLavaDisk();
-		if (getCurrentTick() % 4 == 0) {
+		if (ticks % 4 == 0) {
 			double damage;
 			if (mode == LavaDiskMode.ADVANCE || mode == LavaDiskMode.RETURN) {
 				damage = maxDamage;
@@ -157,6 +159,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 			}
 			checkDamage(damage);
 		}
+		ticks++;
 	}
 
 	private void checkDamage(double damage) {

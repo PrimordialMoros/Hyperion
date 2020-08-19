@@ -33,6 +33,8 @@ public class Evade extends AirAbility implements AddonAbility {
 
 	private double angleStep;
 
+	private int ticks = 0;
+
 	public Evade(Player player) {
 		super(player);
 
@@ -55,7 +57,7 @@ public class Evade extends AirAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (!bPlayer.canBendIgnoreCooldowns(this) || getCurrentTick() > getStartTick() + 10) {
+		if (!bPlayer.canBendIgnoreCooldowns(this) || ticks > 10) {
 			remove();
 			return;
 		}
@@ -64,6 +66,7 @@ public class Evade extends AirAbility implements AddonAbility {
 			direction.rotateAroundY(angleStep);
 			playAirbendingParticles(player.getLocation().add(0, 1, 0), 2, 0, 0, 0);
 		}
+		ticks++;
 	}
 
 	@Override

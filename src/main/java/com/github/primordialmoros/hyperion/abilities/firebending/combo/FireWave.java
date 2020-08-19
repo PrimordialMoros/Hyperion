@@ -68,6 +68,8 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 	private int width;
 	private int height;
 
+	private int ticks = 0;
+
 	public FireWave(Player player) {
 		super(player);
 
@@ -123,11 +125,11 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 			return;
 		}
 
-		if (getCurrentTick() % 10 == 0) {
+		if (ticks % 10 == 0) {
 			checkDamage();
 		}
 
-		if (getCurrentTick() % (moveRate / 50) == 0) {
+		if (ticks % (moveRate / 50) == 0) {
 			if (waveIterator.hasNext()) {
 				Location tempLoc = waveIterator.next().getLocation();
 				if (!prepare(tempLoc.getBlock())) {
@@ -136,6 +138,7 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 			}
 			visualiseWall();
 		}
+		ticks++;
 	}
 
 	private void checkDamage() {
@@ -180,7 +183,11 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 
 	private void visualiseWall() {
 		for (Block block : blocks) {
-			playFirebendingParticles(block.getLocation(), 3, 0.5, 0.5, 0.5);
+			try {
+				playFirebendingParticles(block.getLocation(), 3, 0.5, 0.5, 0.5);
+			} catch (IncompatibleClassChangeError e) {
+				ParticleEffect.FLAME.display(block.getLocation(), 3, 0.5, 0.5, 0.5);
+			}
 			if (ThreadLocalRandom.current().nextInt(3) == 0) {
 				ParticleEffect.SMOKE_NORMAL.display(block.getLocation(), 1, 0.5, 0.5, 0.5);
 			}

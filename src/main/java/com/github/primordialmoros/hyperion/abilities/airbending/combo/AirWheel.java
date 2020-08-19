@@ -54,6 +54,8 @@ public class AirWheel extends AirAbility implements AddonAbility, ComboAbility {
 
 	private double scooterSpeed;
 
+	private int ticks = 0;
+
 	public AirWheel(Player player) {
 		super(player);
 
@@ -76,10 +78,11 @@ public class AirWheel extends AirAbility implements AddonAbility, ComboAbility {
 			remove();
 			return;
 		}
-		if (getCurrentTick() % 200 == 0) affectedEntities.keySet().removeIf(Entity::isDead); // Cleanup every 200 ticks
-		if (getCurrentTick() % 2 == 0) return;
+		ticks++;
+		if (ticks % 200 == 0) affectedEntities.keySet().removeIf(Entity::isDead); // Cleanup every 200 ticks
+		if (ticks % 2 == 0) return;
 
-		int limit = (getCurrentTick() % 3 == 0) ? 270 : 90;
+		int limit = (ticks % 3 == 0) ? 270 : 90;
 		final Location tempLoc = player.getLocation();
 		tempLoc.setPitch(0);
 		tempLoc.add(0, 0.8, 0).add(tempLoc.getDirection().multiply(2.2*scooterSpeed));
