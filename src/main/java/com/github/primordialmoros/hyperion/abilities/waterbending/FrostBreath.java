@@ -30,6 +30,7 @@ import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.IceAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
@@ -62,10 +63,15 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 	private final Set<Location> line = new LinkedHashSet<>();
 	private Location location;
 
+	@Attribute(Attribute.DAMAGE)
 	private double damage;
+	@Attribute(Attribute.RANGE)
 	private int range;
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.CHARGE_DURATION)
 	private long chargeTime;
+	@Attribute(Attribute.DURATION)
 	private long frostDuration;
 
 	private double currentRange;

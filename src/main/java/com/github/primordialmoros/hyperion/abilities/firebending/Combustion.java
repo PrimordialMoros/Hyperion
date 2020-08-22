@@ -28,6 +28,7 @@ import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.CombustionAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
 import com.projectkorra.projectkorra.util.DamageHandler;
@@ -48,12 +49,18 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Combustion extends CombustionAbility implements AddonAbility {
 	private Location location;
 
+	@Attribute(Attribute.DAMAGE)
 	private double damage;
+	@Attribute(Attribute.RANGE)
 	private int range;
+	@Attribute("Power")
 	private int power;
 	private int misfireModifier;
+	@Attribute(Attribute.CHARGE_DURATION)
 	private long chargeTime;
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute("RegenDelay")
 	private long regenBlockTime;
 
 	private boolean charged;

@@ -24,6 +24,7 @@ import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
@@ -55,9 +56,13 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 	private BlockData blockData;
 	private GameMode originalMode;
 
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.DURATION)
 	private long duration;
+	@Attribute(Attribute.SELECT_RANGE)
 	private int selectRange;
+	@Attribute("Resistance")
 	private int resistance;
 
 	private boolean formed;

@@ -27,8 +27,10 @@ import com.github.primordialmoros.hyperion.abilities.firebending.Bolt;
 import com.github.primordialmoros.hyperion.abilities.firebending.Bolt.BoltInfo;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
+import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.event.BendingReloadEvent;
+import com.projectkorra.projectkorra.event.PlayerCooldownChangeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
@@ -168,5 +170,15 @@ public class CoreListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPKReload(final BendingReloadEvent event) {
 		Bukkit.getScheduler().runTaskLater(Hyperion.getPlugin(), Hyperion::reload, 1);
+	}
+
+	@EventHandler
+	public void onAbilityCooldown(final PlayerCooldownChangeEvent event) {
+		final Player player = event.getPlayer();
+		final BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+		if (event.isCancelled() || player == null || bPlayer == null) return;
+		if (bPlayer.isAvatarState()) {
+			// TODO handle cooldown for Hyperion abilities using attributes
+		}
 	}
 }

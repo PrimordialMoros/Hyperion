@@ -28,6 +28,7 @@ import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.ComboAbility;
 import com.projectkorra.projectkorra.ability.IceAbility;
 import com.projectkorra.projectkorra.ability.util.ComboManager.AbilityInformation;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.util.BlockSource;
 import com.projectkorra.projectkorra.util.ClickType;
 import com.projectkorra.projectkorra.util.TempBlock;
@@ -53,10 +54,15 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 	private Location origin;
 	private Location tip;
 
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.SELECT_RANGE)
 	private int sourceRange;
+	@Attribute(Attribute.RANGE)
 	private int maxLength;
+	@Attribute(Attribute.DURATION)
 	private long duration;
+	@Attribute("RegenDelay")
 	private long regenDelay;
 
 	private boolean started;

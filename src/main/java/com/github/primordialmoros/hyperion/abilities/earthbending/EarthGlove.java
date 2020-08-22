@@ -26,6 +26,7 @@ import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -56,8 +57,11 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 	private Vector lastVelocity;
 	private Item glove;
 
+	@Attribute(Attribute.DAMAGE)
 	private double damage;
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.RANGE)
 	private int range;
 
 	public boolean returning;

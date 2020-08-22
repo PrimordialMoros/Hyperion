@@ -26,6 +26,7 @@ import com.github.primordialmoros.hyperion.util.MaterialCheck;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -52,12 +53,18 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 	private Location location;
 	private Location origin;
 
+	@Attribute(Attribute.DAMAGE)
 	private double damage;
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.RANGE)
 	private int range;
+	@Attribute(Attribute.SELECT_RANGE)
 	private int selectRange;
 	private boolean magmaShot;
+	@Attribute("MagmaModifier")
 	private double magmaModifier;
+	@Attribute(Attribute.CHARGE_DURATION)
 	private long magmaPrepareTime;
 
 	private boolean ready;

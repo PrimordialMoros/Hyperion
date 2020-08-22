@@ -25,6 +25,7 @@ import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.PassiveAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,6 +33,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 public class EarthCling extends EarthAbility implements AddonAbility, PassiveAbility {
+	@Attribute(Attribute.SPEED)
 	private double speed;
 
 	public EarthCling(Player player) {

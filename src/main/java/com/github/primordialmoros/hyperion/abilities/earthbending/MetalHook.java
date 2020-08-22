@@ -25,6 +25,7 @@ import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.MetalAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -50,7 +51,9 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 	private BlockData originalData;
 	private Arrow hook;
 
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.RANGE)
 	private int range;
 
 	private boolean reeling;

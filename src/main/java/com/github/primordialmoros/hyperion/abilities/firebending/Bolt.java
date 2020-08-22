@@ -28,6 +28,7 @@ import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.LightningAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import org.bukkit.Location;
@@ -44,9 +45,13 @@ import java.util.Collections;
 public class Bolt extends LightningAbility implements AddonAbility {
 	private Location location;
 
+	@Attribute(Attribute.DAMAGE)
 	private double damage;
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.RANGE)
 	private int range;
+	@Attribute(Attribute.CHARGE_DURATION)
 	private long chargeTime;
 
 	private long strikeTime;

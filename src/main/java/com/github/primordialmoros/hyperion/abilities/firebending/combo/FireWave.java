@@ -24,10 +24,12 @@ import com.projectkorra.projectkorra.Element.SubElement;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
+import com.projectkorra.projectkorra.ability.BlueFireAbility;
 import com.projectkorra.projectkorra.ability.ComboAbility;
 import com.projectkorra.projectkorra.ability.FireAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.ability.util.ComboManager.AbilityInformation;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.firebending.WallOfFire;
 import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
@@ -61,11 +63,17 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 	private Vector vertical;
 	private Vector horizontal;
 
+	@Attribute(Attribute.DAMAGE)
 	private double damage;
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.DURATION)
 	private long duration;
+	@Attribute(Attribute.SPEED)
 	private long moveRate;
+	@Attribute(Attribute.HEIGHT)
 	private int maxHeight;
+	@Attribute(Attribute.WIDTH)
 	private int width;
 	private int height;
 
@@ -85,6 +93,14 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 		moveRate = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.FireCombo.FireWave.MoveRate");
 		maxHeight = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.FireCombo.FireWave.MaxHeight");
 		width = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.FireCombo.FireWave.Width");
+
+		if (bPlayer.canUseSubElement(SubElement.BLUE_FIRE)) {
+			damage *= BlueFireAbility.getDamageFactor();
+			height *= BlueFireAbility.getRangeFactor();
+			maxHeight *= BlueFireAbility.getRangeFactor();
+			width *= BlueFireAbility.getRangeFactor();
+			cooldown *= BlueFireAbility.getCooldownFactor();
+		}
 
 		damage = getDayFactor(damage, player.getWorld());
 		height = (int) getDayFactor(2, player.getWorld());

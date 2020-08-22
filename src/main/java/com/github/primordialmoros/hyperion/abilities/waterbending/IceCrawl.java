@@ -28,6 +28,7 @@ import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.IceAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
@@ -57,11 +58,17 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 	private Vector direction;
 	private Block sourceBlock;
 
+	@Attribute(Attribute.DAMAGE)
 	private double damage;
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.RANGE)
 	private int range;
+	@Attribute(Attribute.SELECT_RANGE)
 	private int prepareRange;
+	@Attribute(Attribute.DURATION)
 	private long duration;
+	@Attribute("RegenDelay")
 	private long iceDuration;
 
 	private boolean launched;

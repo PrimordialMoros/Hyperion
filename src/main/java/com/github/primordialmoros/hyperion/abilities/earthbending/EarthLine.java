@@ -28,6 +28,7 @@ import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.earthbending.RaiseEarth;
 import com.projectkorra.projectkorra.earthbending.passive.DensityShift;
@@ -67,17 +68,27 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	private TempBlock sourceBlock;
 	private EarthLineMode mode;
 
+	@Attribute(Attribute.DAMAGE)
 	private double damage;
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.RANGE)
 	private int range;
+	@Attribute(Attribute.SELECT_RANGE)
 	private int prepareRange;
 
+	@Attribute("PrisonCooldown")
 	private long prisonCooldown;
+	@Attribute("PrisonDuration")
 	private long prisonDuration;
+	@Attribute(Attribute.RADIUS)
 	private double prisonRadius;
+	@Attribute("PrisonPoints")
 	private int prisonPoints;
 
+	@Attribute("MagmaModifier")
 	private double magmaModifier;
+	@Attribute("RegenDelay")
 	private long regen;
 
 	private boolean allowUnderWater;

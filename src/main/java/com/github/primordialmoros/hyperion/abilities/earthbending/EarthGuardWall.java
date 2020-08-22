@@ -24,6 +24,7 @@ import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.earthbending.Collapse;
 import com.projectkorra.projectkorra.earthbending.RaiseEarth;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -40,7 +41,9 @@ import java.util.Set;
 public class EarthGuardWall extends EarthAbility implements AddonAbility {
 	private final Set<Block> pillars = new HashSet<>();
 
+	@Attribute(Attribute.DURATION)
 	private long wallDuration;
+	@Attribute(Attribute.COOLDOWN)
 	private long wallCooldown;
 
 	public EarthGuardWall(Player player) {

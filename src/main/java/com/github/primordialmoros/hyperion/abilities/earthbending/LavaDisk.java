@@ -30,6 +30,7 @@ import com.projectkorra.projectkorra.ability.LavaAbility;
 import com.projectkorra.projectkorra.ability.MultiAbility;
 import com.projectkorra.projectkorra.ability.util.MultiAbilityManager;
 import com.projectkorra.projectkorra.ability.util.MultiAbilityManager.MultiAbilityInfoSub;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -62,9 +63,14 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	private Location location;
 	private LavaDiskMode mode;
 
-	private double maxDamage, minDamage;
+	@Attribute(Attribute.DAMAGE)
+	private double maxDamage;
+	private double minDamage;
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
+	@Attribute(Attribute.RANGE)
 	private int range;
+	@Attribute("RegenDelay")
 	private long regen;
 	private boolean passHit;
 
