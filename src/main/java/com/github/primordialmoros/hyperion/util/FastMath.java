@@ -34,6 +34,6 @@ public class FastMath {
 	}
 
 	public static double cos(int angle) {
-		return sin(angle+90);
+		return sin(angle + 90);
 	}
 }

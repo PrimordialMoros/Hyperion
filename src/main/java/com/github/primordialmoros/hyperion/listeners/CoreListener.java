@@ -85,7 +85,8 @@ public class CoreListener implements Listener {
 		if (event.getEntity() instanceof LightningStrike && event.getEntity().hasMetadata(CoreMethods.BOLT_KEY)) {
 			final BoltInfo boltInfo = (BoltInfo) event.getEntity().getMetadata(CoreMethods.BOLT_KEY).get(0).value();
 			if (boltInfo != null) {
-				if (!Bolt.isNearbyChannel(boltInfo.getLocation(), boltInfo.getAbility().getPlayer())) Bolt.dealDamage(boltInfo);
+				if (!Bolt.isNearbyChannel(boltInfo.getLocation(), boltInfo.getAbility().getPlayer()))
+					Bolt.dealDamage(boltInfo);
 			}
 		}
 	}

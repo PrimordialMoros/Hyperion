@@ -22,7 +22,6 @@ package com.github.primordialmoros.hyperion.abilities.waterbending;
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
-import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.github.primordialmoros.hyperion.util.TempArmorStand;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
@@ -32,6 +31,7 @@ import com.projectkorra.projectkorra.ability.IceAbility;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
+import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import com.projectkorra.projectkorra.waterbending.ice.PhaseChange;
 import org.bukkit.Location;
@@ -138,7 +138,8 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 			remove();
 		}
 
-		if (isWater(location.getBlock().getRelative(BlockFace.DOWN))) PhaseChange.getFrozenBlocksMap().put(new RegenTempBlock(location.getBlock().getRelative(BlockFace.DOWN), Material.ICE.createBlockData(), iceDuration), player);
+		if (isWater(location.getBlock().getRelative(BlockFace.DOWN)))
+			PhaseChange.getFrozenBlocksMap().put(new TempBlock(location.getBlock().getRelative(BlockFace.DOWN), Material.ICE.createBlockData(), iceDuration), player);
 		double x = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
 		double z = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
 		new TempArmorStand(this, location.clone().add(x, -2, z), Material.PACKED_ICE, 1400);

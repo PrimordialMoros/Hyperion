@@ -1,10 +1,10 @@
 name: Hyperion
 description: Addon plugin for ProjectKorra
 author: Moros
-version: ${project.version}
+version: ${pluginVersion}
 main: com.github.primordialmoros.hyperion.Hyperion
 depend: [ProjectKorra]
-api-version: 1.14
+api-version: 1.16
 permissions:
   bending.command.hyperion:
     default: true

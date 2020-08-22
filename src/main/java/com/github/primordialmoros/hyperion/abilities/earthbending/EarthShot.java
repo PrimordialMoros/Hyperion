@@ -186,7 +186,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 				default:
 					data = block.getBlockData();
 			}
-			if (isMetal(block)){
+			if (isMetal(block)) {
 				playMetalbendingSound(block.getLocation());
 				magmaShot = false;
 			} else {

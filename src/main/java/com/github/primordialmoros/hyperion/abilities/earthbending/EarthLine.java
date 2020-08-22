@@ -22,7 +22,6 @@ package com.github.primordialmoros.hyperion.abilities.earthbending;
 import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
-import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.github.primordialmoros.hyperion.util.TempArmorStand;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
@@ -33,6 +32,7 @@ import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.earthbending.RaiseEarth;
 import com.projectkorra.projectkorra.earthbending.passive.DensityShift;
 import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
+import com.projectkorra.projectkorra.util.ActionBar;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -155,7 +155,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 							Block block = collapseBlocks.get(randomIndex);
 							collapseBlocks.remove(randomIndex);
 							final Vector velocity = new Vector(ThreadLocalRandom.current().nextDouble(-0.2, 0.2), ThreadLocalRandom.current().nextDouble(0.1), ThreadLocalRandom.current().nextDouble(-0.2, 0.2));
-							new RegenTempBlock(block, Material.AIR.createBlockData(), regen);
+							new TempBlock(block, Material.AIR.createBlockData(), regen);
 							new BendingFallingBlock(block.getLocation().add(0.5, 0, 0.5), Material.MAGMA_BLOCK.createBlockData(), velocity, this, true);
 						}
 						return;
@@ -193,8 +193,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		if (mode != EarthLineMode.NORMAL) return;
 		ticks = 0;
 		mode = EarthLineMode.PRISON;
-		// TODO add in next PK update
-		// ActionBar.sendActionBar(getElement().getColor() + "* Prison Mode *");
+		ActionBar.sendActionBar(getElement().getColor() + "* Prison Mode *", player);
 	}
 
 	private void imprisonTarget() {
@@ -244,7 +243,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	private void advanceLocation() {
 		if (isWater(location.getBlock())) {
-			if (mode == EarthLineMode.MAGMA ) {
+			if (mode == EarthLineMode.MAGMA) {
 				CoreMethods.playExtinguishEffect(location.clone().add(0, 0.2, 0), 16);
 				remove();
 			} else if (!allowUnderWater) {

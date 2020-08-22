@@ -74,12 +74,12 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (hook == null || !hook.isValid() || !player.getWorld().equals(hook.getWorld()) || !bPlayer.canBendIgnoreCooldowns(this) ) {
+		if (hook == null || !hook.isValid() || !player.getWorld().equals(hook.getWorld()) || !bPlayer.canBendIgnoreCooldowns(this)) {
 			remove();
 			return;
 		}
 
-		if (origin.distanceSquared(hook.getLocation()) > range*range) {
+		if (origin.distanceSquared(hook.getLocation()) > range * range) {
 			remove();
 			return;
 		}
@@ -216,7 +216,7 @@ public class MetalHook extends MetalAbility implements AddonAbility {
 
 	@Override
 	public void handleCollision(Collision collision) {
-		collision.setRemovingSecond(collision.getAbilitySecond() instanceof  MetalHook);
+		collision.setRemovingSecond(collision.getAbilitySecond() instanceof MetalHook);
 		super.handleCollision(collision);
 	}
 

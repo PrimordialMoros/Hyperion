@@ -170,6 +170,18 @@ public class CoreMethods {
 		return new Vector(end.getX() - start.getX(), 0, end.getZ() - start.getZ()).normalize();
 	}
 
+	public static void rotateAroundAxisX(Vector v, double cos, double sin) {
+		double y = v.getY() * cos - v.getZ() * sin;
+		double z = v.getY() * sin + v.getZ() * cos;
+		v.setY(y).setZ(z);
+	}
+
+	public static void rotateAroundAxisY(Vector v, double cos, double sin) {
+		double x = v.getX() * cos + v.getZ() * sin;
+		double z = v.getX() * -sin + v.getZ() * cos;
+		v.setX(x).setZ(z);
+	}
+
 	public static void loadAbilities() {
 		CoreAbility.registerPluginAbilities(Hyperion.getPlugin(), "com.github.primordialmoros.hyperion.abilities");
 

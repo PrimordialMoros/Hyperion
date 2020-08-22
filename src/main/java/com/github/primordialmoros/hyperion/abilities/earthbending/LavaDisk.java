@@ -23,7 +23,6 @@ import com.github.primordialmoros.hyperion.Hyperion;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.FastMath;
 import com.github.primordialmoros.hyperion.util.MaterialCheck;
-import com.github.primordialmoros.hyperion.util.RegenTempBlock;
 import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
@@ -155,7 +154,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 			if (mode == LavaDiskMode.ADVANCE || mode == LavaDiskMode.RETURN) {
 				damage = maxDamage;
 			} else {
-				damage = Math.max(minDamage, maxDamage*distanceModifier);
+				damage = Math.max(minDamage, maxDamage * distanceModifier);
 			}
 			checkDamage(damage);
 		}
@@ -179,9 +178,10 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	}
 
 	private boolean damageBlock(Block block) {
-		if (isMetal(block) || block.isLiquid() || TempBlock.isTempBlock(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation())) return false;
+		if (isMetal(block) || block.isLiquid() || TempBlock.isTempBlock(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation()))
+			return false;
 		if (MaterialCheck.isLeaf(block) || isPlant(block) || materials.contains(block.getType().name()) || isEarthbendable(block)) {
-			new RegenTempBlock(block, Material.AIR.createBlockData(), regen);
+			new TempBlock(block, Material.AIR.createBlockData(), regen);
 			ParticleEffect.LAVA.display(block.getLocation(), 1, 0.5, 0.5, 0.5, 0.2);
 			if (ThreadLocalRandom.current().nextInt(5) == 0) {
 				location.getWorld().playSound(location, Sound.BLOCK_GRINDSTONE_USE, 0.3f, 0.3f);
@@ -205,8 +205,8 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 		for (double pos = 0.1; pos <= 0.8; pos += 0.1) {
 			for (int j = 0; j <= 288; j += 72) {
 				final Vector temp = new Vector(pos * FastMath.cos(rotationAngle + j + offset), 0, pos * FastMath.sin(rotationAngle + j + offset));
-				if (angle != 0) rotateAroundAxisX(temp, cos, sin);
-				if (angle2 != 0) rotateAroundAxisY(temp, cos2, sin2);
+				if (angle != 0) CoreMethods.rotateAroundAxisX(temp, cos, sin);
+				if (angle2 != 0) CoreMethods.rotateAroundAxisY(temp, cos2, sin2);
 				CoreMethods.displayColoredParticle(colors[index], location.clone().add(temp), 1, 0, 0, 0, size);
 				if (pos > 0.5) damageBlock(location.clone().add(temp).getBlock());
 			}
@@ -217,7 +217,8 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	}
 
 	private boolean isLocationSafe() {
-		if (location == null || location.getY() <= 2 || location.getY() >= location.getWorld().getMaxHeight()) return false;
+		if (location == null || location.getY() <= 2 || location.getY() >= location.getWorld().getMaxHeight())
+			return false;
 		if (isWater(location.getBlock())) {
 			for (int i = 0; i < 10; i++) {
 				ParticleEffect.CLOUD.display(location, 2, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble());
@@ -238,7 +239,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 			if (isPlant(temp)) temp.breakNaturally();
 			if (temp.isLiquid() || !isTransparent(temp)) return false;
 		}
-		if (!isLava(source)) new RegenTempBlock(source, Material.AIR.createBlockData(), regen);
+		if (!isLava(source)) new TempBlock(source, Material.AIR.createBlockData(), regen);
 		location = source.getLocation().add(0.5, 0.5, 0.5);
 		distance = location.distance(player.getEyeLocation());
 		return true;
@@ -328,17 +329,5 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 		abils.add(new MultiAbilityInfoSub("Rotate", Element.LAVA));
 		abils.add(new MultiAbilityInfoSub("Shatter", Element.LAVA));
 		return abils;
-	}
-
-	public static void rotateAroundAxisX(Vector v, double cos, double sin) {
-		double y = v.getY() * cos - v.getZ() * sin;
-		double z = v.getY() * sin + v.getZ() * cos;
-		v.setY(y).setZ(z);
-	}
-
-	public static void rotateAroundAxisY(Vector v, double cos, double sin) {
-		double x = v.getX() * cos + v.getZ() * sin;
-		double z = v.getX() * -sin + v.getZ() * cos;
-		v.setX(x).setZ(z);
 	}
 }

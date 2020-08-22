@@ -25,8 +25,8 @@ import com.github.primordialmoros.hyperion.listeners.AbilityListener;
 import com.github.primordialmoros.hyperion.listeners.CoreListener;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
-import com.github.primordialmoros.hyperion.util.MetricsLite;
 import com.github.primordialmoros.hyperion.util.TempArmorStand;
+import org.bstats.bukkit.MetricsLite;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;

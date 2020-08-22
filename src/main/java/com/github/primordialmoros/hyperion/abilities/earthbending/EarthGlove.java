@@ -46,7 +46,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class EarthGlove extends EarthAbility implements AddonAbility {
-	enum Side { RIGHT, LEFT }
+	enum Side {RIGHT, LEFT}
 
 	private static final Map<UUID, Side> lastUsedSide = new ConcurrentHashMap<>();
 	private static final double GLOVE_SPEED = 1.2;

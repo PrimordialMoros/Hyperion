@@ -20,6 +20,7 @@
 package com.github.primordialmoros.hyperion.abilities.firebending.combo;
 
 import com.github.primordialmoros.hyperion.Hyperion;
+import com.projectkorra.projectkorra.Element.SubElement;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
@@ -183,11 +184,7 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 
 	private void visualiseWall() {
 		for (Block block : blocks) {
-			try {
-				playFirebendingParticles(block.getLocation(), 3, 0.5, 0.5, 0.5);
-			} catch (IncompatibleClassChangeError e) {
-				ParticleEffect.FLAME.display(block.getLocation(), 3, 0.5, 0.5, 0.5);
-			}
+			playFirebendingParticles(block.getLocation(), 3, 0.5, 0.5, 0.5);
 			if (ThreadLocalRandom.current().nextInt(3) == 0) {
 				ParticleEffect.SMOKE_NORMAL.display(block.getLocation(), 1, 0.5, 0.5, 0.5);
 			}
@@ -281,7 +278,7 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 	@Override
 	public void handleCollision(Collision collision) {
 		if (collision.getAbilitySecond() instanceof SurgeWave || collision.getAbilitySecond() instanceof SurgeWall) {
-			collision.setRemovingFirst(true); // TODO update to not remove if bPlayer.canUseSubElement(Element.BLUE_FIRE)
+			if (!bPlayer.canUseSubElement(SubElement.BLUE_FIRE)) collision.setRemovingFirst(true);
 			if (collision.getAbilitySecond() instanceof SurgeWall && ((SurgeWall) collision.getAbilitySecond()).isFrozen()) {
 				collision.setRemovingSecond(false);
 			}

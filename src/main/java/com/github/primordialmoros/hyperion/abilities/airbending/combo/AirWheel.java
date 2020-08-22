@@ -85,7 +85,7 @@ public class AirWheel extends AirAbility implements AddonAbility, ComboAbility {
 		int limit = (ticks % 3 == 0) ? 270 : 90;
 		final Location tempLoc = player.getLocation();
 		tempLoc.setPitch(0);
-		tempLoc.add(0, 0.8, 0).add(tempLoc.getDirection().multiply(2.2*scooterSpeed));
+		tempLoc.add(0, 0.8, 0).add(tempLoc.getDirection().multiply(2.2 * scooterSpeed));
 		wheelLocations.clear();
 		for (int i = -90; i <= limit; i += 12) {
 			final Location particleLocation = tempLoc.clone();
