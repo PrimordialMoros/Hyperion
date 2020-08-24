@@ -57,7 +57,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
 	@Attribute(Attribute.SELECT_RANGE)
-	private int sourceRange;
+	private int selectRange;
 	@Attribute(Attribute.RANGE)
 	private int maxLength;
 	@Attribute(Attribute.DURATION)
@@ -75,12 +75,12 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 		}
 
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.WaterCombo.IceDrill.Cooldown");
-		sourceRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.WaterCombo.IceDrill.SourceRange");
+		selectRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.WaterCombo.IceDrill.SelectRange");
 		maxLength = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.WaterCombo.IceDrill.MaxLength");
 		duration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.WaterCombo.IceDrill.Duration");
 		regenDelay = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.WaterCombo.IceDrill.RegenBlockTime");
 
-		sourceRange = (int) getNightFactor(sourceRange, player.getWorld());
+		selectRange = (int) getNightFactor(selectRange, player.getWorld());
 
 		started = false;
 
@@ -140,7 +140,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 
 	private void prepareCone() {
 		maxLength = (int) getNightFactor(maxLength, origin.getWorld());
-		final Vector direction = GeneralMethods.getDirection(origin, GeneralMethods.getTargetedLocation(player, sourceRange + maxLength)).normalize();
+		final Vector direction = GeneralMethods.getDirection(origin, GeneralMethods.getTargetedLocation(player, selectRange + maxLength)).normalize();
 		tip = origin.clone().add(direction.clone().multiply(maxLength));
 		final Location targetLocation = origin.clone().add(direction.clone().multiply(maxLength - 1));
 		int radius = (int) Math.ceil(0.2 * maxLength);
@@ -158,7 +158,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 	}
 
 	private boolean grabSource() {
-		final Block sourceBlock = BlockSource.getWaterSourceBlock(player, sourceRange, ClickType.SHIFT_DOWN, true, true, false);
+		final Block sourceBlock = BlockSource.getWaterSourceBlock(player, selectRange, ClickType.SHIFT_DOWN, true, true, false);
 		if (!GeneralMethods.isAdjacentToThreeOrMoreSources(sourceBlock) || GeneralMethods.isRegionProtectedFromBuild(this, sourceBlock.getLocation())) {
 			return false;
 		}

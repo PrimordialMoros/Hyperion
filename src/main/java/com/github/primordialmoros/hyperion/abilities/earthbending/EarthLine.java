@@ -75,7 +75,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	@Attribute(Attribute.RANGE)
 	private int range;
 	@Attribute(Attribute.SELECT_RANGE)
-	private int prepareRange;
+	private int selectRange;
 
 	@Attribute("PrisonCooldown")
 	private long prisonCooldown;
@@ -117,7 +117,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Damage");
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.Range");
-		prepareRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.PrepareRange");
+		selectRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.SelectRange");
 		allowUnderWater = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.AllowUnderWater");
 		magmaModifier = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Magma.DamageModifier");
 		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Magma.Regen");
@@ -140,7 +140,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 			}
 
 			if (player.isSneaking() && mode != EarthLineMode.MAGMA) {
-				endLocation = GeneralMethods.getTargetedLocation(player, range + prepareRange);
+				endLocation = GeneralMethods.getTargetedLocation(player, range + selectRange);
 				direction = CoreMethods.calculateFlatVector(sourceBlock.getLocation(), endLocation);
 			}
 
@@ -179,7 +179,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 			checkDamage(1);
 			if (ThreadLocalRandom.current().nextInt(5) == 0) playEarthbendingSound(location);
 		} else {
-			if (!bPlayer.canBendIgnoreCooldowns(this) || sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(prepareRange + 5, 2)) {
+			if (!bPlayer.canBendIgnoreCooldowns(this) || sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(selectRange + 5, 2)) {
 				remove();
 			}
 		}
@@ -326,9 +326,9 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	public boolean prepare() {
 		if (launched) return false;
-		Block block = getLavaSourceBlock(prepareRange);
+		Block block = getLavaSourceBlock(selectRange);
 		if (block == null || !bPlayer.canLavabend()) {
-			block = getEarthSourceBlock(prepareRange);
+			block = getEarthSourceBlock(selectRange);
 		}
 		if (block == null || block.getRelative(BlockFace.UP).isLiquid() || !isTransparent(block.getRelative(BlockFace.UP))) {
 			if (isStarted()) remove();
@@ -460,7 +460,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 			return;
 		}
 
-		final Entity targetedEntity = GeneralMethods.getTargetedEntity(player, range + prepareRange, Collections.singletonList(player));
+		final Entity targetedEntity = GeneralMethods.getTargetedEntity(player, range + selectRange, Collections.singletonList(player));
 		if (targetedEntity instanceof LivingEntity && targetedEntity.getLocation().distanceSquared(location) <= range * range) {
 			endLocation = targetedEntity.getLocation();
 		} else {

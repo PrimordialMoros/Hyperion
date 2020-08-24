@@ -65,7 +65,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 	@Attribute(Attribute.RANGE)
 	private int range;
 	@Attribute(Attribute.SELECT_RANGE)
-	private int prepareRange;
+	private int selectRange;
 	@Attribute(Attribute.DURATION)
 	private long duration;
 	@Attribute("RegenDelay")
@@ -89,12 +89,12 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Water.IceCrawl.Damage");
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceCrawl.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceCrawl.Range");
-		prepareRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceCrawl.PrepareRange");
+		selectRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceCrawl.SelectRange");
 		iceDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceCrawl.IceDuration");
 		duration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceCrawl.FreezeDuration");
 
 		range = (int) getNightFactor(range, player.getWorld());
-		prepareRange = (int) getNightFactor(prepareRange, player.getWorld());
+		selectRange = (int) getNightFactor(selectRange, player.getWorld());
 		duration = (long) getNightFactor(duration, player.getWorld());
 
 		launched = false;
@@ -127,7 +127,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 			checkDamage();
 			if (ThreadLocalRandom.current().nextInt(5) == 0) playIcebendingSound(location);
 		} else {
-			if (!bPlayer.canBendIgnoreCooldowns(this) || sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(prepareRange + 5, 2)) {
+			if (!bPlayer.canBendIgnoreCooldowns(this) || sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(selectRange + 5, 2)) {
 				remove();
 				return;
 			}
@@ -203,9 +203,9 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 
 	public boolean prepare() {
 		if (launched) return false;
-		Block block = getIceSourceBlock(player, prepareRange);
+		Block block = getIceSourceBlock(player, selectRange);
 		if (block == null) {
-			block = getWaterSourceBlock(player, prepareRange, false);
+			block = getWaterSourceBlock(player, selectRange, false);
 		}
 
 		if (block == null || (!isWater(block) && !isIce(block)) || !isTransparent(block.getRelative(BlockFace.UP))) {
@@ -290,7 +290,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 
 	private void shootLine() {
 		if (launched) return;
-		final Entity targetedEntity = GeneralMethods.getTargetedEntity(player, range + prepareRange, Collections.singletonList(player));
+		final Entity targetedEntity = GeneralMethods.getTargetedEntity(player, range + selectRange, Collections.singletonList(player));
 		if (targetedEntity instanceof LivingEntity && targetedEntity.getLocation().distanceSquared(location) <= range * range) {
 			locked = true;
 			target = (LivingEntity) targetedEntity;

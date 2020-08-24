@@ -82,7 +82,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthShot.Damage");
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthShot.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthShot.Range");
-		selectRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthShot.PrepareRange");
+		selectRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthShot.SelectRange");
 		magmaShot = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthShot.MagmaShot.AllowConvert");
 		magmaModifier = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthShot.MagmaShot.DamageModifier");
 		magmaPrepareTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthShot.MagmaShot.PrepareTime");

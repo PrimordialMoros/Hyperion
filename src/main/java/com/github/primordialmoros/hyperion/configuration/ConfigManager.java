@@ -34,6 +34,12 @@ public class ConfigManager {
 
 		config.addDefault("EnableCollisions", true);
 
+		config.addDefault("Modifiers.AvatarState.Combustion.ChargeTime", 0);
+		config.addDefault("Modifiers.AvatarState.Bolt.Cooldown", 0);
+		config.addDefault("Modifiers.AvatarState.Bolt.ChargeTime", 0);
+		config.addDefault("Modifiers.AvatarState.EarthLine.Damage", 10);
+		config.addDefault("Modifiers.AvatarState.IceCrawl.Range", 48);
+
 		config.addDefault("Abilities.Air.Evade.Enabled", true);
 		config.addDefault("Abilities.Air.Evade.Description", "As an airbender you can manipulate the streams of air around you quickly roll and evade potential attacks. Left click to use, the direction of your evasive maneuver depends on whether you are looking up or down.");
 		config.addDefault("Abilities.Air.Evade.Cooldown", 1000);
@@ -50,7 +56,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthLine.Damage", 3.0);
 		config.addDefault("Abilities.Earth.EarthLine.Cooldown", 3000);
 		config.addDefault("Abilities.Earth.EarthLine.Range", 24);
-		config.addDefault("Abilities.Earth.EarthLine.PrepareRange", 6);
+		config.addDefault("Abilities.Earth.EarthLine.SelectRange", 6);
 		config.addDefault("Abilities.Earth.EarthLine.AllowUnderWater", true);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.DamageModifier", 2.0);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.Regen", 20000);
@@ -64,7 +70,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthShot.Damage", 3.0);
 		config.addDefault("Abilities.Earth.EarthShot.Cooldown", 1500);
 		config.addDefault("Abilities.Earth.EarthShot.Range", 60);
-		config.addDefault("Abilities.Earth.EarthShot.PrepareRange", 6);
+		config.addDefault("Abilities.Earth.EarthShot.SelectRange", 6);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.AllowConvert", true);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.DamageModifier", 2.0);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.PrepareTime", 1500);
@@ -164,14 +170,14 @@ public class ConfigManager {
 		config.addDefault("Abilities.Water.IceCrawl.Damage", 5.0);
 		config.addDefault("Abilities.Water.IceCrawl.Cooldown", 5000);
 		config.addDefault("Abilities.Water.IceCrawl.Range", 24);
-		config.addDefault("Abilities.Water.IceCrawl.PrepareRange", 8);
+		config.addDefault("Abilities.Water.IceCrawl.SelectRange", 8);
 		config.addDefault("Abilities.Water.IceCrawl.FreezeDuration", 2000);
 		config.addDefault("Abilities.Water.IceCrawl.IceDuration", 8000);
 
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Enabled", true);
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Description", "Given a large enough source of water or ice, a master waterbender is able to form a vast spike of ice capable of drilling through blocks.");
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Cooldown", 15000);
-		config.addDefault("Abilities.Water.WaterCombo.IceDrill.SourceRange", 16);
+		config.addDefault("Abilities.Water.WaterCombo.IceDrill.SelectRange", 16);
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.MaxLength", 16);
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Duration", 10000);
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.RegenBlockTime", 10000);

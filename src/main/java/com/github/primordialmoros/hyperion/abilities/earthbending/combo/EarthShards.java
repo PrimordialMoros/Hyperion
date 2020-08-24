@@ -26,6 +26,7 @@ import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.ComboAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.util.ComboManager.AbilityInformation;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.earthbending.Collapse;
 import com.projectkorra.projectkorra.util.ClickType;
 import org.bukkit.Location;
@@ -34,6 +35,7 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 
 public class EarthShards extends EarthAbility implements AddonAbility, ComboAbility {
+	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
 	private long shotCooldown;
 	private long lastShotTime;

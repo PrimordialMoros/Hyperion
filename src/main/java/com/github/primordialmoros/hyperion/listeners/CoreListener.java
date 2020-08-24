@@ -28,10 +28,12 @@ import com.github.primordialmoros.hyperion.abilities.firebending.Bolt.BoltInfo;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
 import com.projectkorra.projectkorra.BendingPlayer;
+import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.CoreAbility;
+import com.projectkorra.projectkorra.event.AbilityStartEvent;
 import com.projectkorra.projectkorra.event.BendingReloadEvent;
-import com.projectkorra.projectkorra.event.PlayerCooldownChangeEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
@@ -172,13 +174,31 @@ public class CoreListener implements Listener {
 		Bukkit.getScheduler().runTaskLater(Hyperion.getPlugin(), Hyperion::reload, 1);
 	}
 
-	@EventHandler
-	public void onAbilityCooldown(final PlayerCooldownChangeEvent event) {
-		final Player player = event.getPlayer();
-		final BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
-		if (event.isCancelled() || player == null || bPlayer == null) return;
-		if (bPlayer.isAvatarState()) {
-			// TODO handle cooldown for Hyperion abilities using attributes
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onAbilityStart(final AbilityStartEvent event) {
+		if (event.getAbility() instanceof AddonAbility && ((AddonAbility) event.getAbility()).getAuthor().equals(Hyperion.getAuthor())) {
+			CoreAbility ability = (CoreAbility) event.getAbility();
+			final Player player = ability.getPlayer();
+			final BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+			if (player == null || bPlayer == null) return;
+			if (bPlayer.isAvatarState()) {
+				ConfigurationSection section = Hyperion.getPlugin().getConfig().getConfigurationSection("Modifiers.AvatarState." + ability.getName());
+				if (section == null) return;
+				for (String key : section.getKeys(false)) {
+					if (!CoreMethods.HyperionAttributes.contains(key)) continue;
+					Number value;
+					if (section.isInt(key)) {
+						value = section.getInt(key);
+					} else if (section.isDouble(key)) {
+						value = section.getDouble(key);
+					} else if (section.isLong(key)) {
+						value = section.getLong(key);
+					} else {
+						continue;
+					}
+					ability.setAttribute(key, value);
+				}
+			}
 		}
 	}
 }

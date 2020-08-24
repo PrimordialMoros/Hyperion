@@ -24,6 +24,7 @@ import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
+import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -41,7 +42,9 @@ public class EarthShardsProjectile extends EarthAbility implements AddonAbility 
 	private final Location origin;
 	private final Vector direction;
 
+	@Attribute(Attribute.DAMAGE)
 	private final double damage;
+	@Attribute(Attribute.RANGE)
 	private final int range;
 
 	private double distanceTravelled;
