@@ -25,20 +25,31 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 public class ConfigManager {
 
+	public static Config modifiersConfig;
+
 	public ConfigManager() {
 		setupMainConfig();
+		modifiersConfig = new Config("modifiers.yml");
+		setupModifiersConfig();
+	}
+
+	public void setupModifiersConfig() {
+		FileConfiguration config = modifiersConfig.getConfig();
+
+		config.addDefault("AvatarState.Combustion.ChargeTime", 0);
+		config.addDefault("AvatarState.Bolt.Cooldown", 0);
+		config.addDefault("AvatarState.Bolt.ChargeTime", 0);
+		config.addDefault("AvatarState.EarthLine.Damage", 10);
+		config.addDefault("AvatarState.IceCrawl.Range", 48);
+
+		config.options().copyDefaults(true);
+		modifiersConfig.saveConfig();
 	}
 
 	public void setupMainConfig() {
 		FileConfiguration config = Hyperion.getPlugin().getConfig();
 
 		config.addDefault("EnableCollisions", true);
-
-		config.addDefault("Modifiers.AvatarState.Combustion.ChargeTime", 0);
-		config.addDefault("Modifiers.AvatarState.Bolt.Cooldown", 0);
-		config.addDefault("Modifiers.AvatarState.Bolt.ChargeTime", 0);
-		config.addDefault("Modifiers.AvatarState.EarthLine.Damage", 10);
-		config.addDefault("Modifiers.AvatarState.IceCrawl.Range", 48);
 
 		config.addDefault("Abilities.Air.Evade.Enabled", true);
 		config.addDefault("Abilities.Air.Evade.Description", "As an airbender you can manipulate the streams of air around you quickly roll and evade potential attacks. Left click to use, the direction of your evasive maneuver depends on whether you are looking up or down.");

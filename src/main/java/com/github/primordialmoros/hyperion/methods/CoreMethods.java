@@ -47,6 +47,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.NumberConversions;
@@ -228,4 +229,21 @@ public class CoreMethods {
 		"PrisonDuration", "PrisonPoints", "RegenDelay",
 		"Resistance", "Power"
 	).collect(Collectors.toSet()));
+
+	public static void setAttributes(ConfigurationSection section, CoreAbility ability) {
+		for (String key : section.getKeys(false)) {
+			if (!HyperionAttributes.contains(key)) continue;
+			Number value;
+			if (section.isInt(key)) {
+				value = section.getInt(key);
+			} else if (section.isDouble(key)) {
+				value = section.getDouble(key);
+			} else if (section.isLong(key)) {
+				value = section.getLong(key);
+			} else {
+				continue;
+			}
+			ability.setAttribute(key, value);
+		}
+	}
 }

@@ -25,10 +25,10 @@ import com.github.primordialmoros.hyperion.abilities.earthbending.EarthShot;
 import com.github.primordialmoros.hyperion.abilities.earthbending.MetalHook;
 import com.github.primordialmoros.hyperion.abilities.firebending.Bolt;
 import com.github.primordialmoros.hyperion.abilities.firebending.Bolt.BoltInfo;
+import com.github.primordialmoros.hyperion.configuration.ConfigManager;
 import com.github.primordialmoros.hyperion.methods.CoreMethods;
 import com.github.primordialmoros.hyperion.util.BendingFallingBlock;
 import com.projectkorra.projectkorra.BendingPlayer;
-import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.event.AbilityStartEvent;
 import com.projectkorra.projectkorra.event.BendingReloadEvent;
@@ -176,27 +176,15 @@ public class CoreListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR)
 	public void onAbilityStart(final AbilityStartEvent event) {
-		if (event.getAbility() instanceof AddonAbility && ((AddonAbility) event.getAbility()).getAuthor().equals(Hyperion.getAuthor())) {
+		if (event.getAbility() instanceof CoreAbility) {
 			CoreAbility ability = (CoreAbility) event.getAbility();
 			final Player player = ability.getPlayer();
 			final BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 			if (player == null || bPlayer == null) return;
 			if (bPlayer.isAvatarState()) {
-				ConfigurationSection section = Hyperion.getPlugin().getConfig().getConfigurationSection("Modifiers.AvatarState." + ability.getName());
-				if (section == null) return;
-				for (String key : section.getKeys(false)) {
-					if (!CoreMethods.HyperionAttributes.contains(key)) continue;
-					Number value;
-					if (section.isInt(key)) {
-						value = section.getInt(key);
-					} else if (section.isDouble(key)) {
-						value = section.getDouble(key);
-					} else if (section.isLong(key)) {
-						value = section.getLong(key);
-					} else {
-						continue;
-					}
-					ability.setAttribute(key, value);
+				ConfigurationSection section = ConfigManager.modifiersConfig.getConfig().getConfigurationSection("AvatarState." + ability.getName());
+				if (section != null) {
+					CoreMethods.setAttributes(section, ability);
 				}
 			}
 		}
