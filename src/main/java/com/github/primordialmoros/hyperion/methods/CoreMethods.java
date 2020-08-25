@@ -54,13 +54,10 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CoreMethods {
 	private static final BlockFace[] faces = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST, BlockFace.EAST };
@@ -220,19 +217,8 @@ public class CoreMethods {
 		Hyperion.getLog().info("Registered collisions.");
 	}
 
-	public static final Set<String> HyperionAttributes = Collections.unmodifiableSet(Stream.of(
-		"Speed", "Range", "SelectRange",
-		"Damage", "Cooldown", "Duration",
-		"Radius", "ChargeTime", "Width",
-		"Height", "Knockback", "Knockup",
-		"FireTicks", "MagmaModifier", "PrisonCooldown",
-		"PrisonDuration", "PrisonPoints", "RegenDelay",
-		"Resistance", "Power"
-	).collect(Collectors.toSet()));
-
 	public static void setAttributes(ConfigurationSection section, CoreAbility ability) {
 		for (String key : section.getKeys(false)) {
-			if (!HyperionAttributes.contains(key)) continue;
 			Number value;
 			if (section.isInt(key)) {
 				value = section.getInt(key);

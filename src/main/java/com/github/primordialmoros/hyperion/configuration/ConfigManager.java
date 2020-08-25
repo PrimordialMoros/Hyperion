@@ -41,6 +41,8 @@ public class ConfigManager {
 		config.addDefault("AvatarState.Bolt.ChargeTime", 0);
 		config.addDefault("AvatarState.EarthLine.Damage", 10);
 		config.addDefault("AvatarState.IceCrawl.Range", 48);
+		config.addDefault("AvatarState.EarthSmash.ChargeTime", 0);
+		config.addDefault("AvatarState.EarthSmash.Cooldown", 0);
 
 		config.options().copyDefaults(true);
 		modifiersConfig.saveConfig();
@@ -70,11 +72,11 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthLine.SelectRange", 6);
 		config.addDefault("Abilities.Earth.EarthLine.AllowUnderWater", true);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.DamageModifier", 2.0);
-		config.addDefault("Abilities.Earth.EarthLine.Magma.Regen", 20000);
-		config.addDefault("Abilities.Earth.EarthLine.Prison.Cooldown", 15000);
-		config.addDefault("Abilities.Earth.EarthLine.Prison.Duration", 3000);
-		config.addDefault("Abilities.Earth.EarthLine.Prison.Radius", 0.8);
-		config.addDefault("Abilities.Earth.EarthLine.Prison.Points", 8);
+		config.addDefault("Abilities.Earth.EarthLine.Magma.RegenDelay", 20000);
+		config.addDefault("Abilities.Earth.EarthLine.PrisonCooldown", 15000);
+		config.addDefault("Abilities.Earth.EarthLine.PrisonDuration", 3000);
+		config.addDefault("Abilities.Earth.EarthLine.PrisonRadius", 0.8);
+		config.addDefault("Abilities.Earth.EarthLine.PrisonPoints", 8);
 
 		config.addDefault("Abilities.Earth.EarthShot.Enabled", true);
 		config.addDefault("Abilities.Earth.EarthShot.Description", "EarthShot is an offensive earth projectile move. Tap sneak while looking at a nearby earthbendable block and it will ascend to your eye height. Left click to launch your projectile. Once thrown, you can hold sneak to control its movement. If you are a Lavabender you can hold sneak while looking at your raised source to turn it into a more powerful MagmaShot!");
@@ -84,7 +86,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthShot.SelectRange", 6);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.AllowConvert", true);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.DamageModifier", 2.0);
-		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.PrepareTime", 1500);
+		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.ChargeTime", 1500);
 
 		config.addDefault("Abilities.Earth.EarthGlove.Enabled", true);
 		config.addDefault("Abilities.Earth.EarthGlove.Description", "Dai Li agents use this technique for various purposes. Hold sneak and click to launch your glove and attempt to grab your target. If you continue holding sneak, the gloves will attempt to return to you. You can also destroy other players' gloves by tapping sneak while looking at them.");
@@ -122,7 +124,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.LavaDisk.MinDamage", 1.0);
 		config.addDefault("Abilities.Earth.LavaDisk.Cooldown", 7000);
 		config.addDefault("Abilities.Earth.LavaDisk.Range", 24);
-		config.addDefault("Abilities.Earth.LavaDisk.Regen", 10000);
+		config.addDefault("Abilities.Earth.LavaDisk.RegenDelay", 10000);
 		config.addDefault("Abilities.Earth.LavaDisk.PassThroughEntities", true);
 		config.addDefault("Abilities.Earth.LavaDisk.AdditionalMeltableBlocks", materials);
 
@@ -156,7 +158,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Fire.Combustion.ChargeTime", 1500);
 		config.addDefault("Abilities.Fire.Combustion.Power", 3);
 		config.addDefault("Abilities.Fire.Combustion.MisfireModifier", -1);
-		config.addDefault("Abilities.Fire.Combustion.RegenBlockTime", 15000);
+		config.addDefault("Abilities.Fire.Combustion.RegenDelay", 15000);
 
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Enabled", true);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Description", "Master Jeong Jeong used this advanced technique to cast a great fire wave that grows in size while it advances forward.");
@@ -191,7 +193,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.SelectRange", 16);
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.MaxLength", 16);
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Duration", 10000);
-		config.addDefault("Abilities.Water.WaterCombo.IceDrill.RegenBlockTime", 10000);
+		config.addDefault("Abilities.Water.WaterCombo.IceDrill.RegenDelay", 10000);
 
 		config.options().copyDefaults(true);
 		Hyperion.getPlugin().saveConfig();

@@ -20,6 +20,7 @@
 package com.github.primordialmoros.hyperion.commands;
 
 import com.github.primordialmoros.hyperion.Hyperion;
+import com.github.primordialmoros.hyperion.configuration.ConfigManager;
 import com.projectkorra.projectkorra.command.PKCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -40,6 +41,7 @@ public class HyperionCommand extends PKCommand {
 		} else if (args.size() == 1) {
 			if (args.get(0).equals("reload") && hasPermission(sender, "reload")) {
 				Hyperion.getPlugin().reloadConfig();
+				ConfigManager.modifiersConfig.reloadConfig();
 				sender.sendMessage(ChatColor.GREEN + "Hyperion config has been reloaded.");
 			}
 		}

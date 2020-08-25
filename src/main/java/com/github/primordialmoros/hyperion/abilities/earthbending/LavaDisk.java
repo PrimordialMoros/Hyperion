@@ -71,7 +71,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	@Attribute(Attribute.RANGE)
 	private int range;
 	@Attribute("RegenDelay")
-	private long regen;
+	private long regenDelay;
 	private boolean passHit;
 
 	private double distance;
@@ -91,7 +91,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 		minDamage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.LavaDisk.MinDamage");
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.LavaDisk.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.LavaDisk.Range");
-		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.LavaDisk.Regen");
+		regenDelay = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.LavaDisk.RegenDelay");
 		passHit = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.LavaDisk.PassThroughEntities");
 		materials = new HashSet<>(Hyperion.getPlugin().getConfig().getStringList("Abilities.Earth.LavaDisk.AdditionalMeltableBlocks"));
 
@@ -187,7 +187,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 		if (isMetal(block) || block.isLiquid() || TempBlock.isTempBlock(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation()))
 			return false;
 		if (MaterialCheck.isLeaf(block) || isPlant(block) || materials.contains(block.getType().name()) || isEarthbendable(block)) {
-			new TempBlock(block, Material.AIR.createBlockData(), regen);
+			new TempBlock(block, Material.AIR.createBlockData(), regenDelay);
 			ParticleEffect.LAVA.display(block.getLocation(), 1, 0.5, 0.5, 0.5, 0.2);
 			if (ThreadLocalRandom.current().nextInt(5) == 0) {
 				location.getWorld().playSound(location, Sound.BLOCK_GRINDSTONE_USE, 0.3f, 0.3f);
@@ -245,7 +245,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 			if (isPlant(temp)) temp.breakNaturally();
 			if (temp.isLiquid() || !isTransparent(temp)) return false;
 		}
-		if (!isLava(source)) new TempBlock(source, Material.AIR.createBlockData(), regen);
+		if (!isLava(source)) new TempBlock(source, Material.AIR.createBlockData(), regenDelay);
 		location = source.getLocation().add(0.5, 0.5, 0.5);
 		distance = location.distance(player.getEyeLocation());
 		return true;

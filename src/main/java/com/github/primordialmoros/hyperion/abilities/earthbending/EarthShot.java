@@ -65,7 +65,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 	@Attribute("MagmaModifier")
 	private double magmaModifier;
 	@Attribute(Attribute.CHARGE_DURATION)
-	private long magmaPrepareTime;
+	private long chargeTime;
 
 	private boolean ready;
 	private boolean launched;
@@ -85,7 +85,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 		selectRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthShot.SelectRange");
 		magmaShot = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthShot.MagmaShot.AllowConvert");
 		magmaModifier = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthShot.MagmaShot.DamageModifier");
-		magmaPrepareTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthShot.MagmaShot.PrepareTime");
+		chargeTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthShot.MagmaShot.ChargeTime");
 
 		ready = false;
 		launched = false;
@@ -139,10 +139,10 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 				if (readySource.getBlock().equals(player.getTargetBlock(MaterialCheck.getIgnoreMaterialSet(), selectRange * 2)) && player.isSneaking()) {
 					if (magmaStartTime == 0) {
 						magmaStartTime = System.currentTimeMillis();
-						if (magmaPrepareTime > 0) playLavabendingSound(readySource.getLocation());
+						if (chargeTime > 0) playLavabendingSound(readySource.getLocation());
 					}
 					playParticles(readySource.getLocation().add(0.5, 0.5, 0.5));
-					if (magmaPrepareTime <= 0 || System.currentTimeMillis() > magmaStartTime + magmaPrepareTime) {
+					if (chargeTime <= 0 || System.currentTimeMillis() > magmaStartTime + chargeTime) {
 						convertedMagma = true;
 						readySource.setType(Material.MAGMA_BLOCK);
 					}

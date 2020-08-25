@@ -61,7 +61,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
 	@Attribute("RegenDelay")
-	private long regenBlockTime;
+	private long regenDelay;
 
 	private boolean charged;
 	private boolean launched;
@@ -87,7 +87,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 		chargeTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Combustion.ChargeTime");
 		power = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.Combustion.Power");
 		misfireModifier = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.Combustion.MisfireModifier");
-		regenBlockTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Combustion.RegenBlockTime");
+		regenDelay = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Combustion.RegenDelay");
 
 		charged = chargeTime <= 0;
 		launched = false;
@@ -192,7 +192,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 		ParticleEffect.EXPLOSION_HUGE.display(center, 5, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
 		center.getWorld().playSound(center, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
-		if (regenBlockTime > 0 && !center.getBlock().isLiquid()) {
+		if (regenDelay > 0 && !center.getBlock().isLiquid()) {
 			for (Location l : GeneralMethods.getCircle(center, size, 1, false, true, 0)) {
 				if (GeneralMethods.isRegionProtectedFromBuild(this, l)) {
 					remove();
@@ -201,7 +201,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 				if (MaterialCheck.isAir(l.getBlock()) || MaterialCheck.isUnbreakable(l.getBlock()) || l.getBlock().isLiquid()) {
 					continue;
 				}
-				new TempBlock(l.getBlock(), Material.AIR.createBlockData(), regenBlockTime + ThreadLocalRandom.current().nextInt(1000));
+				new TempBlock(l.getBlock(), Material.AIR.createBlockData(), regenDelay + ThreadLocalRandom.current().nextInt(1000));
 				if (ThreadLocalRandom.current().nextInt(3) == 0 && l.getBlock().getRelative(BlockFace.DOWN).getType().isSolid()) {
 					l.getBlock().setType(Material.FIRE);
 				}

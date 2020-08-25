@@ -77,9 +77,9 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	@Attribute(Attribute.SELECT_RANGE)
 	private int selectRange;
 
-	@Attribute("PrisonCooldown")
+	@Attribute("Prison" + Attribute.COOLDOWN)
 	private long prisonCooldown;
-	@Attribute("PrisonDuration")
+	@Attribute("Prison" + Attribute.DURATION)
 	private long prisonDuration;
 	@Attribute(Attribute.RADIUS)
 	private double prisonRadius;
@@ -121,10 +121,10 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		allowUnderWater = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.AllowUnderWater");
 		magmaModifier = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Magma.DamageModifier");
 		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Magma.Regen");
-		prisonCooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Prison.Cooldown");
-		prisonDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Prison.Duration");
-		prisonRadius = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Prison.Radius");
-		prisonPoints = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.Prison.Points");
+		prisonCooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.PrisonCooldown");
+		prisonDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.PrisonDuration");
+		prisonRadius = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.PrisonRadius");
+		prisonPoints = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.PrisonPoints");
 
 		if (prepare()) {
 			start();

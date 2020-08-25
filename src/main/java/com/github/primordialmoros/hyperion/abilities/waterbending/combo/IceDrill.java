@@ -78,7 +78,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 		selectRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.WaterCombo.IceDrill.SelectRange");
 		maxLength = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.WaterCombo.IceDrill.MaxLength");
 		duration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.WaterCombo.IceDrill.Duration");
-		regenDelay = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.WaterCombo.IceDrill.RegenBlockTime");
+		regenDelay = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.WaterCombo.IceDrill.RegenDelay");
 
 		selectRange = (int) getNightFactor(selectRange, player.getWorld());
 
