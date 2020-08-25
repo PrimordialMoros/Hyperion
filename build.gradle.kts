@@ -3,7 +3,7 @@ plugins {
     id("com.github.johnrengelman.shadow").version("6.0.0")
 }
 
-group = "com.github.primordialmoros"
+group = "me.moros"
 version = "1.5.0"
 
 configure<JavaPluginConvention> {
@@ -28,7 +28,7 @@ tasks {
     shadowJar {
         archiveClassifier.set("")
         dependencies {
-            relocate("org.bstats", "com.github.primordialmoros.hyperion.bstats")
+            relocate("org.bstats", "me.moros.hyperion.bstats")
         }
         minimize()
     }
