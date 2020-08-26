@@ -207,18 +207,19 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 	}
 
 	public void checkBlast(boolean hit) {
+		double dmg = damage;
+		if (convertedMagma) {
+			dmg = damage * magmaModifier;
+		} else if (isMetal(projectile.getFallingBlock().getBlockData().getMaterial())) {
+			dmg = getMetalAugment(damage);
+		}
 		Location tempLocation = projectile.getFallingBlock().getLocation().clone().add(0, 0.5, 0);
 		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(tempLocation, 1.5)) {
 			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
 				if (entity instanceof Player && Commands.invincible.contains((entity).getName())) {
 					continue;
 				}
-				if (convertedMagma) {
-					damage *= magmaModifier;
-				} else if (isMetal(projectile.getFallingBlock().getBlockData().getMaterial())) {
-					damage = getMetalAugment(damage);
-				}
-				DamageHandler.damageEntity(entity, damage, this);
+				DamageHandler.damageEntity(entity, dmg, this);
 				((LivingEntity) entity).setNoDamageTicks(0);
 				Vector vector = player.getEyeLocation().getDirection();
 				entity.setVelocity(vector.normalize().multiply(0.4));

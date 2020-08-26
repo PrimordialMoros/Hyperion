@@ -35,7 +35,7 @@ import me.moros.hyperion.abilities.earthbending.EarthGuardWall;
 import me.moros.hyperion.abilities.earthbending.EarthLine;
 import me.moros.hyperion.abilities.earthbending.EarthShot;
 import me.moros.hyperion.abilities.earthbending.LavaDisk;
-import me.moros.hyperion.abilities.earthbending.MetalHook;
+import me.moros.hyperion.abilities.earthbending.MetalCable;
 import me.moros.hyperion.abilities.firebending.Bolt;
 import me.moros.hyperion.abilities.firebending.Combustion;
 import me.moros.hyperion.abilities.waterbending.FrostBreath;
@@ -79,7 +79,9 @@ public class AbilityListener implements Listener {
 				} else if (abilityName.equalsIgnoreCase("earthguard")) {
 					new EarthGuardWall(player);
 				} else if (abilityName.equalsIgnoreCase("earthglove")) {
-					EarthGlove.attemptDestroy(player, bPlayer);
+					EarthGlove.attemptDestroy(player);
+				} else if (abilityName.equalsIgnoreCase("metalcable")) {
+					MetalCable.attemptDestroy(player);
 				}
 			} else if (coreAbility instanceof FireAbility && bPlayer.isElementToggled(Element.FIRE)) {
 				if (abilityName.equalsIgnoreCase("combustion")) {
@@ -134,8 +136,8 @@ public class AbilityListener implements Listener {
 					EarthLine.shootLine(player);
 				} else if (abilityName.equalsIgnoreCase("earthshot")) {
 					EarthShot.throwProjectile(player);
-				} else if (abilityName.equalsIgnoreCase("metalhook")) {
-					new MetalHook(player);
+				} else if (abilityName.equalsIgnoreCase("metalcable")) {
+					new MetalCable(player);
 				} else if (abilityName.equalsIgnoreCase("earthguard")) {
 					new EarthGuard(player);
 				} else if (abilityName.equalsIgnoreCase("earthglove")) {

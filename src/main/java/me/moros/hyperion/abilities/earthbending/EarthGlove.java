@@ -19,7 +19,6 @@
 
 package me.moros.hyperion.abilities.earthbending;
 
-import com.projectkorra.projectkorra.BendingPlayer;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
@@ -301,14 +300,11 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 		remove();
 	}
 
-	public static void attemptDestroy(final Player p, final BendingPlayer bendingPlayer) {
-		if (bendingPlayer.getBoundAbility() == null || !bendingPlayer.getBoundAbility().getName().equals("EarthGlove")) {
-			return;
-		}
-		for (Entity targetedEntity : GeneralMethods.getEntitiesAroundPoint(p.getEyeLocation(), 8)) {
-			if (targetedEntity instanceof Item && p.hasLineOfSight(targetedEntity) && targetedEntity.hasMetadata(CoreMethods.GLOVE_KEY)) {
+	public static void attemptDestroy(final Player player) {
+		for (Entity targetedEntity : GeneralMethods.getEntitiesAroundPoint(player.getEyeLocation(), 8)) {
+			if (targetedEntity instanceof Item && player.hasLineOfSight(targetedEntity) && targetedEntity.hasMetadata(CoreMethods.GLOVE_KEY)) {
 				EarthGlove ability = (EarthGlove) targetedEntity.getMetadata(CoreMethods.GLOVE_KEY).get(0).value();
-				if (ability != null && !p.equals(ability.getPlayer())) {
+				if (ability != null && !player.equals(ability.getPlayer())) {
 					ability.shatterGlove();
 					return;
 				}

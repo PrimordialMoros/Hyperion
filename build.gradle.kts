@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "me.moros"
-version = "1.5.0"
+version = "1.5.1"
 
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8

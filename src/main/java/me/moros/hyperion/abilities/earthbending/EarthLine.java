@@ -56,9 +56,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class EarthLine extends EarthAbility implements AddonAbility {
-	private enum EarthLineMode {
-		NORMAL, PRISON, MAGMA
-	}
+	private enum EarthLineMode {NORMAL, PRISON, MAGMA}
 
 	private final List<Block> collapseBlocks = new ArrayList<>();
 	private Location location;

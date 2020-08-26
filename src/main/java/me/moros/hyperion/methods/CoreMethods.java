@@ -35,7 +35,7 @@ import me.moros.hyperion.abilities.earthbending.EarthGlove;
 import me.moros.hyperion.abilities.earthbending.EarthLine;
 import me.moros.hyperion.abilities.earthbending.EarthShot;
 import me.moros.hyperion.abilities.earthbending.LavaDisk;
-import me.moros.hyperion.abilities.earthbending.MetalHook;
+import me.moros.hyperion.abilities.earthbending.MetalCable;
 import me.moros.hyperion.abilities.firebending.Combustion;
 import me.moros.hyperion.abilities.firebending.combo.FireWave;
 import me.moros.hyperion.abilities.waterbending.FrostBreath;
@@ -54,9 +54,7 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CoreMethods {
@@ -65,7 +63,7 @@ public class CoreMethods {
 	public static final String NO_INTERACTION_KEY = "BENDING_HYPERION_NO_INTERACTION";
 	public static final String NO_PICKUP_KEY = "BENDING_HYPERION_NO_PICKUP";
 	public static final String GLOVE_KEY = "BENDING_HYPERION_EARTH_GLOVE";
-	public static final String HOOK_KEY = "BENDING_HYPERION_METAL_HOOK_KEY";
+	public static final String CABLE_KEY = "BENDING_HYPERION_METAL_CABLE_KEY";
 	public static final String BOLT_KEY = "BENDING_HYPERION_LIGHTNING_KEY";
 
 	public static List<Location> getCirclePoints(Location location, int points, double size) {
@@ -123,8 +121,8 @@ public class CoreMethods {
 		}
 	}
 
-	public static Set<Location> getLinePoints(Location startLoc, Location endLoc, int points) {
-		Set<Location> locations = new LinkedHashSet<>();
+	public static List<Location> getLinePoints(Location startLoc, Location endLoc, int points) {
+		List<Location> locations = new ArrayList<>(points);
 		Location diff = endLoc.clone().subtract(startLoc);
 		double diffX = diff.getX() / points;
 		double diffY = diff.getY() / points;
@@ -201,7 +199,7 @@ public class CoreMethods {
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(FrostBreath.class), CoreAbility.getAbility(FireShield.class), true, true));
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(FrostBreath.class), CoreAbility.getAbility(AirShield.class), true, true));
 
-		ProjectKorra.getCollisionInitializer().addSmallAbility(CoreAbility.getAbility(MetalHook.class));
+		ProjectKorra.getCollisionInitializer().addSmallAbility(CoreAbility.getAbility(MetalCable.class));
 
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(EarthLine.class), CoreAbility.getAbility(AirShield.class), false, true));
 

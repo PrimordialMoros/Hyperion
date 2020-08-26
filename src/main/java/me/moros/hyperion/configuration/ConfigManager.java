@@ -128,11 +128,20 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.LavaDisk.PassThroughEntities", true);
 		config.addDefault("Abilities.Earth.LavaDisk.AdditionalMeltableBlocks", materials);
 
-		config.addDefault("Abilities.Earth.MetalHook.Enabled", true);
-		config.addDefault("Abilities.Earth.MetalHook.Description", "This ability is used by Metalbenders to launch metal grappling hooks, allowing them to easily maneuver terrain. To use this ability, you must have some form of iron in your inventory. Left click to launch a grappling hook, once attached it will automatically pull you towards it. Hold sneak or switch slots to disengage the hook.");
-		config.addDefault("Abilities.Earth.MetalHook.Cooldown", 1500);
-		config.addDefault("Abilities.Earth.MetalHook.Range", 30);
-		config.addDefault("Abilities.Earth.MetalHook.RequireItems", true);
+		final String[] cableMaterials = {
+			Material.IRON_CHESTPLATE.name(),
+			Material.IRON_INGOT.name(),
+			Material.IRON_BLOCK.name()
+		};
+
+		config.addDefault("Abilities.Earth.MetalCable.Enabled", true); // TODO FIX
+		config.addDefault("Abilities.Earth.MetalCable.Description", "This incredibly versatile ability is used by Metalbenders for all purposes. Left click to launch a metal cable. If it connects to an entity or a block you will be pulled towards it. If you hold sneak, the entity or block will be pulled towards you instead. You can also left click again to throw any grabbed targets towards the direction you are looking at. Thrown blocks also deal damage. Note, depending on the server config, you might need some form of metal in your inventory to use this ability.");
+		config.addDefault("Abilities.Earth.MetalCable.Damage", 4.0);
+		config.addDefault("Abilities.Earth.MetalCable.BlockSpeed", 1.4);
+		config.addDefault("Abilities.Earth.MetalCable.Cooldown", 5000);
+		config.addDefault("Abilities.Earth.MetalCable.Range", 30);
+		config.addDefault("Abilities.Earth.MetalCable.RegenDelay", 10000);
+		config.addDefault("Abilities.Earth.MetalCable.RequiredItems", cableMaterials);
 
 		config.addDefault("Abilities.Earth.EarthCombo.EarthShards.Enabled", true);
 		config.addDefault("Abilities.Earth.EarthCombo.EarthShards.Description", "Dai Li agents can disintegrate their earth gloves in multiple shards of rock and throw them at an enemy to damage them.");

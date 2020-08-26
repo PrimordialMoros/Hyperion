@@ -26,7 +26,7 @@ import com.projectkorra.projectkorra.event.BendingReloadEvent;
 import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.abilities.earthbending.EarthGuard;
 import me.moros.hyperion.abilities.earthbending.EarthShot;
-import me.moros.hyperion.abilities.earthbending.MetalHook;
+import me.moros.hyperion.abilities.earthbending.MetalCable;
 import me.moros.hyperion.abilities.firebending.Bolt;
 import me.moros.hyperion.abilities.firebending.Bolt.BoltInfo;
 import me.moros.hyperion.configuration.ConfigManager;
@@ -78,9 +78,14 @@ public class CoreListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onArrowHit(final ProjectileHitEvent event) {
-		if (event.getHitBlock() != null && event.getEntity() instanceof Arrow && event.getEntity().hasMetadata(CoreMethods.HOOK_KEY)) {
-			final MetalHook hook = (MetalHook) event.getEntity().getMetadata(CoreMethods.HOOK_KEY).get(0).value();
-			if (hook != null) hook.setBlockHit(event.getHitBlock());
+		if (event.getEntity() instanceof Arrow && event.getEntity().hasMetadata(CoreMethods.CABLE_KEY)) {
+			if (event.getHitBlock() != null) {
+				final MetalCable cable = (MetalCable) event.getEntity().getMetadata(CoreMethods.CABLE_KEY).get(0).value();
+				if (cable != null) cable.setHitBlock(event.getHitBlock());
+			} else if (event.getHitEntity() != null) {
+				final MetalCable cable = (MetalCable) event.getEntity().getMetadata(CoreMethods.CABLE_KEY).get(0).value();
+				if (cable != null) cable.setHitEntity(event.getHitEntity());
+			}
 		}
 	}
 
@@ -97,10 +102,8 @@ public class CoreListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Arrow && event.getDamager().hasMetadata(CoreMethods.HOOK_KEY)) {
+		if (event.getDamager() instanceof Arrow && event.getDamager().hasMetadata(CoreMethods.CABLE_KEY)) {
 			event.setCancelled(true);
-			final MetalHook hook = (MetalHook) event.getDamager().getMetadata(CoreMethods.HOOK_KEY).get(0).value();
-			if (hook != null) hook.remove();
 		}
 	}
 
