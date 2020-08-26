@@ -4,6 +4,8 @@
 [![License](https://img.shields.io/github/license/PrimordialMoros/Hyperion?color=blue)](LICENSE)
 [![GitHub release](https://img.shields.io/github/v/release/PrimordialMoros/Hyperion)](https://github.com/PrimordialMoros/Hyperion/releases)
 
+**New**: Modifier System. Read more about it on the [wiki](https://github.com/PrimordialMoros/Hyperion/wiki/Modifiers)!
+
 Addon plugin for ProjectKorra with an emphasis on intricate mechanics
 
 ## Abilities
@@ -17,7 +19,7 @@ Addon plugin for ProjectKorra with an emphasis on intricate mechanics
 * EarthLine
 * EarthShot
 * LavaDisk
-* MetalHook
+* MetalCable
 * EarthShards (combo)
 ### Fire
 * Bolt
