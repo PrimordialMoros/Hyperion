@@ -57,7 +57,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MetalCable extends MetalAbility implements AddonAbility {
-	private List<Location> pointLocations;
+	private List<Location> pointLocations = new ArrayList<>();
 	private Location location;
 	private Location origin;
 	private Arrow cable;
@@ -241,7 +241,8 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 		} else {
 			temp = GeneralMethods.getLeftSide(player.getLocation(), 0.3);
 		}
-		pointLocations = CoreMethods.getLinePoints(temp.add(0, 1, 0), location, NumberConversions.ceil(distance * 2));
+		pointLocations.clear();
+		pointLocations.addAll(CoreMethods.getLinePoints(temp.add(0, 1, 0), location, NumberConversions.ceil(distance * 2)));
 		int counter = 0;
 		for (final Location tempLocation : pointLocations) {
 			if (tempLocation.getBlock().isLiquid() || !isTransparent(tempLocation.getBlock())) {
@@ -301,7 +302,7 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 
 	@Override
 	public List<Location> getLocations() {
-		return new ArrayList<>(pointLocations);
+		return pointLocations;
 	}
 
 	@Override
