@@ -20,6 +20,7 @@
 package me.moros.hyperion.util;
 
 import com.projectkorra.projectkorra.ability.ElementalAbility;
+import me.moros.hyperion.Hyperion;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -45,12 +46,14 @@ public class MaterialCheck {
 	);
 
 	private static final Set<Material> unbreakables = EnumSet.of(
-		Material.BARRIER, Material.BEDROCK, Material.OBSIDIAN, Material.NETHER_PORTAL,
-		Material.END_PORTAL, Material.END_PORTAL_FRAME
+		Material.BARRIER, Material.BEDROCK, Material.OBSIDIAN, Material.CRYING_OBSIDIAN, Material.NETHER_PORTAL,
+		Material.END_PORTAL, Material.END_PORTAL_FRAME, Material.END_GATEWAY
 	);
 
 	public static boolean isUnbreakable(Block block) {
-		return unbreakables.contains(block.getType()) || (block.getState() instanceof InventoryHolder) || containers.contains(block.getType()) || (block.getState() instanceof CreatureSpawner);
+		return unbreakables.contains(block.getType()) || (block.getState() instanceof InventoryHolder) ||
+			containers.contains(block.getType()) || (block.getState() instanceof CreatureSpawner) ||
+			Hyperion.getPlugin().getConfig().getStringList("ExtraUnbreakableMaterials").contains(block.getType().name());
 	}
 
 	public static boolean isAir(Block block) {

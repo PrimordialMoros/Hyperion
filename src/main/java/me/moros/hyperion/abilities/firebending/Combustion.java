@@ -65,7 +65,6 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 
 	private boolean charged;
 	private boolean launched;
-	private boolean hasClicked;
 	private boolean hasExploded;
 
 	private double initialHealth;
@@ -91,7 +90,6 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 
 		charged = chargeTime <= 0;
 		launched = false;
-		hasClicked = false;
 		hasExploded = false;
 
 		initialHealth = player.getHealth();
@@ -120,20 +118,20 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 				remove();
 				return;
 			}
-			playParticleRing();
 			if (!charged) {
 				if (System.currentTimeMillis() > getStartTime() + chargeTime) {
 					charged = true;
 				}
 			} else {
-				CoreMethods.playFocusParticles(player);
 				if (player.getHealth() + 0.5 < initialHealth) {
 					createExplosion(player.getEyeLocation(), power + misfireModifier, damage + misfireModifier);
 					return;
 				}
-				if (!player.isSneaking()) {
+				if (player.isSneaking() && chargeTime != 0) {
+					playParticleRing();
+					CoreMethods.playFocusParticles(player);
+				} else {
 					bPlayer.addCooldown(this);
-					location = player.getEyeLocation().clone();
 					launched = true;
 				}
 			}
@@ -141,50 +139,46 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 	}
 
 	private void advanceLocation() {
-		final Vector direction = player.getEyeLocation().getDirection().multiply(0.2);
-		for (int i = 0; i < 10; i++) {
-			distanceTravelled += 0.2;
+		final Vector direction = player.getEyeLocation().getDirection();
+		if (distanceTravelled >= randomBeamDistance) {
+			player.getWorld().playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.5f, 0.01F);
+			randomBeamDistance = distanceTravelled + 7 + 3 * ThreadLocalRandom.current().nextGaussian();
+			double radius = ThreadLocalRandom.current().nextDouble(0.6, 1.6);
+			for (int angle = 0; angle <= 360; angle += 12) {
+				final Vector temp = GeneralMethods.getOrthogonalVector(direction, angle, 0.2);
+				final Vector dir = GeneralMethods.getOrthogonalVector(direction, angle, radius);
+				ParticleEffect.FIREWORKS_SPARK.display(location.clone().add(temp), 0, dir.getX(), dir.getY(), dir.getZ(), 0.12);
+			}
+		}
+		for (int i = 0; i < 5; i++) {
+			distanceTravelled += 0.4;
 			if (distanceTravelled > range) {
 				remove();
 				return;
 			}
-			location.add(direction);
-			if (ThreadLocalRandom.current().nextInt(5) == 0) {
-				location.getWorld().playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.01F);
-			}
-
-			if (location.getBlock().isLiquid() || !isTransparent(location.getBlock()) || hasClicked) {
-				createExplosion(location, power, damage);
-				return;
-			}
-
+			location.add(direction.clone().multiply(0.4));
 			ParticleEffect.SMOKE_LARGE.display(location, 1, 0, 0, 0, 0.06);
 			ParticleEffect.FIREWORKS_SPARK.display(location, 1, 0, 0, 0, 0.06);
-
-			if (i % 4 == 0) {
+			if (i % 2 != 0) {
 				if (GeneralMethods.isRegionProtectedFromBuild(this, location)) {
 					remove();
 					return;
 				}
+				if (ThreadLocalRandom.current().nextInt(3) == 0) {
+					location.getWorld().playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.01F);
+				}
+				if (location.getBlock().isLiquid() || !isTransparent(location.getBlock())) {
+					createExplosion(location, power, damage);
+					return;
+				}
 				checkDamage();
-			}
-		}
-		if (distanceTravelled >= randomBeamDistance) {
-			player.getWorld().playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.5f, 0.01F);
-			randomBeamDistance = distanceTravelled + 7 + 3 * ThreadLocalRandom.current().nextGaussian();
-			double radius = 0.6 * (1 + (range - distanceTravelled) / range);
-			for (int angle = 0; angle <= 360; angle += 12) {
-				final Vector temp = GeneralMethods.getOrthogonalVector(direction.clone(), angle, radius);
-				ParticleEffect.FIREWORKS_SPARK.display(location.clone().add(temp), 1, 0, 0, 0, 0.01);
 			}
 		}
 	}
 
 	private void createExplosion(Location center, int size, double damage) {
 		if (hasExploded) return;
-
 		hasExploded = true;
-
 		ParticleEffect.FLAME.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f, 20);
 		ParticleEffect.SMOKE_LARGE.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
 		ParticleEffect.FIREWORKS_SPARK.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
@@ -217,7 +211,6 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 				new FireDamageTimer(e, player);
 			}
 		}
-		bPlayer.addCooldown(this);
 		remove();
 	}
 
@@ -328,6 +321,6 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 	}
 
 	private void attemptExplode() {
-		hasClicked = true;
+		createExplosion(location, power, damage); // Allow suicide when combustion isn't launched yet
 	}
 }

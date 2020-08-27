@@ -122,7 +122,7 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 				}
 				checkArea(1.5 + currentRange * 0.2);
 			} else {
-				if (player.isSneaking()) {
+				if (player.isSneaking() && chargeTime != 0) {
 					CoreMethods.playFocusParticles(player);
 				} else {
 					if (calculateBreath()) {

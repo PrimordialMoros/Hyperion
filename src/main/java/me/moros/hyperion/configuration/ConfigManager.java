@@ -53,6 +53,13 @@ public class ConfigManager {
 
 		config.addDefault("EnableCollisions", true);
 
+		final String[] extras = {
+			Material.ANCIENT_DEBRIS.name(),
+			Material.NETHERITE_BLOCK.name()
+		};
+
+		config.addDefault("ExtraUnbreakableMaterials", extras);
+
 		config.addDefault("Abilities.Air.Evade.Enabled", true);
 		config.addDefault("Abilities.Air.Evade.Description", "As an airbender you can manipulate the streams of air around you quickly roll and evade potential attacks. Left click to use, the direction of your evasive maneuver depends on whether you are looking up or down.");
 		config.addDefault("Abilities.Air.Evade.Cooldown", 1000);

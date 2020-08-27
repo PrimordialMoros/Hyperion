@@ -72,7 +72,6 @@ public class Bolt extends LightningAbility implements AddonAbility {
 
 		charged = chargeTime <= 0;
 		struck = false;
-		strikeTime = System.currentTimeMillis();
 
 		range = (int) getDayFactor(range, player.getWorld());
 		damage = getDayFactor(damage, player.getWorld());
@@ -98,7 +97,7 @@ public class Bolt extends LightningAbility implements AddonAbility {
 
 		if (charged) {
 			if (!struck) {
-				if (player.isSneaking()) {
+				if (player.isSneaking() && chargeTime != 0) {
 					CoreMethods.playFocusParticles(player);
 				} else {
 					strike();
