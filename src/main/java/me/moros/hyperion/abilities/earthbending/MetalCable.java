@@ -24,11 +24,10 @@ import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.MetalAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.attribute.Attribute;
-import com.projectkorra.projectkorra.command.Commands;
-import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
 import me.moros.hyperion.Hyperion;
+import me.moros.hyperion.abilities.earthbending.util.Projectile;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.BendingFallingBlock;
 import me.moros.hyperion.util.MaterialCheck;
@@ -37,7 +36,6 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.AbstractArrow;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.FallingBlock;
@@ -49,7 +47,6 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -57,7 +54,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class MetalCable extends MetalAbility implements AddonAbility {
-	private List<Location> pointLocations = new ArrayList<>();
+	private final List<Location> pointLocations = new ArrayList<>();
 	private Location location;
 	private Location origin;
 	private Arrow cable;
@@ -75,7 +72,6 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 	private long regenDelay;
 
 	private boolean hasHit;
-	private long launchTime;
 	private int ticks;
 
 	public MetalCable(Player player) {
@@ -114,36 +110,24 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 			remove();
 			return;
 		}
+		location = cable.getLocation();
 		final double distance = player.getLocation().distance(location);
 		if (hasHit) {
 			if (target == null || !target.isValid(player)) {
 				remove();
 				return;
 			}
-			location = target.getLocation();
-
-			if (target.getEntity() instanceof FallingBlock) {
-				checkDamage();
-			}
-
-			if (target.launched) {
-				if (System.currentTimeMillis() > launchTime + 10000) {
-					remove();
-				}
-				return;
-			}
 
 			final Vector direction;
-			Entity entityToMove;
-			Location targetLocation;
-			if (target.getType() == CableTarget.Type.ENTITY && player.isSneaking()) {
-				cable.teleport(location);
-				entityToMove = target.getEntity();
-				Vector dir = player.getEyeLocation().getDirection().multiply(distance / 2);
-				targetLocation = player.getEyeLocation().add(dir);
-			} else {
-				entityToMove = player;
-				targetLocation = location;
+			Entity entityToMove = player;
+			Location targetLocation = location;
+			if (target.getType() == CableTarget.Type.ENTITY) {
+				cable.teleport(target.getEntity().getLocation());
+				if (player.isSneaking()) {
+					entityToMove = target.getEntity();
+					Vector dir = player.getEyeLocation().getDirection().multiply(distance / 2);
+					targetLocation = player.getEyeLocation().add(dir);
+				}
 			}
 			direction = GeneralMethods.getDirection(entityToMove.getLocation(), targetLocation).normalize();
 			if (distance > 3) {
@@ -152,7 +136,10 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 				if (target.getType() == CableTarget.Type.ENTITY) {
 					entityToMove.setVelocity(new Vector());
 					if (target.getEntity() instanceof FallingBlock) {
-						playBlockParticles((FallingBlock) target.getEntity());
+						FallingBlock fb = (FallingBlock) target.getEntity();
+						Location tempLocation = fb.getLocation().add(0, 0.5, 0);
+						ParticleEffect.BLOCK_CRACK.display(tempLocation, 4, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, fb.getBlockData());
+						ParticleEffect.BLOCK_DUST.display(tempLocation, 6, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, fb.getBlockData());
 						target.getEntity().remove();
 					}
 					remove();
@@ -167,38 +154,19 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 					}
 				}
 			}
-		} else {
-			location = cable.getLocation();
 		}
 		visualizeLine(distance);
-	}
-
-	public void checkDamage() {
-		boolean hit = false;
-		FallingBlock fb = (FallingBlock) target.getEntity();
-		double dmg = isMetal(fb.getBlockData().getMaterial()) ? getMetalAugment(damage) : damage;
-		Location tempLocation = fb.getLocation().clone().add(0, 0.5, 0);
-		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(tempLocation, 1.5)) {
-			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
-				if (entity instanceof Player && Commands.invincible.contains((entity).getName())) {
-					continue;
-				}
-				DamageHandler.damageEntity(entity, dmg, this);
-				((LivingEntity) entity).setNoDamageTicks(0);
-				hit = true;
-			}
-		}
-		if (hit) {
-			playBlockParticles(fb);
-			fb.remove();
-			remove();
-		}
 	}
 
 	public void attemptLaunchTarget() {
 		if (target == null || target.getType() == CableTarget.Type.BLOCK) return;
 
-		final Entity targetedEntity = GeneralMethods.getTargetedEntity(player, range, Collections.singletonList(player));
+		final List<Entity> ignore = new ArrayList<>(3);
+		ignore.add(cable);
+		ignore.add(player);
+		ignore.add(target.getEntity());
+
+		final Entity targetedEntity = GeneralMethods.getTargetedEntity(player, range, ignore);
 		final Location targetLocation;
 		if (targetedEntity instanceof LivingEntity) {
 			targetLocation = targetedEntity.getLocation();
@@ -206,10 +174,9 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 			targetLocation = player.getTargetBlock(MaterialCheck.getIgnoreMaterialSet(), range).getLocation();
 		}
 
-		Vector direction = GeneralMethods.getDirection(target.getLocation(), targetLocation).normalize();
+		Vector direction = GeneralMethods.getDirection(location, targetLocation).normalize();
 		target.getEntity().setVelocity(direction.multiply(blockSpeed));
-		launchTime = System.currentTimeMillis();
-		target.launched = true;
+		remove();
 	}
 
 	private boolean launchCable() {
@@ -217,8 +184,14 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 		if (target.getBlock().isLiquid()) {
 			return false;
 		}
-		final Vector dir = GeneralMethods.getDirection(player.getEyeLocation(), target).normalize();
-		origin = player.getEyeLocation().add(player.getEyeLocation().getDirection().normalize().multiply(1.2));
+
+		if (player.getMainHand() == MainHand.RIGHT) {
+			origin = GeneralMethods.getRightSide(player.getLocation(), 0.3);
+		} else {
+			origin = GeneralMethods.getLeftSide(player.getLocation(), 0.3);
+		}
+		origin.add(0, 1, 0);
+		final Vector dir = GeneralMethods.getDirection(origin, target).normalize();
 		final Arrow arrow = player.getWorld().spawnArrow(origin, dir, 1.6F, 0);
 		arrow.setShooter(player);
 		arrow.setGravity(false);
@@ -342,23 +315,16 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 			return;
 		}
 		if (player.isSneaking() && !MaterialCheck.isUnbreakable(block)) {
-			location = cable.getLocation();
 			BlockData data = block.getState().getBlockData();
 			new TempBlock(block, Material.AIR.createBlockData(), regenDelay);
 			final Vector velocity = GeneralMethods.getDirection(location, player.getEyeLocation()).normalize().multiply(0.2);
-			BendingFallingBlock bfb = new BendingFallingBlock(cable.getLocation(), data, velocity, this, true);
-			playBlockParticles(bfb.getFallingBlock());
+			final BendingFallingBlock bfb = new BendingFallingBlock(location, data, velocity, this, true);
+			new Projectile(this, bfb, damage);
 			target = new CableTarget(bfb.getFallingBlock());
 		} else {
-			location = cable.getLocation();
 			target = new CableTarget(block);
 		}
 		hasHit = true;
-	}
-
-	public void playBlockParticles(FallingBlock fb) {
-		ParticleEffect.BLOCK_CRACK.display(fb.getLocation(), 4, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, fb.getBlockData());
-		ParticleEffect.BLOCK_DUST.display(fb.getLocation(), 6, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, fb.getBlockData());
 	}
 
 	public void setHitEntity(Entity entity) {
@@ -397,8 +363,6 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 		private final Block block;
 		private final Material material;
 
-		private boolean launched;
-
 		public CableTarget(Entity entity) {
 			block = null;
 			material = null;
@@ -430,14 +394,6 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 				return entity != null && entity.isValid() && entity.getWorld().equals(p.getWorld());
 			} else {
 				return block.getType() == material;
-			}
-		}
-
-		public Location getLocation() {
-			if (type == Type.ENTITY) {
-				return entity.getLocation().add(0, 0.5, 0);
-			} else {
-				return block.getLocation().add(0.5, 0.5, 0.5);
 			}
 		}
 	}
