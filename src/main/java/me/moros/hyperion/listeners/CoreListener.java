@@ -38,6 +38,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LightningStrike;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -79,12 +80,15 @@ public class CoreListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onArrowHit(final ProjectileHitEvent event) {
 		if (event.getEntity() instanceof Arrow && event.getEntity().hasMetadata(CoreMethods.CABLE_KEY)) {
-			if (event.getHitBlock() != null) {
-				final MetalCable cable = (MetalCable) event.getEntity().getMetadata(CoreMethods.CABLE_KEY).get(0).value();
-				if (cable != null) cable.setHitBlock(event.getHitBlock());
-			} else if (event.getHitEntity() != null) {
-				final MetalCable cable = (MetalCable) event.getEntity().getMetadata(CoreMethods.CABLE_KEY).get(0).value();
-				if (cable != null) cable.setHitEntity(event.getHitEntity());
+			final MetalCable cable = (MetalCable) event.getEntity().getMetadata(CoreMethods.CABLE_KEY).get(0).value();
+			if (cable != null) {
+				if (event.getHitBlock() != null) {
+					cable.setHitBlock(event.getHitBlock());
+				} else if (event.getHitEntity() instanceof LivingEntity) {
+					cable.setHitEntity(event.getHitEntity());
+				} else {
+					event.getEntity().remove();
+				}
 			}
 		}
 	}
