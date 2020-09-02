@@ -95,7 +95,7 @@ public class Projectile extends EarthAbility implements AddonAbility {
 
 	@Override
 	public String getName() {
-		return name;
+		return projectile == null ? "Projectile" : name;
 	}
 
 	@Override
