@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "me.moros"
-version = "1.5.1"
+version = "1.6.0"
 
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     implementation("org.bstats", "bstats-bukkit-lite", "1.7")
-    compileOnly("org.spigotmc:spigot-api:1.16.1-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.16.3-R0.1-SNAPSHOT")
     compileOnly("com.github.ProjectKorra:ProjectKorra:v1.9.0")
 }
 

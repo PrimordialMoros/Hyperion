@@ -99,6 +99,8 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	public EarthLine(Player player) {
 		super(player);
 
+		if (!isEnabled()) return;
+
 		if (!bPlayer.canBend(this)) {
 			return;
 		}
@@ -163,7 +165,11 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 							int randomIndex = ThreadLocalRandom.current().nextInt(collapseBlocks.size());
 							Block block = collapseBlocks.get(randomIndex);
 							collapseBlocks.remove(randomIndex);
-							final Vector velocity = new Vector(ThreadLocalRandom.current().nextDouble(-0.2, 0.2), ThreadLocalRandom.current().nextDouble(0.1), ThreadLocalRandom.current().nextDouble(-0.2, 0.2));
+							ThreadLocalRandom rand = ThreadLocalRandom.current();
+							double x = rand.nextDouble(-0.2, 0.2);
+							double y = rand.nextDouble(0.1);
+							double z = rand.nextDouble(-0.2, 0.2);
+							final Vector velocity = new Vector(x, y, z);
 							new TempBlock(block, Material.AIR.createBlockData(), regen);
 							new BendingFallingBlock(block.getLocation().add(0.5, 0, 0.5), Material.MAGMA_BLOCK.createBlockData(), velocity, this, true);
 						}

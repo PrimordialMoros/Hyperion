@@ -225,15 +225,15 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 	@Override
 	public ArrayList<AbilityInformation> getCombination() {
 		ArrayList<AbilityInformation> combination = new ArrayList<>();
-		combination.add(new AbilityInformation("FrostBreath", ClickType.LEFT_CLICK));
-		combination.add(new AbilityInformation("FrostBreath", ClickType.LEFT_CLICK));
+		combination.add(new AbilityInformation("IceBreath", ClickType.LEFT_CLICK));
+		combination.add(new AbilityInformation("IceBreath", ClickType.LEFT_CLICK));
 		combination.add(new AbilityInformation("IceCrawl", ClickType.SHIFT_DOWN));
 		return combination;
 	}
 
 	@Override
 	public String getInstructions() {
-		return "FrostBreath (Left Click) > FrostBreath (Left Click) > IceCrawl (Hold Sneak) > IceCrawl (Left Click to form spike in the direction you are looking)";
+		return "IceBreath (Left Click) > IceBreath (Left Click) > IceCrawl (Hold Sneak) > IceCrawl (Left Click to form spike in the direction you are looking)";
 	}
 
 	@Override

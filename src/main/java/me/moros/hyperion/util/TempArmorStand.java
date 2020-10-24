@@ -36,7 +36,6 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 public class TempArmorStand {
@@ -72,8 +71,8 @@ public class TempArmorStand {
 
 	public void showParticles(boolean show) {
 		if (show) {
-			ParticleEffect.BLOCK_CRACK.display(armorStand.getEyeLocation().add(0, 0.2, 0), 4, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, headMaterial.createBlockData());
-			ParticleEffect.BLOCK_DUST.display(armorStand.getEyeLocation().add(0, 0.2, 0), 6, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, headMaterial.createBlockData());
+			ParticleEffect.BLOCK_CRACK.display(armorStand.getEyeLocation().add(0, 0.2, 0), 4, 0.25, 0.125, 0.25, 0, headMaterial.createBlockData());
+			ParticleEffect.BLOCK_DUST.display(armorStand.getEyeLocation().add(0, 0.2, 0), 6, 0.25, 0.125, 0.25, 0, headMaterial.createBlockData());
 		}
 	}
 

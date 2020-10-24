@@ -26,7 +26,7 @@ Addon plugin for ProjectKorra with an emphasis on intricate mechanics
 * Combustion
 * FireWave (combo)
 ### Water
-* FrostBreath
+* IceBreath
 * IceCrawl
 * IceDrill (combo)
 

@@ -38,7 +38,7 @@ import me.moros.hyperion.abilities.earthbending.LavaDisk;
 import me.moros.hyperion.abilities.earthbending.MetalCable;
 import me.moros.hyperion.abilities.firebending.Combustion;
 import me.moros.hyperion.abilities.firebending.combo.FireWave;
-import me.moros.hyperion.abilities.waterbending.FrostBreath;
+import me.moros.hyperion.abilities.waterbending.IceBreath;
 import me.moros.hyperion.abilities.waterbending.IceCrawl;
 import me.moros.hyperion.util.FastMath;
 import org.bukkit.Color;
@@ -196,8 +196,8 @@ public class CoreMethods {
 		ProjectKorra.getCollisionInitializer().addLargeAbility(CoreAbility.getAbility(LavaDisk.class));
 		ProjectKorra.getCollisionInitializer().addRemoveSpoutAbility(CoreAbility.getAbility(LavaDisk.class));
 
-		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(FrostBreath.class), CoreAbility.getAbility(FireShield.class), true, true));
-		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(FrostBreath.class), CoreAbility.getAbility(AirShield.class), true, true));
+		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(IceBreath.class), CoreAbility.getAbility(FireShield.class), true, true));
+		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(IceBreath.class), CoreAbility.getAbility(AirShield.class), true, true));
 
 		ProjectKorra.getCollisionInitializer().addSmallAbility(CoreAbility.getAbility(MetalCable.class));
 

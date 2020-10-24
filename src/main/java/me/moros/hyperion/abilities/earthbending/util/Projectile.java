@@ -34,8 +34,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import java.util.concurrent.ThreadLocalRandom;
-
 public class Projectile extends EarthAbility implements AddonAbility {
 	private final BendingFallingBlock projectile;
 
@@ -82,8 +80,8 @@ public class Projectile extends EarthAbility implements AddonAbility {
 			}
 		}
 		if (hit) {
-			ParticleEffect.BLOCK_CRACK.display(tempLocation, 4, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, projectile.getFallingBlock().getBlockData());
-			ParticleEffect.BLOCK_DUST.display(tempLocation, 6, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, projectile.getFallingBlock().getBlockData());
+			ParticleEffect.BLOCK_CRACK.display(tempLocation, 4, 0.25, 0.125, 0.25, 0, projectile.getFallingBlock().getBlockData());
+			ParticleEffect.BLOCK_DUST.display(tempLocation, 6, 0.25, 0.125, 0.25, 0, projectile.getFallingBlock().getBlockData());
 			remove();
 		}
 	}

@@ -171,7 +171,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Fire.Combustion.Damage", 6.0);
 		config.addDefault("Abilities.Fire.Combustion.Cooldown", 10000);
 		config.addDefault("Abilities.Fire.Combustion.Range", 80);
-		config.addDefault("Abilities.Fire.Combustion.ChargeTime", 1500);
+		config.addDefault("Abilities.Fire.Combustion.ChargeTime", 0);
 		config.addDefault("Abilities.Fire.Combustion.Power", 3);
 		config.addDefault("Abilities.Fire.Combustion.MisfireModifier", -1);
 		config.addDefault("Abilities.Fire.Combustion.RegenDelay", 15000);
@@ -186,13 +186,13 @@ public class ConfigManager {
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.MaxHeight", 6);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Width", 2);
 
-		config.addDefault("Abilities.Water.FrostBreath.Enabled", true);
-		config.addDefault("Abilities.Water.FrostBreath.Description", "As demonstrated by Katara, a Waterbender is able to freeze their breath, causing anything it touches to be frozen! With this ability bound, simply hold sneak to start breathing frost!");
-		config.addDefault("Abilities.Water.FrostBreath.Damage", 3.0);
-		config.addDefault("Abilities.Water.FrostBreath.Range", 5);
-		config.addDefault("Abilities.Water.FrostBreath.Cooldown", 10000);
-		config.addDefault("Abilities.Water.FrostBreath.ChargeTime", 1000);
-		config.addDefault("Abilities.Water.FrostBreath.FrostDuration", 5000);
+		config.addDefault("Abilities.Water.IceBreath.Enabled", true);
+		config.addDefault("Abilities.Water.IceBreath.Description", "As demonstrated by Katara, a Waterbender is able to freeze their breath. With this ability bound, simply hold sneak to charge and then release a breath of ice that freeze water and nearby entities.");
+		config.addDefault("Abilities.Water.IceBreath.Damage", 3.0);
+		config.addDefault("Abilities.Water.IceBreath.Range", 5);
+		config.addDefault("Abilities.Water.IceBreath.Cooldown", 10000);
+		config.addDefault("Abilities.Water.IceBreath.ChargeTime", 1000);
+		config.addDefault("Abilities.Water.IceBreath.FrostDuration", 5000);
 
 		config.addDefault("Abilities.Water.IceCrawl.Enabled", true);
 		config.addDefault("Abilities.Water.IceCrawl.Description", "Tap sneak at a water or ice source block and then left click in a direction to launch forward a narrow line of ice. Upon colliding with an enemy, it deals damage and freezes the target's feet.");

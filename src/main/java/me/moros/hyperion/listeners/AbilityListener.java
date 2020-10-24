@@ -38,7 +38,7 @@ import me.moros.hyperion.abilities.earthbending.LavaDisk;
 import me.moros.hyperion.abilities.earthbending.MetalCable;
 import me.moros.hyperion.abilities.firebending.Bolt;
 import me.moros.hyperion.abilities.firebending.Combustion;
-import me.moros.hyperion.abilities.waterbending.FrostBreath;
+import me.moros.hyperion.abilities.waterbending.IceBreath;
 import me.moros.hyperion.abilities.waterbending.IceCrawl;
 import me.moros.hyperion.abilities.waterbending.combo.IceDrill;
 import org.bukkit.entity.Player;
@@ -90,8 +90,8 @@ public class AbilityListener implements Listener {
 					new Bolt(player);
 				}
 			} else if (coreAbility instanceof WaterAbility && bPlayer.isElementToggled(Element.WATER)) {
-				if (abilityName.equalsIgnoreCase("frostbreath")) {
-					new FrostBreath(player);
+				if (abilityName.equalsIgnoreCase("icebreath")) {
+					new IceBreath(player);
 				} else if (abilityName.equalsIgnoreCase("icecrawl")) {
 					new IceCrawl(player);
 				}

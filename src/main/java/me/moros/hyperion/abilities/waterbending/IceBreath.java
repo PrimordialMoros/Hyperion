@@ -59,7 +59,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class FrostBreath extends IceAbility implements AddonAbility {
+public class IceBreath extends IceAbility implements AddonAbility {
 	private final Set<Location> line = new LinkedHashSet<>();
 	private Location location;
 
@@ -78,18 +78,18 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 	private boolean charged;
 	private boolean released;
 
-	public FrostBreath(Player player) {
+	public IceBreath(Player player) {
 		super(player);
 
 		if (!bPlayer.canBend(this)) {
 			return;
 		}
 
-		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Water.FrostBreath.Damage");
-		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.FrostBreath.Range");
-		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.Cooldown");
-		chargeTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.ChargeTime");
-		frostDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.FrostBreath.FrostDuration");
+		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Water.IceBreath.Damage");
+		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Water.IceBreath.Range");
+		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceBreath.Cooldown");
+		chargeTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceBreath.ChargeTime");
+		frostDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Water.IceBreath.FrostDuration");
 
 		charged = chargeTime <= 0;
 		released = false;
@@ -212,17 +212,17 @@ public class FrostBreath extends IceAbility implements AddonAbility {
 
 	@Override
 	public boolean isEnabled() {
-		return Hyperion.getPlugin().getConfig().getBoolean("Abilities.Water.FrostBreath.Enabled");
+		return Hyperion.getPlugin().getConfig().getBoolean("Abilities.Water.IceBreath.Enabled");
 	}
 
 	@Override
 	public String getName() {
-		return "FrostBreath";
+		return "IceBreath";
 	}
 
 	@Override
 	public String getDescription() {
-		return Hyperion.getPlugin().getConfig().getString("Abilities.Water.FrostBreath.Description");
+		return Hyperion.getPlugin().getConfig().getString("Abilities.Water.IceBreath.Description");
 	}
 
 	@Override

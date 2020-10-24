@@ -76,6 +76,8 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 	public Combustion(final Player player) {
 		super(player);
 
+		if (!isEnabled()) return;
+
 		if (isWater(player.getEyeLocation().getBlock()) || hasAbility(player, Combustion.class) || !bPlayer.canBend(this)) {
 			return;
 		}
@@ -140,10 +142,11 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 
 	private void advanceLocation() {
 		final Vector direction = player.getEyeLocation().getDirection();
+		ThreadLocalRandom rand = ThreadLocalRandom.current();
 		if (distanceTravelled >= randomBeamDistance) {
 			player.getWorld().playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.5f, 0.01F);
-			randomBeamDistance = distanceTravelled + 7 + 3 * ThreadLocalRandom.current().nextGaussian();
-			double radius = ThreadLocalRandom.current().nextDouble(0.6, 1.6);
+			randomBeamDistance = distanceTravelled + 7 + 3 * rand.nextGaussian();
+			double radius = rand.nextDouble(0.6, 1.6);
 			for (int angle = 0; angle <= 360; angle += 12) {
 				final Vector temp = GeneralMethods.getOrthogonalVector(direction, angle, 0.2);
 				final Vector dir = GeneralMethods.getOrthogonalVector(direction, angle, radius);
@@ -164,7 +167,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 					remove();
 					return;
 				}
-				if (ThreadLocalRandom.current().nextInt(3) == 0) {
+				if (rand.nextInt(3) == 0) {
 					location.getWorld().playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.01F);
 				}
 				if (location.getBlock().isLiquid() || !isTransparent(location.getBlock())) {
@@ -179,11 +182,11 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 	private void createExplosion(Location center, int size, double damage) {
 		if (hasExploded) return;
 		hasExploded = true;
-		ParticleEffect.FLAME.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f, 20);
-		ParticleEffect.SMOKE_LARGE.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
-		ParticleEffect.FIREWORKS_SPARK.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
-		ParticleEffect.SMOKE_LARGE.display(center, 20, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
-		ParticleEffect.EXPLOSION_HUGE.display(center, 5, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
+		ParticleEffect.FLAME.display(center, 20, 1, 1, 1, 0.5f, 20);
+		ParticleEffect.SMOKE_LARGE.display(center, 20, 1, 1, 1, 0.5f);
+		ParticleEffect.FIREWORKS_SPARK.display(center, 20, 1, 1, 1, 0.5f);
+		ParticleEffect.SMOKE_LARGE.display(center, 20, 1, 1, 1, 0.5f);
+		ParticleEffect.EXPLOSION_HUGE.display(center, 5, 1, 1, 1, 0.5f);
 		center.getWorld().playSound(center, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		if (regenDelay > 0 && !center.getBlock().isLiquid()) {
