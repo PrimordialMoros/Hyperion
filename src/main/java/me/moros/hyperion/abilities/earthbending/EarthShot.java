@@ -309,19 +309,21 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 
 	@Override
 	public void remove() {
-		if (launched && projectile.getFallingBlock() != null) {
-			final Location tempLocation = projectile.getFallingBlock().getLocation().clone();
-			ParticleEffect.BLOCK_CRACK.display(tempLocation, 6, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0, projectile.getFallingBlock().getBlockData());
-			ParticleEffect.BLOCK_DUST.display(tempLocation, 4, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0, projectile.getFallingBlock().getBlockData());
-			if (convertedMagma) {
-				ParticleEffect.SMOKE_LARGE.display(tempLocation, 16, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.05);
-				ParticleEffect.FIREWORKS_SPARK.display(tempLocation, 8, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.05);
-				tempLocation.getWorld().playSound(tempLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0);
-			} else {
-				if (isMetal(projectile.getFallingBlock().getBlockData().getMaterial())) {
-					playMetalbendingSound(tempLocation);
+		if (projectile.getFallingBlock() != null) {
+			if (launched) {
+				final Location tempLocation = projectile.getFallingBlock().getLocation().clone();
+				ParticleEffect.BLOCK_CRACK.display(tempLocation, 6, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0, projectile.getFallingBlock().getBlockData());
+				ParticleEffect.BLOCK_DUST.display(tempLocation, 4, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0, projectile.getFallingBlock().getBlockData());
+				if (convertedMagma) {
+					ParticleEffect.SMOKE_LARGE.display(tempLocation, 16, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.05);
+					ParticleEffect.FIREWORKS_SPARK.display(tempLocation, 8, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.05);
+					tempLocation.getWorld().playSound(tempLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0);
 				} else {
-					playEarthbendingSound(tempLocation);
+					if (isMetal(projectile.getFallingBlock().getBlockData().getMaterial())) {
+						playMetalbendingSound(tempLocation);
+					} else {
+						playEarthbendingSound(tempLocation);
+					}
 				}
 			}
 			projectile.remove();

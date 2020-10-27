@@ -134,6 +134,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 					CoreMethods.playFocusParticles(player);
 				} else {
 					bPlayer.addCooldown(this);
+					location = player.getEyeLocation();
 					launched = true;
 				}
 			}
