@@ -91,12 +91,13 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthShot.Cooldown", 1500);
 		config.addDefault("Abilities.Earth.EarthShot.Range", 60);
 		config.addDefault("Abilities.Earth.EarthShot.SelectRange", 6);
+		config.addDefault("Abilities.Earth.EarthShot.AllowQuickLaunch", false);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.AllowConvert", true);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.DamageModifier", 2.0);
 		config.addDefault("Abilities.Earth.EarthShot.MagmaShot.ChargeTime", 1500);
 
 		config.addDefault("Abilities.Earth.EarthGlove.Enabled", true);
-		config.addDefault("Abilities.Earth.EarthGlove.Description", "Dai Li agents use this technique for various purposes. Hold sneak and click to launch your glove and attempt to grab your target. If you continue holding sneak, the gloves will attempt to return to you. You can also destroy other players' gloves by tapping sneak while looking at them.");
+		config.addDefault("Abilities.Earth.EarthGlove.Description", "Dai Li agents use this technique for various purposes. Left click to launch your glove and attempt to grab your target. If you are holding sneak, the gloves will attempt to return to you. You can also destroy other players' gloves by tapping sneak while looking at them.");
 		config.addDefault("Abilities.Earth.EarthGlove.Damage", 1.0);
 		config.addDefault("Abilities.Earth.EarthGlove.Cooldown", 5000);
 		config.addDefault("Abilities.Earth.EarthGlove.Range", 24);
@@ -178,6 +179,7 @@ public class ConfigManager {
 
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Enabled", true);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Description", "Master Jeong Jeong used this advanced technique to cast a great fire wave that grows in size while it advances forward.");
+		config.addDefault("Abilities.Fire.FireCombo.FireWave.RequireSneaking", true);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Damage", 3.0);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Cooldown", 20000);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Range", 16);

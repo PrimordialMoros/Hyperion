@@ -141,9 +141,7 @@ public class AbilityListener implements Listener {
 				} else if (abilityName.equalsIgnoreCase("earthguard")) {
 					new EarthGuard(player);
 				} else if (abilityName.equalsIgnoreCase("earthglove")) {
-					if (player.isSneaking()) {
-						new EarthGlove(player);
-					}
+					new EarthGlove(player);
 				}
 			} else if (coreAbility instanceof FireAbility && bPlayer.isElementToggled(Element.FIRE)) {
 				if (abilityName.equalsIgnoreCase("combustion")) {

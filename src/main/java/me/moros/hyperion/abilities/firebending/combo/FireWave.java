@@ -76,6 +76,7 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 	@Attribute(Attribute.WIDTH)
 	private int width;
 	private int height;
+	private boolean requireSneaking;
 
 	private int ticks = 0;
 
@@ -86,6 +87,7 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 			return;
 		}
 
+		requireSneaking = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Fire.FireCombo.FireWave.RequireSneaking");
 		damage = Hyperion.getPlugin().getConfig().getDouble("Abilities.Fire.FireCombo.FireWave.Damage");
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.FireCombo.FireWave.Cooldown");
 		int range = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.FireCombo.FireWave.Range");
@@ -128,7 +130,12 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 
 	@Override
 	public void progress() {
-		if (!bPlayer.canBendIgnoreBindsCooldowns(this) || bPlayer.getBoundAbilityName() == null || !bPlayer.getBoundAbilityName().equalsIgnoreCase("WallOfFire") || blocks.isEmpty() || !player.isSneaking()) {
+		if (!bPlayer.canBendIgnoreBindsCooldowns(this) || bPlayer.getBoundAbilityName() == null || !bPlayer.getBoundAbilityName().equalsIgnoreCase("WallOfFire") || blocks.isEmpty()) {
+			remove();
+			return;
+		}
+
+		if (requireSneaking && !player.isSneaking()) {
 			remove();
 			return;
 		}

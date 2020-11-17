@@ -98,6 +98,7 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 			returning = true;
 		}
 
+		Vector vector = lastVelocity.clone(); // Record velocity
 		if (returning) {
 			if (!player.isSneaking()) {
 				shatterGlove();
@@ -109,31 +110,36 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 				remove();
 				return;
 			}
-			final Vector returnVector = GeneralMethods.getDirection(glove.getLocation(), returnLocation).normalize();
 			if (grabbed) {
 				if (grabbedTarget == null || !grabbedTarget.isValid() || (grabbedTarget instanceof Player && !((Player) grabbedTarget).isOnline())) {
 					shatterGlove();
 					return;
 				}
-				grabbedTarget.setVelocity(returnVector.clone().multiply(GLOVE_GRABBED_SPEED));
-				setGloveVelocity(returnVector.clone().multiply(GLOVE_GRABBED_SPEED));
+				grabbedTarget.setVelocity(GeneralMethods.getDirection(grabbedTarget.getLocation(), returnLocation).normalize().multiply(GLOVE_GRABBED_SPEED));
+				glove.teleport(grabbedTarget.getEyeLocation().subtract(0, grabbedTarget.getHeight() / 2, 0));
+				return;
 			} else {
-				setGloveVelocity(returnVector.clone().multiply(GLOVE_SPEED));
+				setGloveVelocity(GeneralMethods.getDirection(glove.getLocation(), returnLocation).normalize().multiply(GLOVE_SPEED));
 			}
 		} else {
 			setGloveVelocity(lastVelocity.clone().normalize().multiply(GLOVE_SPEED));
 			checkDamage();
+			if (grabbed) {
+				Location returnLocation = player.getEyeLocation().add(player.getEyeLocation().getDirection().multiply(1.5));
+				final Vector returnVector = GeneralMethods.getDirection(glove.getLocation(), returnLocation).normalize();
+				grabbedTarget.setVelocity(returnVector.clone().multiply(GLOVE_GRABBED_SPEED));
+				setGloveVelocity(returnVector.clone().multiply(GLOVE_GRABBED_SPEED));
+				return;
+			}
 		}
 
 		double velocityLimit = (grabbed ? GLOVE_GRABBED_SPEED : GLOVE_SPEED) - 0.2;
-		if (glove.isOnGround() || lastVelocity.angle(glove.getVelocity()) > Math.PI / 4 || glove.getVelocity().length() < velocityLimit) {
+		if (glove.isOnGround() || vector.angle(glove.getVelocity()) > Math.PI / 4 || glove.getVelocity().length() < velocityLimit) {
 			shatterGlove();
 		}
 	}
 
 	private boolean launchEarthGlove() {
-		if (!player.isSneaking()) return false;
-
 		final Location gloveSpawnLocation;
 		switch (lastUsedSide.getOrDefault(player.getUniqueId(), Side.RIGHT)) {
 			case LEFT:
@@ -156,7 +162,8 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 		final Entity targetedEntity = GeneralMethods.getTargetedEntity(player, range, Collections.singletonList(player));
 		final Vector velocityVector;
 		if (targetedEntity instanceof LivingEntity) {
-			velocityVector = GeneralMethods.getDirection(gloveSpawnLocation, ((LivingEntity) targetedEntity).getEyeLocation());
+			Location targetLoc = ((LivingEntity) targetedEntity).getEyeLocation().subtract(0, targetedEntity.getHeight() / 2, 0);
+			velocityVector = GeneralMethods.getDirection(gloveSpawnLocation, targetLoc);
 		} else {
 			velocityVector = GeneralMethods.getDirection(gloveSpawnLocation, GeneralMethods.getTargetedLocation(player, range));
 		}
@@ -181,7 +188,7 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 		returning = true;
 		grabbed = true;
 		grabbedTarget = entity;
-		glove.teleport(grabbedTarget.getEyeLocation());
+		glove.teleport(grabbedTarget.getEyeLocation().subtract(0, grabbedTarget.getHeight() / 2, 0));
 	}
 
 	public void checkDamage() {

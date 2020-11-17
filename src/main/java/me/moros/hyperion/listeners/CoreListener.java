@@ -45,6 +45,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.ItemMergeEvent;
@@ -58,8 +60,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.PlayerInventory;
 
 public class CoreListener implements Listener {
-
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void EntityChangeBlockEvent(final EntityChangeBlockEvent event) {
 		if (event.getEntityType().equals(EntityType.FALLING_BLOCK)) {
 			final FallingBlock fb = (FallingBlock) event.getEntity();
@@ -77,7 +78,7 @@ public class CoreListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onArrowHit(final ProjectileHitEvent event) {
 		if (event.getEntity() instanceof Arrow && event.getEntity().hasMetadata(CoreMethods.CABLE_KEY)) {
 			final MetalCable cable = (MetalCable) event.getEntity().getMetadata(CoreMethods.CABLE_KEY).get(0).value();
@@ -104,29 +105,44 @@ public class CoreListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
 		if (event.getDamager() instanceof Arrow && event.getDamager().hasMetadata(CoreMethods.CABLE_KEY)) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onEntityDamageEvent(final EntityDamageEvent event) {
+		if (event.getCause() != DamageCause.FIRE && event.getCause() != DamageCause.FIRE_TICK) {
+			return;
+		}
+		if (event.getEntity() instanceof Player) {
+			final Player player = (Player) event.getEntity();
+			if (CoreAbility.hasAbility(player, EarthGuard.class)) {
+				if (CoreAbility.getAbility(player, EarthGuard.class).hasActiveArmor()) {
+					player.setFireTicks(0);
+					event.setCancelled(true);
+				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onInteractAtEntity(final PlayerInteractAtEntityEvent event) {
 		if (event.getRightClicked().hasMetadata(CoreMethods.NO_INTERACTION_KEY)) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onItemPickup(final EntityPickupItemEvent event) {
 		if (event.getItem().hasMetadata(CoreMethods.NO_PICKUP_KEY)) {
 			event.setCancelled(true);
-			event.getItem().remove();
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onHopperItemPickup(final InventoryPickupItemEvent event) {
 		if (event.getItem().hasMetadata(CoreMethods.NO_PICKUP_KEY)) {
 			event.setCancelled(true);
@@ -134,7 +150,7 @@ public class CoreListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onInventoryClick(final InventoryClickEvent event) {
 		if (event.isCancelled() || !(event.getClickedInventory() instanceof PlayerInventory) || event.getSlotType() != InventoryType.SlotType.ARMOR) {
 			return;
@@ -149,7 +165,7 @@ public class CoreListener implements Listener {
 		}
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onItemMerge(final ItemMergeEvent event) {
 		if (event.getEntity().hasMetadata(CoreMethods.GLOVE_KEY) || event.getTarget().hasMetadata(CoreMethods.GLOVE_KEY)) {
 			event.setCancelled(true);

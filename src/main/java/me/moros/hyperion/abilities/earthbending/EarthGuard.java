@@ -23,12 +23,14 @@ import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.attribute.Attribute;
+import com.projectkorra.projectkorra.earthbending.EarthArmor;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.util.BendingFallingBlock;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -38,6 +40,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.NumberConversions;
@@ -126,10 +129,11 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		}
 	}
 
-	private void formArmor() {
+	private void formArmor(Material material) {
 		if (formed) return;
 
 		final ItemStack head, chest, leggings, boots;
+		Color color = Color.fromRGB(EarthArmor.getColor(material));
 		if (metal) {
 			if (gold) {
 				head = new ItemStack(Material.GOLDEN_HELMET, 1);
@@ -156,6 +160,9 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 
 		for (ItemStack item : newArmor) {
 			ItemMeta generalMeta = item.getItemMeta();
+			if (generalMeta instanceof LeatherArmorMeta) {
+				((LeatherArmorMeta) generalMeta).setColor(color);
+			}
 			generalMeta.setDisplayName(ChatColor.GREEN + "Earth Guard Armor");
 			generalMeta.setLore(Collections.singletonList(ChatColor.DARK_GREEN + "Temporary"));
 			item.setItemMeta(generalMeta);
@@ -189,8 +196,9 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		final double distanceSquared = player.getEyeLocation().distanceSquared(loc);
 		final double speedFactor = (distanceSquared > selectRange * selectRange) ? 1.5 : 0.8;
 		if (distanceSquared <= 0.5 * 0.5) {
+			Material mat = armorFallingBlock.getFallingBlock().getBlockData().getMaterial();
 			armorFallingBlock.remove();
-			formArmor();
+			formArmor(mat);
 			return;
 		}
 
