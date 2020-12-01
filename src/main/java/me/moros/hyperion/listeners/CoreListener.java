@@ -54,10 +54,12 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryPickupItemEvent;
-import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
 
 public class CoreListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
@@ -94,7 +96,7 @@ public class CoreListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onLightningStrike(final EntitySpawnEvent event) {
 		if (event.getEntity() instanceof LightningStrike && event.getEntity().hasMetadata(CoreMethods.BOLT_KEY)) {
 			final BoltInfo boltInfo = (BoltInfo) event.getEntity().getMetadata(CoreMethods.BOLT_KEY).get(0).value();
@@ -152,16 +154,21 @@ public class CoreListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onInventoryClick(final InventoryClickEvent event) {
-		if (event.isCancelled() || !(event.getClickedInventory() instanceof PlayerInventory) || event.getSlotType() != InventoryType.SlotType.ARMOR) {
+		ItemStack item = event.getCurrentItem();
+		if (item == null || !(event.getClickedInventory() instanceof PlayerInventory)) {
 			return;
 		}
-		final PlayerInventory inventory = (PlayerInventory) event.getClickedInventory();
-		if (inventory.getHolder() instanceof Player) {
-			final Player player = ((Player) inventory.getHolder()).getPlayer();
-			if (CoreAbility.hasAbility(player, EarthGuard.class)) {
-				final EarthGuard guard = CoreAbility.getAbility(player, EarthGuard.class);
-				if (guard.hasActiveArmor()) event.setCancelled(true);
+
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null && Hyperion.getLayer().hasEarthGuardKey(meta.getPersistentDataContainer())) {
+			final PlayerInventory inventory = (PlayerInventory) event.getClickedInventory();
+			if (inventory.getHolder() instanceof Player) {
+				final Player player = ((Player) inventory.getHolder()).getPlayer();
+				if (!CoreAbility.hasAbility(player, EarthGuard.class)) {
+					inventory.remove(item);
+				}
 			}
+			event.setCancelled(true);
 		}
 	}
 
@@ -172,7 +179,7 @@ public class CoreListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	public void onPlayerDeath(final PlayerDeathEvent event) {
 		if (CoreAbility.hasAbility(event.getEntity(), EarthGuard.class)) {
 			final EarthGuard guard = CoreAbility.getAbility(event.getEntity(), EarthGuard.class);
@@ -184,20 +191,26 @@ public class CoreListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
-	public void onPlayerLogout(final PlayerQuitEvent event) {
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerChangeWorld(final PlayerChangedWorldEvent event) {
 		if (CoreAbility.hasAbility(event.getPlayer(), EarthGuard.class)) {
-			final EarthGuard guard = CoreAbility.getAbility(event.getPlayer(), EarthGuard.class);
-			if (guard.hasActiveArmor()) guard.remove();
+			CoreAbility.getAbility(event.getPlayer(), EarthGuard.class).remove();
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	public void onPlayerLogout(final PlayerQuitEvent event) {
+		if (CoreAbility.hasAbility(event.getPlayer(), EarthGuard.class)) {
+			CoreAbility.getAbility(event.getPlayer(), EarthGuard.class).remove();
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onPKReload(final BendingReloadEvent event) {
 		Bukkit.getScheduler().runTaskLater(Hyperion.getPlugin(), Hyperion::reload, 1);
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onAbilityStart(final AbilityStartEvent event) {
 		if (event.getAbility() instanceof CoreAbility) {
 			CoreAbility ability = (CoreAbility) event.getAbility();

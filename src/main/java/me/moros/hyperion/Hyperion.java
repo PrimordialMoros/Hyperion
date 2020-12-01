@@ -36,6 +36,7 @@ public class Hyperion extends JavaPlugin {
 	private static String author;
 	private static String version;
 	private static Logger log;
+	private static PersistentDataLayer layer;
 
 	@Override
 	public void onEnable() {
@@ -47,6 +48,7 @@ public class Hyperion extends JavaPlugin {
 		new MetricsLite(this, 8212);
 		new ConfigManager();
 		new HyperionCommand();
+		layer = new PersistentDataLayer();
 		CoreMethods.loadAbilities();
 
 		getServer().getPluginManager().registerEvents(new AbilityListener(), this);
@@ -85,5 +87,9 @@ public class Hyperion extends JavaPlugin {
 
 	public static Logger getLog() {
 		return log;
+	}
+
+	public static PersistentDataLayer getLayer() {
+		return layer;
 	}
 }

@@ -28,6 +28,7 @@ import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import me.moros.hyperion.Hyperion;
+import me.moros.hyperion.PersistentDataLayer;
 import me.moros.hyperion.util.BendingFallingBlock;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -165,10 +166,18 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 			}
 			generalMeta.setDisplayName(ChatColor.GREEN + "Earth Guard Armor");
 			generalMeta.setLore(Collections.singletonList(ChatColor.DARK_GREEN + "Temporary"));
+			Hyperion.getLayer().addEarthGuardKey(generalMeta.getPersistentDataContainer());
 			item.setItemMeta(generalMeta);
 		}
 
-		oldArmor.addAll(Arrays.asList(player.getInventory().getArmorContents()));
+		for (ItemStack item : player.getInventory().getArmorContents()) {
+			if (item == null) continue;
+			ItemMeta meta = item.getItemMeta();
+			if (meta == null || !Hyperion.getLayer().hasEarthGuardKey(meta.getPersistentDataContainer())) {
+				oldArmor.add(item);
+			}
+		}
+
 		originalMode = player.getGameMode();
 		player.getInventory().setArmorContents(newArmor.toArray(new ItemStack[4]));
 		new TempPotionEffect(player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, NumberConversions.round(duration / 50F), resistance));
