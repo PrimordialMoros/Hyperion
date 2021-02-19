@@ -120,7 +120,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 				Vector dir = player.getEyeLocation().getDirection().clone().normalize().multiply(0.2);
 				velocity.add(dir.setY(0));
 			}
-			projectile.getFallingBlock().setVelocity(velocity.normalize().multiply(1.6));
+			projectile.getFallingBlock().setVelocity(velocity.normalize().multiply(1.8));
 			lastVelocity = projectile.getFallingBlock().getVelocity().clone();
 			checkBlast(false);
 		} else {
@@ -359,10 +359,10 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 			location = projectile.getFallingBlock().getLocation();
 			Vector direction = GeneralMethods.getDirection(location, GeneralMethods.getTargetedLocation(player, range)).normalize();
 			projectile.getFallingBlock().setGravity(true);
-			projectile.getFallingBlock().setVelocity(direction.multiply(1.8));
+			projectile.getFallingBlock().setVelocity(direction.multiply(1.8).add(new Vector(0, 0.2, 0)));
 		} else {
 			Vector direction = GeneralMethods.getDirection(readySource.getLocation(), GeneralMethods.getTargetedLocation(player, range, readySource.getBlock().getType())).normalize();
-			projectile = new BendingFallingBlock(readySource.getLocation().add(0.5, 0, 0.5), readySource.getBlock().getBlockData(), direction.multiply(1.8), this, true);
+			projectile = new BendingFallingBlock(readySource.getLocation().add(0.5, 0, 0.5), readySource.getBlock().getBlockData(), direction.multiply(1.8).add(new Vector(0, 0.2, 0)), this, true);
 			location = projectile.getFallingBlock().getLocation();
 			readySource.revertBlock();
 			getPreventEarthbendingBlocks().remove(readySource.getBlock());

@@ -170,12 +170,15 @@ public class ConfigManager {
 		config.addDefault("Abilities.Fire.Combustion.Enabled", true);
 		config.addDefault("Abilities.Fire.Combustion.Description", "Hold sneak to focus large amounts of energy into your body. Once charged, release shift to fire a powerful maneuverable Combustion beam Left click to detonate the beam manually.");
 		config.addDefault("Abilities.Fire.Combustion.Damage", 6.0);
+		config.addDefault("Abilities.Fire.Combustion.Speed", 1.6);
 		config.addDefault("Abilities.Fire.Combustion.Cooldown", 10000);
 		config.addDefault("Abilities.Fire.Combustion.Range", 80);
 		config.addDefault("Abilities.Fire.Combustion.ChargeTime", 0);
-		config.addDefault("Abilities.Fire.Combustion.Power", 3);
-		config.addDefault("Abilities.Fire.Combustion.MisfireModifier", -1);
+		config.addDefault("Abilities.Fire.Combustion.Power", 3.0);
+		config.addDefault("Abilities.Fire.Combustion.MisfireModifier", -1.0);
 		config.addDefault("Abilities.Fire.Combustion.RegenDelay", 15000);
+		config.addDefault("Abilities.Fire.Combustion.FireTicks", 40);
+		config.addDefault("Abilities.Fire.Combustion.ScaleDamageByDistance", false);
 
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Enabled", true);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Description", "Master Jeong Jeong used this advanced technique to cast a great fire wave that grows in size while it advances forward.");

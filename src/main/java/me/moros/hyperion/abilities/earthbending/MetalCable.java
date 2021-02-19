@@ -175,7 +175,7 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 		}
 
 		Vector direction = GeneralMethods.getDirection(location, targetLocation).normalize();
-		target.getEntity().setVelocity(direction.multiply(blockSpeed));
+		target.getEntity().setVelocity(direction.multiply(blockSpeed).add(new Vector(0, 0.2, 0)));
 		remove();
 	}
 
@@ -192,7 +192,7 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 		}
 		origin.add(0, 1, 0);
 		final Vector dir = GeneralMethods.getDirection(origin, target).normalize();
-		final Arrow arrow = player.getWorld().spawnArrow(origin, dir, 1.6F, 0);
+		final Arrow arrow = player.getWorld().spawnArrow(origin, dir, 1.8F, 0);
 		arrow.setShooter(player);
 		arrow.setGravity(false);
 		arrow.setInvulnerable(true);

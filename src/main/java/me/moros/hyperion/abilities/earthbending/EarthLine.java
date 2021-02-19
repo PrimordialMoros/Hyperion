@@ -270,7 +270,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		double z = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
 		new TempArmorStand(this, location.clone().add(x, -2, z), mode == EarthLineMode.MAGMA ? Material.MAGMA_BLOCK : location.getBlock().getRelative(BlockFace.DOWN).getType(), 700);
 
-		location.add(direction.clone().multiply(mode == EarthLineMode.MAGMA ? 0.4 : 0.7));
+		location.add(direction.clone().multiply(mode == EarthLineMode.MAGMA ? 0.6 : 0.8));
 		final Block baseBlock = location.getBlock().getRelative(BlockFace.DOWN);
 		if (!isValidBlock(baseBlock)) {
 			if (isValidBlock(baseBlock.getRelative(BlockFace.UP))) {

@@ -151,7 +151,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 		double z = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
 		new TempArmorStand(this, location.clone().add(x, -2, z), Material.PACKED_ICE, 1400);
 
-		location.add(direction.clone().multiply(0.5));
+		location.add(direction.clone().multiply(0.7));
 		final Block baseBlock = location.getBlock().getRelative(BlockFace.DOWN);
 		if (!isValidBlock(baseBlock)) {
 			if (isValidBlock(baseBlock.getRelative(BlockFace.UP))) {
