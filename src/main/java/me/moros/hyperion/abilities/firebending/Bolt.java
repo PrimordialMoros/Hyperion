@@ -181,7 +181,7 @@ public class Bolt extends LightningAbility implements AddonAbility {
 			return;
 		}
 		location = targetLocation;
-		player.getWorld().strikeLightningEffect(location);
+		player.getWorld().spigot().strikeLightningEffect(location, true);
 		player.getWorld().spawn(location, LightningStrike.class, entity -> {
 			entity.setCustomName("Bolt");
 			entity.setCustomNameVisible(false);
