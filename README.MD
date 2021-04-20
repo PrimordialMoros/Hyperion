@@ -30,5 +30,7 @@ Addon plugin for ProjectKorra with an emphasis on intricate mechanics
 * IceCrawl
 * IceDrill (combo)
 
+### Chi
+* Smokescreen
 
-Note: Combustion and EarthGuard are meant to replace ProjectKorra's Combustion and EarthArmor, so make sure to disable them in the PK config.
+Note: Smokescreen, Combustion and EarthGuard are meant to replace ProjectKorra's Smokescreen, Combustion and EarthArmor, so make sure to disable them in the PK config.

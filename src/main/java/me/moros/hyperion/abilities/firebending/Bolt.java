@@ -32,6 +32,7 @@ import me.moros.hyperion.abilities.earthbending.EarthGuard;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.MaterialCheck;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
@@ -185,8 +186,10 @@ public class Bolt extends LightningAbility implements AddonAbility {
 		player.getWorld().spawn(location, LightningStrike.class, entity -> {
 			entity.setCustomName("Bolt");
 			entity.setCustomNameVisible(false);
+			entity.setSilent(true);
 			entity.setMetadata(CoreMethods.BOLT_KEY, new FixedMetadataValue(Hyperion.getPlugin(), new BoltInfo(this, damage, targetLocation.clone())));
 		});
+		player.getWorld().playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 5, 1.2F);
 		struck = true;
 		strikeTime = System.currentTimeMillis();
 		bPlayer.addCooldown(this);
