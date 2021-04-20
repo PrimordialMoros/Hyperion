@@ -24,6 +24,8 @@ import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.event.AbilityStartEvent;
 import com.projectkorra.projectkorra.event.BendingReloadEvent;
 import me.moros.hyperion.Hyperion;
+import me.moros.hyperion.abilities.chiblocking.Smokescreen;
+import me.moros.hyperion.abilities.chiblocking.Smokescreen.SmokescreenData;
 import me.moros.hyperion.abilities.earthbending.EarthGuard;
 import me.moros.hyperion.abilities.earthbending.EarthShot;
 import me.moros.hyperion.abilities.earthbending.MetalCable;
@@ -40,6 +42,7 @@ import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -80,7 +83,7 @@ public class CoreListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onArrowHit(final ProjectileHitEvent event) {
 		if (event.getEntity() instanceof Arrow && event.getEntity().hasMetadata(CoreMethods.CABLE_KEY)) {
 			final MetalCable cable = (MetalCable) event.getEntity().getMetadata(CoreMethods.CABLE_KEY).get(0).value();
@@ -92,6 +95,11 @@ public class CoreListener implements Listener {
 				} else {
 					event.getEntity().remove();
 				}
+			}
+		} else if (event.getEntity() instanceof Snowball && event.getEntity().hasMetadata(CoreMethods.SMOKESCREEN_KEY)) {
+			final SmokescreenData data = (SmokescreenData) event.getEntity().getMetadata(CoreMethods.SMOKESCREEN_KEY).get(0).value();
+			if (data != null) {
+				Smokescreen.createCloud(event.getEntity().getLocation(), data);
 			}
 		}
 	}

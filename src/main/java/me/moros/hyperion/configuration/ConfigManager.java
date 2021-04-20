@@ -216,6 +216,13 @@ public class ConfigManager {
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.Duration", 10000);
 		config.addDefault("Abilities.Water.WaterCombo.IceDrill.RegenDelay", 10000);
 
+		config.addDefault("Abilities.Chi.Smokescreen.Enabled", true);
+		config.addDefault("Abilities.Chi.Smokescreen.Description", "Left click to launch a bomb which will explode on contact and create a smoke cloud that blinds nearby entities.");
+		config.addDefault("Abilities.Chi.Smokescreen.Cooldown", 24000);
+		config.addDefault("Abilities.Chi.Smokescreen.CloudDuration", 7000);
+		config.addDefault("Abilities.Chi.Smokescreen.BlindnessTicks", 30);
+		config.addDefault("Abilities.Chi.Smokescreen.Radius", 5.0);
+
 		config.options().copyDefaults(true);
 		Hyperion.getPlugin().saveConfig();
 	}

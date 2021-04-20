@@ -24,11 +24,13 @@ import com.projectkorra.projectkorra.Element;
 import com.projectkorra.projectkorra.PKListener;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
+import com.projectkorra.projectkorra.ability.ChiAbility;
 import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.FireAbility;
 import com.projectkorra.projectkorra.ability.WaterAbility;
 import me.moros.hyperion.abilities.airbending.Evade;
+import me.moros.hyperion.abilities.chiblocking.Smokescreen;
 import me.moros.hyperion.abilities.earthbending.EarthGlove;
 import me.moros.hyperion.abilities.earthbending.EarthGuard;
 import me.moros.hyperion.abilities.earthbending.EarthGuardWall;
@@ -153,6 +155,10 @@ public class AbilityListener implements Listener {
 					if (player.isSneaking()) {
 						IceDrill.setClicked(player);
 					}
+				}
+			} else if (coreAbility instanceof ChiAbility && bPlayer.isElementToggled(Element.CHI)) {
+				if (abilityName.equalsIgnoreCase("smokescreen")) {
+					new Smokescreen(player);
 				}
 			}
 		}
