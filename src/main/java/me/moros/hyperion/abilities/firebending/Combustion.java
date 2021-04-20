@@ -129,23 +129,25 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 				remove();
 				return;
 			}
-			if (!charged) {
-				if (System.currentTimeMillis() > getStartTime() + chargeTime) {
-					charged = true;
-				}
-			} else {
-				if (player.getHealth() + 0.5 < initialHealth) {
-					createExplosion(player.getEyeLocation(), power + misfireModifier, damage + misfireModifier);
-					return;
-				}
-				if (player.isSneaking() && chargeTime != 0) {
-					playParticleRing();
+			location = player.getEyeLocation();
+			if (chargeTime != 0) {
+				playParticleRing();
+				if (charged) {
 					CoreMethods.playFocusParticles(player);
 				} else {
-					bPlayer.addCooldown(this);
-					location = player.getEyeLocation();
-					launched = true;
+					if (System.currentTimeMillis() > getStartTime() + chargeTime) {
+						charged = true;
+					}
 				}
+			}
+			if (player.getHealth() + 0.5 < initialHealth) {
+				createExplosion(player.getEyeLocation(), power + misfireModifier, damage + misfireModifier);
+				return;
+			}
+
+			if (charged && (!player.isSneaking() || chargeTime <= 0)) {
+				bPlayer.addCooldown(this);
+				launched = true;
 			}
 		}
 	}
