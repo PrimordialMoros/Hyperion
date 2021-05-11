@@ -12,3 +12,24 @@ permissions:
   bending.command.hyperion.reload:
     default: op
     description: Reload the config of Hyperion.
+  hyperion.player:
+    default: true
+    description: Access to hyperion abilities.
+    children:
+      bending.ability.AirWheel: true
+      bending.ability.Evade: true
+      bending.ability.Smokescreen: true
+      bending.ability.EarthShards: true
+      bending.ability.EarthCling: true
+      bending.ability.EarthGlove: true
+      bending.ability.EarthGuard: true
+      bending.ability.EarthLine: true
+      bending.ability.EarthShot: true
+      bending.ability.LavaDisk: true
+      bending.ability.MetalCable: true
+      bending.ability.FireWave: true
+      bending.ability.Bolt: true
+      bending.ability.Combustion: true
+      bending.ability.IceDrill: true
+      bending.ability.IceBreath: true
+      bending.ability.IceCrawl: true

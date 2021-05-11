@@ -319,6 +319,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 		if (collision.getAbilitySecond() instanceof Combustion) {
 			if (!hasExploded && !((Combustion) collision.getAbilitySecond()).hasExploded) {
 				createExplosion(collision.getLocationFirst(), 2 * power, 2 * damage);
+				collision.setRemovingSecond(true);
 			}
 			return;
 		} else if (collision.getAbilitySecond().isExplosiveAbility() || collision.getAbilitySecond().getElement().equals(Element.EARTH)) {
