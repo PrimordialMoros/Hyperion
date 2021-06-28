@@ -76,11 +76,13 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthLine.Damage", 3.0);
 		config.addDefault("Abilities.Earth.EarthLine.Cooldown", 3000);
 		config.addDefault("Abilities.Earth.EarthLine.Range", 24);
+		config.addDefault("Abilities.Earth.EarthLine.Speed", 0.8);
 		config.addDefault("Abilities.Earth.EarthLine.SelectRange", 6);
 		config.addDefault("Abilities.Earth.EarthLine.MakeSpikes",true);
 		config.addDefault("Abilities.Earth.EarthLine.AllowUnderWater", true);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.DamageModifier", 2.0);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.RegenDelay", 20000);
+		config.addDefault("Abilities.Earth.EarthLine.Magma.Speed", 0.6);
 		config.addDefault("Abilities.Earth.EarthLine.PrisonCooldown", 15000);
 		config.addDefault("Abilities.Earth.EarthLine.PrisonDuration", 3000);
 		config.addDefault("Abilities.Earth.EarthLine.PrisonRadius", 0.8);

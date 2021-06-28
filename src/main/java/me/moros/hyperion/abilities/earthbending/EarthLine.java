@@ -94,6 +94,8 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	private boolean targetLocked;
 	private boolean collapsing;
 	private boolean makeSpikes;
+	private double earthLineSpeed;
+	private double magmaLineSpeed;
 
 	private int ticks;
 
@@ -120,8 +122,10 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.Range");
 		selectRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.SelectRange");
 		makeSpikes = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.MakeSpikes");
+		earthLineSpeed = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Speed");
 		allowUnderWater = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.AllowUnderWater");
 		magmaModifier = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Magma.DamageModifier");
+		magmaLineSpeed = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Magma.Speed");
 		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Magma.Regen");
 		prisonCooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.PrisonCooldown");
 		prisonDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.PrisonDuration");
@@ -191,7 +195,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		}
 	}
 
-	private void collapseWall() {
+	/*private void collapseWall() {
 		if (collapsing) return;
 		collapsing = true;
 		player.getWorld().playSound(location, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
@@ -204,7 +208,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		if (collapseBlocks.isEmpty()) {
 			remove();
 		}
-	}
+	}*/
 
 	public void setPrisonMode() {
 		if (mode != EarthLineMode.NORMAL) return;
@@ -272,7 +276,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		double z = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
 		new TempArmorStand(this, location.clone().add(x, -2, z), mode == EarthLineMode.MAGMA ? Material.MAGMA_BLOCK : location.getBlock().getRelative(BlockFace.DOWN).getType(), 700);
 
-		location.add(direction.clone().multiply(mode == EarthLineMode.MAGMA ? 0.6 : 0.8));
+		location.add(direction.clone().multiply(mode == EarthLineMode.MAGMA ? magmaLineSpeed : earthLineSpeed));
 		final Block baseBlock = location.getBlock().getRelative(BlockFace.DOWN);
 		if (!isValidBlock(baseBlock)) {
 			if (isValidBlock(baseBlock.getRelative(BlockFace.UP))) {
@@ -281,7 +285,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				location.add(0, -1, 0);
 			} else {
 				if (mode == EarthLineMode.MAGMA) {
-					collapseWall();
+					//collapseWall();
 					return;
 				}
 				remove();
