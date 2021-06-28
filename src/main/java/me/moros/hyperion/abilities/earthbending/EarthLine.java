@@ -93,6 +93,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	private boolean launched;
 	private boolean targetLocked;
 	private boolean collapsing;
+	private boolean makeSpikes;
 
 	private int ticks;
 
@@ -118,6 +119,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.Range");
 		selectRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.SelectRange");
+		makeSpikes = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.MakeSpikes");
 		allowUnderWater = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.AllowUnderWater");
 		magmaModifier = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Magma.DamageModifier");
 		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Magma.Regen");
@@ -321,7 +323,12 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 		if (hasHit) {
 			if (mode == EarthLineMode.NORMAL) {
-				raiseSpikes();
+				if(makeSpikes){
+					raiseSpikes();
+				}
+				else{
+					remove();
+				}
 			} else {
 				remove();
 			}
@@ -452,7 +459,9 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	private void shootLine() {
 		if (launched) {
-			raiseSpikes();
+			if(makeSpikes){
+				raiseSpikes();
+			}
 			return;
 		}
 

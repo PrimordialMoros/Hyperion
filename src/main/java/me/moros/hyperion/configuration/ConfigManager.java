@@ -77,6 +77,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthLine.Cooldown", 3000);
 		config.addDefault("Abilities.Earth.EarthLine.Range", 24);
 		config.addDefault("Abilities.Earth.EarthLine.SelectRange", 6);
+		config.addDefault("Abilities.Earth.EarthLine.MakeSpikes",true);
 		config.addDefault("Abilities.Earth.EarthLine.AllowUnderWater", true);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.DamageModifier", 2.0);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.RegenDelay", 20000);
