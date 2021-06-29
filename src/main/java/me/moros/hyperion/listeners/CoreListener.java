@@ -29,8 +29,6 @@ import me.moros.hyperion.abilities.chiblocking.Smokescreen.SmokescreenData;
 import me.moros.hyperion.abilities.earthbending.EarthGuard;
 import me.moros.hyperion.abilities.earthbending.EarthShot;
 import me.moros.hyperion.abilities.earthbending.MetalCable;
-import me.moros.hyperion.abilities.firebending.Bolt;
-import me.moros.hyperion.abilities.firebending.Bolt.BoltInfo;
 import me.moros.hyperion.configuration.ConfigManager;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.BendingFallingBlock;
@@ -39,7 +37,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Snowball;
@@ -51,7 +48,6 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.entity.ItemMergeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
@@ -100,17 +96,6 @@ public class CoreListener implements Listener {
 			final SmokescreenData data = (SmokescreenData) event.getEntity().getMetadata(CoreMethods.SMOKESCREEN_KEY).get(0).value();
 			if (data != null) {
 				Smokescreen.createCloud(event.getEntity().getLocation(), data);
-			}
-		}
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	public void onLightningStrike(final EntitySpawnEvent event) {
-		if (event.getEntity() instanceof LightningStrike && event.getEntity().hasMetadata(CoreMethods.BOLT_KEY)) {
-			final BoltInfo boltInfo = (BoltInfo) event.getEntity().getMetadata(CoreMethods.BOLT_KEY).get(0).value();
-			if (boltInfo != null) {
-				if (!Bolt.isNearbyChannel(boltInfo.getLocation(), boltInfo.getAbility().getPlayer()))
-					Bolt.dealDamage(boltInfo);
 			}
 		}
 	}

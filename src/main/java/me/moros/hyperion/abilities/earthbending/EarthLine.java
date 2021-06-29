@@ -289,7 +289,9 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 			} else {
 				if (mode == EarthLineMode.MAGMA) {
 					if(breakBlocks){
-					collapseWall();
+						collapseWall();
+					} else {
+						remove();
 					}
 					return;
 				}

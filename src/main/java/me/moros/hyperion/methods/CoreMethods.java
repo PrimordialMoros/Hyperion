@@ -64,7 +64,6 @@ public class CoreMethods {
 	public static final String NO_PICKUP_KEY = "BENDING_HYPERION_NO_PICKUP";
 	public static final String GLOVE_KEY = "BENDING_HYPERION_EARTH_GLOVE";
 	public static final String CABLE_KEY = "BENDING_HYPERION_METAL_CABLE_KEY";
-	public static final String BOLT_KEY = "BENDING_HYPERION_LIGHTNING_KEY";
 	public static final String SMOKESCREEN_KEY = "BENDING_HYPERION_SMOKESCREEN_KEY";
 
 	public static List<Location> getCirclePoints(Location location, int points, double size) {

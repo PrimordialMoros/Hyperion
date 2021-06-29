@@ -36,10 +36,8 @@ import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LightningStrike;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.Collections;
 
@@ -55,9 +53,7 @@ public class Bolt extends LightningAbility implements AddonAbility {
 	@Attribute(Attribute.CHARGE_DURATION)
 	private long chargeTime;
 
-	private long strikeTime;
 	private boolean charged;
-	private boolean struck;
 
 	public Bolt(final Player player) {
 		super(player);
@@ -72,7 +68,6 @@ public class Bolt extends LightningAbility implements AddonAbility {
 		chargeTime = Hyperion.getPlugin().getConfig().getLong("Abilities.Fire.Bolt.ChargeTime");
 
 		charged = chargeTime <= 0;
-		struck = false;
 
 		range = (int) getDayFactor(range, player.getWorld());
 		damage = getDayFactor(damage, player.getWorld());
@@ -84,25 +79,17 @@ public class Bolt extends LightningAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (struck) {
-			if (System.currentTimeMillis() > strikeTime + 500) {
-				remove();
-			}
-			return;
-		} else {
-			if (!bPlayer.canBendIgnoreCooldowns(this) || isWater(player.getEyeLocation().getBlock())) {
-				remove();
-				return;
-			}
+		if (!bPlayer.canBendIgnoreCooldowns(this) || isWater(player.getEyeLocation().getBlock())) {
+			remove();
+		return;
 		}
 
 		if (charged) {
-			if (!struck) {
-				if (player.isSneaking() && chargeTime != 0) {
-					CoreMethods.playFocusParticles(player);
-				} else {
-					strike();
-				}
+			if (player.isSneaking() && chargeTime != 0) {
+				CoreMethods.playFocusParticles(player);
+			} else {
+				strike();
+				remove();
 			}
 		} else {
 			if (!player.isSneaking()) {
@@ -183,22 +170,15 @@ public class Bolt extends LightningAbility implements AddonAbility {
 		}
 		location = targetLocation;
 		player.getWorld().spigot().strikeLightningEffect(location, true);
-		player.getWorld().spawn(location, LightningStrike.class, entity -> {
-			entity.setCustomName("Bolt");
-			entity.setCustomNameVisible(false);
-			entity.setSilent(true);
-			entity.setMetadata(CoreMethods.BOLT_KEY, new FixedMetadataValue(Hyperion.getPlugin(), new BoltInfo(this, damage, targetLocation.clone())));
-		});
 		player.getWorld().playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 5, 1.2F);
-		struck = true;
-		strikeTime = System.currentTimeMillis();
 		bPlayer.addCooldown(this);
+		if (!Bolt.isNearbyChannel(location, player)) {
+			dealDamage(location);
+		}
 	}
 
-	public static void dealDamage(BoltInfo info) {
-		Location strikeLocation = info.getLocation();
+	public void dealDamage(Location strikeLocation) {
 		boolean enhanced = isWater(strikeLocation.getBlock());
-
 		for (final Entity e : GeneralMethods.getEntitiesAroundPoint(strikeLocation, 5)) {
 			if (e instanceof Creeper) ((Creeper) e).setPowered(true);
 			if (e instanceof LivingEntity && !(e instanceof ArmorStand)) {
@@ -213,18 +193,12 @@ public class Bolt extends LightningAbility implements AddonAbility {
 					final EarthGuard armorAbility = CoreAbility.getAbility((Player) e, EarthGuard.class);
 					if (armorAbility.hasActiveArmor() && armorAbility.isMetalArmor()) vulnerable = true;
 				}
-
-				double baseDamage = vulnerable ? info.getDamage() * 2 : info.getDamage();
+				double baseDamage = vulnerable ? damage * 2 : damage;
 				double distanceModifier = enhanced ? distance / 3 : distance / 2;
-				info.getAbility().dealDamage((LivingEntity) e, (distance < 1.5) ? baseDamage : baseDamage - distanceModifier);
+				DamageHandler.damageEntity(e, (distance < 1.5) ? baseDamage : baseDamage - distanceModifier, this);
 				AirAbility.breakBreathbendingHold(e);
 			}
 		}
-		info.getAbility().remove();
-	}
-
-	public void dealDamage(LivingEntity ent, double dmg) {
-		DamageHandler.damageEntity(ent, dmg, this);
 	}
 
 	public static boolean isNearbyChannel(Location location, Player source) {
@@ -238,29 +212,5 @@ public class Bolt extends LightningAbility implements AddonAbility {
 			}
 		}
 		return false;
-	}
-
-	public static class BoltInfo {
-		private final Bolt ability;
-		private final double damage;
-		private final Location location;
-
-		public BoltInfo(Bolt boltAbility, double boltDamage, Location boltLocation) {
-			ability = boltAbility;
-			damage = boltDamage;
-			location = boltLocation;
-		}
-
-		public double getDamage() {
-			return damage;
-		}
-
-		public Location getLocation() {
-			return location;
-		}
-
-		public Bolt getAbility() {
-			return ability;
-		}
 	}
 }
