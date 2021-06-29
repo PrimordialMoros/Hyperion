@@ -14,3 +14,6 @@ gradle-app.setting
 *.iml
 
 libs/
+.project
+.vscode/tasks.json
+.vscode/settings.json

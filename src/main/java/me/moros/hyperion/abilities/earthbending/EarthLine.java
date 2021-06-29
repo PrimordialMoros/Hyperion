@@ -94,6 +94,11 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	private boolean targetLocked;
 	private boolean collapsing;
 
+	private boolean makeSpikes;
+	private double earthLineSpeed;
+	private double magmaLineSpeed;
+	private boolean breakBlocks;
+
 	private int ticks;
 
 	public EarthLine(Player player) {
@@ -118,9 +123,13 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		cooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Cooldown");
 		range = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.Range");
 		selectRange = Hyperion.getPlugin().getConfig().getInt("Abilities.Earth.EarthLine.SelectRange");
+		makeSpikes = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.MakeSpikes");
+		earthLineSpeed = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Speed");
 		allowUnderWater = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.AllowUnderWater");
 		magmaModifier = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Magma.DamageModifier");
-		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Magma.Regen");
+		magmaLineSpeed = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Magma.Speed");
+		breakBlocks = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.Magma.BreakBlocks");
+		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Magma.RegenDelay");
 		prisonCooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.PrisonCooldown");
 		prisonDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.PrisonDuration");
 		prisonRadius = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.PrisonRadius");
@@ -270,7 +279,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		double z = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
 		new TempArmorStand(this, location.clone().add(x, -2, z), mode == EarthLineMode.MAGMA ? Material.MAGMA_BLOCK : location.getBlock().getRelative(BlockFace.DOWN).getType(), 700);
 
-		location.add(direction.clone().multiply(mode == EarthLineMode.MAGMA ? 0.6 : 0.8));
+		location.add(direction.clone().multiply(mode == EarthLineMode.MAGMA ? magmaLineSpeed : earthLineSpeed));
 		final Block baseBlock = location.getBlock().getRelative(BlockFace.DOWN);
 		if (!isValidBlock(baseBlock)) {
 			if (isValidBlock(baseBlock.getRelative(BlockFace.UP))) {
@@ -279,7 +288,9 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				location.add(0, -1, 0);
 			} else {
 				if (mode == EarthLineMode.MAGMA) {
+					if(breakBlocks){
 					collapseWall();
+					}
 					return;
 				}
 				remove();
@@ -321,7 +332,12 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 		if (hasHit) {
 			if (mode == EarthLineMode.NORMAL) {
-				raiseSpikes();
+				if(makeSpikes){
+					raiseSpikes();
+				}
+				else{
+					remove();
+				}
 			} else {
 				remove();
 			}
@@ -452,7 +468,9 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	private void shootLine() {
 		if (launched) {
-			raiseSpikes();
+			if(makeSpikes){
+				raiseSpikes();
+			}
 			return;
 		}
 
