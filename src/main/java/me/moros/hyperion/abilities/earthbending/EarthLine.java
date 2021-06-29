@@ -93,9 +93,11 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	private boolean launched;
 	private boolean targetLocked;
 	private boolean collapsing;
+
 	private boolean makeSpikes;
 	private double earthLineSpeed;
 	private double magmaLineSpeed;
+	private boolean breakBlocks;
 
 	private int ticks;
 
@@ -126,7 +128,8 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		allowUnderWater = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.AllowUnderWater");
 		magmaModifier = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Magma.DamageModifier");
 		magmaLineSpeed = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.Magma.Speed");
-		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Magma.Regen");
+		breakBlocks = Hyperion.getPlugin().getConfig().getBoolean("Abilities.Earth.EarthLine.Magma.BreakBlocks");
+		regen = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.Magma.RegenDelay");
 		prisonCooldown = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.PrisonCooldown");
 		prisonDuration = Hyperion.getPlugin().getConfig().getLong("Abilities.Earth.EarthLine.PrisonDuration");
 		prisonRadius = Hyperion.getPlugin().getConfig().getDouble("Abilities.Earth.EarthLine.PrisonRadius");
@@ -195,7 +198,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		}
 	}
 
-	/*private void collapseWall() {
+	private void collapseWall() {
 		if (collapsing) return;
 		collapsing = true;
 		player.getWorld().playSound(location, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
@@ -208,7 +211,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		if (collapseBlocks.isEmpty()) {
 			remove();
 		}
-	}*/
+	}
 
 	public void setPrisonMode() {
 		if (mode != EarthLineMode.NORMAL) return;
@@ -285,7 +288,9 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				location.add(0, -1, 0);
 			} else {
 				if (mode == EarthLineMode.MAGMA) {
-					//collapseWall();
+					if(breakBlocks){
+					collapseWall();
+					}
 					return;
 				}
 				remove();

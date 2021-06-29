@@ -81,8 +81,9 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthLine.MakeSpikes",true);
 		config.addDefault("Abilities.Earth.EarthLine.AllowUnderWater", true);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.DamageModifier", 2.0);
-		config.addDefault("Abilities.Earth.EarthLine.Magma.RegenDelay", 20000);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.Speed", 0.6);
+		config.addDefault("Abilities.Earth.EarthLine.Magma.BreakBlocks", true);
+		config.addDefault("Abilities.Earth.EarthLine.Magma.RegenDelay", 20000);
 		config.addDefault("Abilities.Earth.EarthLine.PrisonCooldown", 15000);
 		config.addDefault("Abilities.Earth.EarthLine.PrisonDuration", 3000);
 		config.addDefault("Abilities.Earth.EarthLine.PrisonRadius", 0.8);
