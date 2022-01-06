@@ -146,7 +146,7 @@ public class ConfigManager {
 			Material.IRON_BLOCK.name()
 		};
 
-		config.addDefault("Abilities.Earth.MetalCable.Enabled", true); // TODO FIX
+		config.addDefault("Abilities.Earth.MetalCable.Enabled", true);
 		config.addDefault("Abilities.Earth.MetalCable.Description", "This incredibly versatile ability is used by Metalbenders for all purposes. Left click to launch a metal cable. If it connects to an entity or a block you will be pulled towards it. If you hold sneak, the entity or block will be pulled towards you instead. You can also left click again to throw any grabbed targets towards the direction you are looking at. Thrown blocks also deal damage. Note, depending on the server config, you might need some form of metal in your inventory to use this ability.");
 		config.addDefault("Abilities.Earth.MetalCable.Damage", 4.0);
 		config.addDefault("Abilities.Earth.MetalCable.BlockSpeed", 1.4);

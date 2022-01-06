@@ -223,7 +223,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	}
 
 	private boolean isLocationSafe() {
-		if (location == null || location.getY() <= 2 || location.getY() >= location.getWorld().getMaxHeight())
+		if (location == null)
 			return false;
 		if (isWater(location.getBlock())) {
 			for (int i = 0; i < 10; i++) {

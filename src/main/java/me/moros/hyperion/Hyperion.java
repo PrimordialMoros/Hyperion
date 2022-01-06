@@ -26,7 +26,7 @@ import me.moros.hyperion.listeners.CoreListener;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.BendingFallingBlock;
 import me.moros.hyperion.util.TempArmorStand;
-import org.bstats.bukkit.MetricsLite;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.logging.Logger;
@@ -45,7 +45,7 @@ public class Hyperion extends JavaPlugin {
 		version = getDescription().getVersion();
 		author = getDescription().getAuthors().get(0);
 
-		new MetricsLite(this, 8212);
+		new Metrics(this, 8212);
 		new ConfigManager();
 		new HyperionCommand();
 		layer = new PersistentDataLayer();

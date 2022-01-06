@@ -1,12 +1,12 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow").version("6.0.0")
+    id("com.github.johnrengelman.shadow").version("7.1.2")
 }
 
 group = "me.moros"
-version = "1.6.6"
+version = "1.6.7"
 
-configure<JavaPluginConvention> {
+configure<JavaPluginExtension> {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
@@ -15,11 +15,10 @@ repositories {
     mavenCentral()
     maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     maven("https://jitpack.io")
-    maven("https://repo.codemc.org/repository/maven-public")
 }
 
 dependencies {
-    implementation("org.bstats", "bstats-bukkit-lite", "1.7")
+    implementation("org.bstats", "bstats-bukkit", "2.2.1")
     compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
     compileOnly("com.github.ProjectKorra:ProjectKorra:v1.9.0")
 }
