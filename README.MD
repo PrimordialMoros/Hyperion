@@ -14,6 +14,7 @@ Addon plugin for ProjectKorra with an emphasis on intricate mechanics
 * Evade
 ### Earth
 * EarthCling (passive)
+* Locksmithing (passive)
 * EarthGlove
 * EarthGuard
 * EarthLine
@@ -24,6 +25,7 @@ Addon plugin for ProjectKorra with an emphasis on intricate mechanics
 ### Fire
 * Bolt
 * Combustion
+* FlameRush
 * FireWave (combo)
 ### Water
 * IceBreath
