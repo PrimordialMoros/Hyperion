@@ -54,8 +54,8 @@ public class ConfigManager {
 		config.addDefault("EnableCollisions", true);
 
 		final String[] extras = {
-			Material.ANCIENT_DEBRIS.name(),
-			Material.NETHERITE_BLOCK.name()
+				Material.ANCIENT_DEBRIS.name(),
+				Material.NETHERITE_BLOCK.name()
 		};
 
 		config.addDefault("ExtraUnbreakableMaterials", extras);
@@ -71,6 +71,11 @@ public class ConfigManager {
 		config.addDefault("Abilities.Air.AirCombo.AirWheel.Cooldown", 15000);
 		config.addDefault("Abilities.Air.AirCombo.AirWheel.AffectCooldown", 750);
 
+		config.addDefault("Abilities.Earth.LockSmithing.Enabled", true);
+		config.addDefault("Abilities.Earth.LockSmithing.Description", "This passive ability allows metalbenders to forge keys out of various metals and lock containers.");
+		config.addDefault("Abilities.Earth.LockSmithing.Instructions", "Right click a container using an ingot to create a key and lock it. Hold sneak while right clicking with a valid key to remove the lock.");
+		config.addDefault("Abilities.Earth.EarthLine.Cooldown", 500);
+
 		config.addDefault("Abilities.Earth.EarthLine.Enabled", true);
 		config.addDefault("Abilities.Earth.EarthLine.Description", "Tap sneak while looking at an earthbendable block on the ground and then left click in a direction to launch a narrow line of earth towards your target to deal damage and knock them back. Additionally, you can hold sneak to control the direction of the line. Left clicking will cause spikes to erupt at the line's current location. Right click (you need an item in your offhand for right click to be detected if you are targeting air) instead to imprison your target without dealing damage.");
 		config.addDefault("Abilities.Earth.EarthLine.Damage", 3.0);
@@ -78,7 +83,7 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthLine.Range", 24);
 		config.addDefault("Abilities.Earth.EarthLine.Speed", 0.8);
 		config.addDefault("Abilities.Earth.EarthLine.SelectRange", 6);
-		config.addDefault("Abilities.Earth.EarthLine.MakeSpikes",true);
+		config.addDefault("Abilities.Earth.EarthLine.MakeSpikes", true);
 		config.addDefault("Abilities.Earth.EarthLine.AllowUnderWater", true);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.DamageModifier", 2.0);
 		config.addDefault("Abilities.Earth.EarthLine.Magma.Speed", 0.6);
@@ -120,15 +125,15 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.EarthGuard.WallCooldown", 3000);
 
 		final String[] materials = {
-			Material.COBBLESTONE.name(),
-			Material.ACACIA_LOG.name(),
-			Material.BIRCH_LOG.name(),
-			Material.DARK_OAK_LOG.name(),
-			Material.JUNGLE_LOG.name(),
-			Material.OAK_LOG.name(),
-			Material.SPRUCE_LOG.name(),
-			Material.ICE.name(),
-			Material.PACKED_ICE.name()
+				Material.COBBLESTONE.name(),
+				Material.ACACIA_LOG.name(),
+				Material.BIRCH_LOG.name(),
+				Material.DARK_OAK_LOG.name(),
+				Material.JUNGLE_LOG.name(),
+				Material.OAK_LOG.name(),
+				Material.SPRUCE_LOG.name(),
+				Material.ICE.name(),
+				Material.PACKED_ICE.name()
 		};
 		config.addDefault("Abilities.Earth.LavaDisk.Enabled", true);
 		config.addDefault("Abilities.Earth.LavaDisk.Description", "Tap sneak to select a nearby earth or lava source. This disk made of molten earth will destroy any earthbendable and any soft materials it comes in contact with. The closer you are to the LavaDisk the faster it spins and the more damage it deals.");
@@ -141,9 +146,9 @@ public class ConfigManager {
 		config.addDefault("Abilities.Earth.LavaDisk.AdditionalMeltableBlocks", materials);
 
 		final String[] cableMaterials = {
-			Material.IRON_CHESTPLATE.name(),
-			Material.IRON_INGOT.name(),
-			Material.IRON_BLOCK.name()
+				Material.IRON_CHESTPLATE.name(),
+				Material.IRON_INGOT.name(),
+				Material.IRON_BLOCK.name()
 		};
 
 		config.addDefault("Abilities.Earth.MetalCable.Enabled", true);
@@ -183,6 +188,18 @@ public class ConfigManager {
 		config.addDefault("Abilities.Fire.Combustion.RegenDelay", 15000);
 		config.addDefault("Abilities.Fire.Combustion.FireTicks", 40);
 		config.addDefault("Abilities.Fire.Combustion.ScaleDamageByDistance", false);
+
+		config.addDefault("Abilities.Fire.FlameRush.Enabled", true);
+		config.addDefault("Abilities.Fire.FlameRush.Description", "Hold sneak to charge and release to create a dual fire stream. When smoke particles appear the move is fully charged.");
+		config.addDefault("Abilities.Fire.FlameRush.Cooldown", 10000);
+		config.addDefault("Abilities.Fire.FlameRush.Damage", 1.7);
+		config.addDefault("Abilities.Fire.FlameRush.Range", 16);
+		config.addDefault("Abilities.Fire.FlameRush.Speed", 1.2);
+		config.addDefault("Abilities.Fire.FlameRush.ChargeFactor", 2);
+		config.addDefault("Abilities.Fire.FlameRush.MaxChargeTime", 2500);
+		config.addDefault("Abilities.Fire.FlameRush.CollisionRadius", 0.5);
+		config.addDefault("Abilities.Fire.FlameRush.Knockback", 0.9);
+		config.addDefault("Abilities.Fire.FlameRush.FireTicks", 15);
 
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Enabled", true);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Description", "Master Jeong Jeong used this advanced technique to cast a great fire wave that grows in size while it advances forward.");

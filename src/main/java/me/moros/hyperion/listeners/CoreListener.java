@@ -29,10 +29,18 @@ import me.moros.hyperion.abilities.chiblocking.Smokescreen.SmokescreenData;
 import me.moros.hyperion.abilities.earthbending.EarthGuard;
 import me.moros.hyperion.abilities.earthbending.EarthShot;
 import me.moros.hyperion.abilities.earthbending.MetalCable;
+import me.moros.hyperion.abilities.earthbending.passive.Locksmithing;
 import me.moros.hyperion.configuration.ConfigManager;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.BendingFallingBlock;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TranslatableComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Nameable;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.Lockable;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
@@ -43,6 +51,7 @@ import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -112,8 +121,7 @@ public class CoreListener implements Listener {
 		if (event.getCause() != DamageCause.FIRE && event.getCause() != DamageCause.FIRE_TICK) {
 			return;
 		}
-		if (event.getEntity() instanceof Player) {
-			final Player player = (Player) event.getEntity();
+		if (event.getEntity() instanceof Player player) {
 			if (CoreAbility.hasAbility(player, EarthGuard.class)) {
 				if (CoreAbility.getAbility(player, EarthGuard.class).hasActiveArmor()) {
 					player.setFireTicks(0);
@@ -153,7 +161,7 @@ public class CoreListener implements Listener {
 		}
 
 		ItemMeta meta = item.getItemMeta();
-		if (meta != null && Hyperion.getLayer().hasEarthGuardKey(meta.getPersistentDataContainer())) {
+		if (meta != null && Hyperion.getLayer().hasEarthGuardKey(meta)) {
 			final PlayerInventory inventory = (PlayerInventory) event.getClickedInventory();
 			if (inventory.getHolder() instanceof Player) {
 				final Player player = ((Player) inventory.getHolder()).getPlayer();
@@ -205,8 +213,7 @@ public class CoreListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onAbilityStart(final AbilityStartEvent event) {
-		if (event.getAbility() instanceof CoreAbility) {
-			CoreAbility ability = (CoreAbility) event.getAbility();
+		if (event.getAbility() instanceof CoreAbility ability) {
 			final Player player = ability.getPlayer();
 			final BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 			if (player == null || bPlayer == null) return;
@@ -216,6 +223,22 @@ public class CoreListener implements Listener {
 					CoreMethods.setAttributes(section, ability);
 				}
 			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	public void onBlockBreak(BlockBreakEvent event) {
+		Player player = event.getPlayer();
+		Block block = event.getBlock();
+		if (block.getState() instanceof Lockable lockable && !Locksmithing.canBreak(player, lockable)) {
+			String name = ((Nameable) lockable).getCustomName();
+			if (name == null) {
+				name = "Container";
+			}
+			player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TranslatableComponent("container.isLocked", name));
+			Location loc = block.getLocation().add(0.5, 0.5, 0.5);
+			block.getWorld().playSound(loc, Sound.BLOCK_CHEST_LOCKED, 1, 1);
+			event.setCancelled(true);
 		}
 	}
 }

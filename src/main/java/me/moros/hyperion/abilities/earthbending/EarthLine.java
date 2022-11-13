@@ -29,6 +29,7 @@ import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.earthbending.RaiseEarth;
 import com.projectkorra.projectkorra.earthbending.passive.DensityShift;
 import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
+import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.ActionBar;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
@@ -202,7 +203,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		if (collapsing) return;
 		collapsing = true;
 		player.getWorld().playSound(location, Sound.ENTITY_GENERIC_EXPLODE, 0.5f, 0.5f);
-		ParticleEffect.EXPLOSION_NORMAL.display(location, 1, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.5f);
+		ParticleEffect.EXPLOSION_NORMAL.display(location, 1, 1, 1, 1, 0.5f);
 		checkDamage(2);
 		for (final Block block : GeneralMethods.getBlocksAroundPoint(location, 3)) {
 			if (block.getY() < location.getBlockY() || !isEarthbendable(block) || isMetal(block)) continue;
@@ -288,7 +289,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				location.add(0, -1, 0);
 			} else {
 				if (mode == EarthLineMode.MAGMA) {
-					if(breakBlocks){
+					if (breakBlocks) {
 						collapseWall();
 					} else {
 						remove();
@@ -299,7 +300,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				return;
 			}
 		}
-		if (GeneralMethods.isRegionProtectedFromBuild(this, location) || location.distanceSquared(sourceBlock.getLocation()) > range * range) {
+		if (RegionProtection.isRegionProtected(this, location) || location.distanceSquared(sourceBlock.getLocation()) > range * range) {
 			remove();
 		}
 	}
@@ -326,7 +327,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				DamageHandler.damageEntity(entity, appliedDamage, this);
 				if (mode == EarthLineMode.MAGMA) {
 					entity.setFireTicks(40);
-					new FireDamageTimer(entity, player);
+					new FireDamageTimer(entity, player, this);
 				}
 				hasHit = true;
 			}
@@ -334,10 +335,9 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 		if (hasHit) {
 			if (mode == EarthLineMode.NORMAL) {
-				if(makeSpikes){
+				if (makeSpikes) {
 					raiseSpikes();
-				}
-				else{
+				} else {
 					remove();
 				}
 			} else {
@@ -364,22 +364,14 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		if (DensityShift.isPassiveSand(block)) DensityShift.revertSand(block);
 		final BlockData sourceData;
 		switch (block.getType()) {
-			case SAND:
-				sourceData = Material.SANDSTONE.createBlockData();
-				break;
-			case RED_SAND:
-				sourceData = Material.RED_SANDSTONE.createBlockData();
-				break;
-			case STONE:
-				sourceData = Material.COBBLESTONE.createBlockData();
-				break;
-			case LAVA:
+			case SAND -> sourceData = Material.SANDSTONE.createBlockData();
+			case RED_SAND -> sourceData = Material.RED_SANDSTONE.createBlockData();
+			case STONE -> sourceData = Material.COBBLESTONE.createBlockData();
+			case LAVA -> {
 				sourceData = Material.MAGMA_BLOCK.createBlockData();
 				mode = EarthLineMode.MAGMA;
-				break;
-			case GRAVEL:
-			default:
-				sourceData = Material.STONE.createBlockData();
+			}
+			default -> sourceData = Material.STONE.createBlockData();
 		}
 		sourceBlock = new TempBlock(block, sourceData);
 		location = sourceBlock.getLocation();
@@ -470,7 +462,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	private void shootLine() {
 		if (launched) {
-			if(makeSpikes){
+			if (makeSpikes) {
 				raiseSpikes();
 			}
 			return;

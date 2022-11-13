@@ -60,7 +60,7 @@ public class EarthShardsProjectile extends EarthAbility implements AddonAbility 
 
 		origin = spawnLocation.clone();
 		final Location targetLocation = GeneralMethods.getTargetedLocation(player, range);
-		direction = GeneralMethods.getDirection(origin, CoreMethods.getRandomOffsetLocation(targetLocation, accuracyDrop * targetLocation.distance(origin)));
+		direction = GeneralMethods.getDirection(origin, CoreMethods.withGaussianOffset(targetLocation, accuracyDrop * targetLocation.distance(origin)));
 		location = origin.clone();
 
 		start();
@@ -96,8 +96,7 @@ public class EarthShardsProjectile extends EarthAbility implements AddonAbility 
 	public void checkDamage() {
 		Location check = location.clone().add(0, -0.5, 0);
 		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(check, 1.5)) {
-			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
-				LivingEntity lEnt = (LivingEntity) entity;
+			if (entity instanceof LivingEntity lEnt && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
 				if (lEnt.getEyeLocation().distanceSquared(check) > 0.5 && lEnt.getLocation().distanceSquared(check) > 0.5) {
 					continue;
 				}

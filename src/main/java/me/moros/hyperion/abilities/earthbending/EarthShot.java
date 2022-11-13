@@ -30,7 +30,6 @@ import com.projectkorra.projectkorra.util.TempBlock;
 import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.BendingFallingBlock;
-import me.moros.hyperion.util.MaterialCheck;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -138,7 +137,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 				if (!magmaShot || convertedMagma || !bPlayer.canLavabend()) {
 					return;
 				}
-				if (readySource.getBlock().equals(player.getTargetBlock(MaterialCheck.getIgnoreMaterialSet(), selectRange * 2)) && player.isSneaking()) {
+				if (readySource.getBlock().equals(player.getTargetBlock(getTransparentMaterialSet(), selectRange * 2)) && player.isSneaking()) {
 					if (magmaStartTime == 0) {
 						magmaStartTime = System.currentTimeMillis();
 						if (chargeTime > 0) playLavabendingSound(readySource.getLocation());
@@ -162,9 +161,15 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 	public boolean prepare() {
 		if (launched) return false;
 		Block block = getLavaSourceBlock(selectRange);
+		if (block == null) {
+			Block temp = player.getTargetBlock(getTransparentMaterialSet(), selectRange);
+			if (temp.getType() == Material.MAGMA_BLOCK) {
+				block = temp;
+			}
+		}
 		if (block == null || !bPlayer.canLavabend()) {
 			block = getEarthSourceBlock(selectRange);
-			if (block == null) return false;
+			if (block == null || (isMetal(block) && !bPlayer.canMetalbend())) return false;
 		}
 		if (block.getLocation().getBlockY() > origin.getBlockY()) {
 			origin = block.getLocation();
@@ -176,25 +181,18 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 		}
 
 		final BlockData data;
-		if (isLava(block)) {
+		if (isLava(block) || block.getType() == Material.MAGMA_BLOCK) {
 			data = Material.MAGMA_BLOCK.createBlockData();
 			magmaShot = true;
 			convertedMagma = true;
 			playEarthbendingSound(block.getLocation());
 		} else {
-			switch (block.getType()) {
-				case SAND:
-					data = Material.SANDSTONE.createBlockData();
-					break;
-				case RED_SAND:
-					data = Material.RED_SANDSTONE.createBlockData();
-					break;
-				case GRAVEL:
-					data = Material.STONE.createBlockData();
-					break;
-				default:
-					data = block.getBlockData();
-			}
+			data = switch (block.getType()) {
+				case SAND -> Material.SANDSTONE.createBlockData();
+				case RED_SAND -> Material.RED_SANDSTONE.createBlockData();
+				case GRAVEL -> Material.STONE.createBlockData();
+				default -> block.getBlockData();
+			};
 			if (isMetal(block)) {
 				playMetalbendingSound(block.getLocation());
 				magmaShot = false;
@@ -318,7 +316,7 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 				ParticleEffect.BLOCK_DUST.display(tempLocation, 4, 1, 1, 1, 0, projectile.getFallingBlock().getBlockData());
 				if (convertedMagma) {
 					ParticleEffect.SMOKE_LARGE.display(tempLocation, 16, 1, 1, 1, 0.05);
-					ParticleEffect.FIREWORKS_SPARK.display(tempLocation, 8,1, 1, 1, 0.05);
+					ParticleEffect.FIREWORKS_SPARK.display(tempLocation, 8, 1, 1, 1, 0.05);
 					tempLocation.getWorld().playSound(tempLocation, Sound.ENTITY_GENERIC_EXPLODE, 1.5f, 0);
 				} else {
 					if (isMetal(projectile.getFallingBlock().getBlockData().getMaterial())) {
@@ -377,8 +375,8 @@ public class EarthShot extends EarthAbility implements AddonAbility {
 		ParticleEffect.LAVA.display(loc, 2, 0.5, 0.5, 0.5);
 		ParticleEffect.SMOKE_NORMAL.display(loc, 2, 0.5, 0.5, 0.5);
 		for (int i = 0; i < 8; i++) {
-			GeneralMethods.displayColoredParticle("#FFA400", CoreMethods.getRandomOffsetLocation(loc, 1));
-			GeneralMethods.displayColoredParticle("#FF8C00", CoreMethods.getRandomOffsetLocation(loc, 1));
+			GeneralMethods.displayColoredParticle("#FFA400", CoreMethods.withGaussianOffset(loc, 1));
+			GeneralMethods.displayColoredParticle("#FF8C00", CoreMethods.withGaussianOffset(loc, 1));
 		}
 	}
 }

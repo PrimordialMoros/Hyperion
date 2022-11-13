@@ -141,24 +141,16 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 
 	private boolean launchEarthGlove() {
 		final Location gloveSpawnLocation;
-		switch (lastUsedSide.getOrDefault(player.getUniqueId(), Side.RIGHT)) {
-			case LEFT:
-				side = Side.RIGHT;
-				gloveSpawnLocation = GeneralMethods.getRightSide(player.getLocation(), 0.5);
-				break;
-			case RIGHT:
-			default:
-				side = Side.LEFT;
-				gloveSpawnLocation = GeneralMethods.getLeftSide(player.getLocation(), 0.5);
-				break;
-		}
-
-		if (bPlayer.isOnCooldown(getCooldownForSide(side))) {
+		side = lastUsedSide.get(player.getUniqueId());
+		if (side != null && bPlayer.isOnCooldown(getCooldownForSide(side))) {
 			return false;
 		}
-
-		lastUsedSide.put(player.getUniqueId(), side);
-		gloveSpawnLocation.add(0, 0.8, 0);
+		side = lastUsedSide.computeIfPresent(player.getUniqueId(), (u, s) -> side == Side.LEFT ? Side.RIGHT : Side.LEFT);
+		if (side == Side.RIGHT) {
+			gloveSpawnLocation = GeneralMethods.getRightSide(player.getLocation(), 0.5).add(0, 0.8, 0);
+		} else {
+			gloveSpawnLocation = GeneralMethods.getLeftSide(player.getLocation(), 0.5).add(0, 0.8, 0);
+		}
 		final Entity targetedEntity = GeneralMethods.getTargetedEntity(player, range, Collections.singletonList(player));
 		final Vector velocityVector;
 		if (targetedEntity instanceof LivingEntity) {
@@ -194,11 +186,10 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 	public void checkDamage() {
 		Location testLocation = glove.getLocation().clone();
 		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(testLocation, 0.8)) {
-			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
+			if (entity instanceof LivingEntity livingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
 					continue;
 				}
-				final LivingEntity livingEntity = (LivingEntity) entity;
 				if (player.isSneaking()) {
 					grabTarget(livingEntity);
 					return;
@@ -320,12 +311,9 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 	}
 
 	public static String getCooldownForSide(Side s) {
-		switch (s) {
-			case LEFT:
-				return "EarthGloveLeft";
-			case RIGHT:
-			default:
-				return "EarthGloveRight";
-		}
+		return switch (s) {
+			case LEFT -> "EarthGloveLeft";
+			case RIGHT -> "EarthGloveRight";
+		};
 	}
 }

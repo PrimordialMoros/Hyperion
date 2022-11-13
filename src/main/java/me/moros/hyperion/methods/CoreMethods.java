@@ -25,6 +25,7 @@ import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
+import com.projectkorra.projectkorra.earthbending.EarthSmash;
 import com.projectkorra.projectkorra.firebending.FireShield;
 import com.projectkorra.projectkorra.util.ColoredParticle;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -37,6 +38,7 @@ import me.moros.hyperion.abilities.earthbending.EarthShot;
 import me.moros.hyperion.abilities.earthbending.LavaDisk;
 import me.moros.hyperion.abilities.earthbending.MetalCable;
 import me.moros.hyperion.abilities.firebending.Combustion;
+import me.moros.hyperion.abilities.firebending.FlameRush;
 import me.moros.hyperion.abilities.firebending.combo.FireWave;
 import me.moros.hyperion.abilities.waterbending.IceBreath;
 import me.moros.hyperion.abilities.waterbending.IceCrawl;
@@ -54,11 +56,13 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class CoreMethods {
-	private static final BlockFace[] faces = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST, BlockFace.EAST };
+	private static final BlockFace[] faces = {BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST, BlockFace.EAST};
 
 	public static final String NO_INTERACTION_KEY = "BENDING_HYPERION_NO_INTERACTION";
 	public static final String NO_PICKUP_KEY = "BENDING_HYPERION_NO_PICKUP";
@@ -94,31 +98,22 @@ public class CoreMethods {
 	public static void playExtinguishEffect(Location location, int amount) {
 		if (location == null) return;
 		for (int i = 0; i < amount; i++) {
-			ParticleEffect.CLOUD.display(location, 1, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble());
+			ParticleEffect.CLOUD.display(location, 1, 0.3, 0.3, 0.3);
 		}
 		location.getWorld().playSound(location, Sound.BLOCK_LAVA_EXTINGUISH, 1, 1);
 	}
 
 	public static BlockFace getLeftBlockFace(BlockFace forward) {
-		switch (forward) {
-			case NORTH_WEST:
-				return BlockFace.SOUTH_WEST;
-			case NORTH_EAST:
-				return BlockFace.NORTH_WEST;
-			case SOUTH_WEST:
-				return BlockFace.SOUTH_EAST;
-			case SOUTH_EAST:
-				return BlockFace.NORTH_EAST;
-			case NORTH:
-				return BlockFace.WEST;
-			case SOUTH:
-				return BlockFace.EAST;
-			case WEST:
-				return BlockFace.SOUTH;
-			case EAST:
-			default:
-				return BlockFace.NORTH;
-		}
+		return switch (forward) {
+			case NORTH_WEST -> BlockFace.SOUTH_WEST;
+			case NORTH_EAST -> BlockFace.NORTH_WEST;
+			case SOUTH_WEST -> BlockFace.SOUTH_EAST;
+			case SOUTH_EAST -> BlockFace.NORTH_EAST;
+			case NORTH -> BlockFace.WEST;
+			case SOUTH -> BlockFace.EAST;
+			case WEST -> BlockFace.SOUTH;
+			default -> BlockFace.NORTH;
+		};
 	}
 
 	public static List<Location> getLinePoints(Location startLoc, Location endLoc, int points) {
@@ -158,11 +153,21 @@ public class CoreMethods {
 		return false;
 	}
 
-	public static Location getRandomOffsetLocation(Location loc, double offset) {
-		final double x = ThreadLocalRandom.current().nextDouble(-offset, offset);
-		final double y = ThreadLocalRandom.current().nextDouble(-offset, offset);
-		final double z = ThreadLocalRandom.current().nextDouble(-offset, offset);
-		return loc.clone().add(x, y, z);
+	public static Location withGaussianOffset(Location loc, double offset) {
+		return withGaussianOffset(loc, offset, offset, offset);
+	}
+
+	public static Location withGaussianOffset(Location loc, double offsetX, double offsetY, double offsetZ) {
+		return loc.clone().add(gaussianVector(offsetX, offsetY, offsetZ));
+	}
+
+	public static Vector gaussianVector(double offset) {
+		return gaussianVector(offset, offset, offset);
+	}
+
+	public static Vector gaussianVector(double offsetX, double offsetY, double offsetZ) {
+		ThreadLocalRandom r = ThreadLocalRandom.current();
+		return new Vector(r.nextGaussian() * offsetX, r.nextGaussian() * offsetY, r.nextGaussian() * offsetZ);
 	}
 
 	public static Vector calculateFlatVector(Location start, Location end) {
@@ -211,6 +216,23 @@ public class CoreMethods {
 
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(FireWave.class), CoreAbility.getAbility(SurgeWave.class), false, true));
 		ProjectKorra.getCollisionManager().addCollision(new Collision(CoreAbility.getAbility(FireWave.class), CoreAbility.getAbility(SurgeWall.class), false, true));
+
+		CoreAbility flameRush = CoreAbility.getAbility(FlameRush.class);
+		CoreAbility combustion = CoreAbility.getAbility(Combustion.class);
+		CoreAbility esmash = CoreAbility.getAbility(EarthSmash.class);
+		ProjectKorra.getCollisionManager().addCollision(new Collision(flameRush, flameRush, true, true));
+		ProjectKorra.getCollisionManager().addCollision(new Collision(flameRush, combustion, true, true));
+		ProjectKorra.getCollisionManager().addCollision(new Collision(flameRush, esmash, true, true));
+		ProjectKorra.getCollisionInitializer().addRemoveSpoutAbility(flameRush);
+
+		Set<CoreAbility> collidables = new HashSet<>(ProjectKorra.getCollisionInitializer().getSmallAbilities());
+		collidables.addAll(ProjectKorra.getCollisionInitializer().getLargeAbilities());
+		for (CoreAbility abil : collidables) {
+			if (abil.getName().equalsIgnoreCase("EarthSmash") || abil.getName().equalsIgnoreCase("Combustion")) {
+				continue;
+			}
+			ProjectKorra.getCollisionManager().addCollision(new Collision(flameRush, abil, false, true));
+		}
 
 		Hyperion.getLog().info("Registered collisions.");
 	}

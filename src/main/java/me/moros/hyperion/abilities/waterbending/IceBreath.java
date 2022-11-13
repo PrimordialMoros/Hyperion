@@ -28,6 +28,7 @@ import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.airbending.AirShield;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
+import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -146,10 +147,10 @@ public class IceBreath extends IceAbility implements AddonAbility {
 	}
 
 	private void visualizeBreath(double offset, double particleSize) {
-		ParticleEffect.SNOW_SHOVEL.display(location, 5, ThreadLocalRandom.current().nextDouble(-offset, offset), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(-offset, offset), particleSize);
-		ParticleEffect.BLOCK_CRACK.display(location, 4, ThreadLocalRandom.current().nextDouble(-offset, offset), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(-offset, offset), particleSize, Material.ICE.createBlockData());
-		ParticleEffect.SPELL_MOB.display(CoreMethods.getRandomOffsetLocation(location, offset), 0, 220, 220, 220, 0.003, new Particle.DustOptions(Color.fromRGB(220, 220, 220), 1));
-		ParticleEffect.SPELL_MOB.display(CoreMethods.getRandomOffsetLocation(location, offset), 0, 180, 180, 255, 0.0035, new Particle.DustOptions(Color.fromRGB(180, 180, 255), 1));
+		ParticleEffect.SNOW_SHOVEL.display(location, 5, offset, 1, offset, particleSize);
+		ParticleEffect.BLOCK_CRACK.display(location, 4, offset, 1, offset, particleSize, Material.ICE.createBlockData());
+		ParticleEffect.SPELL_MOB.display(CoreMethods.withGaussianOffset(location, offset), 0, 220, 220, 220, 0.003, new Particle.DustOptions(Color.fromRGB(220, 220, 220), 1));
+		ParticleEffect.SPELL_MOB.display(CoreMethods.withGaussianOffset(location, offset), 0, 180, 180, 255, 0.0035, new Particle.DustOptions(Color.fromRGB(180, 180, 255), 1));
 	}
 
 	private boolean calculateBreath() {
@@ -171,7 +172,7 @@ public class IceBreath extends IceAbility implements AddonAbility {
 
 		final List<BlockFace> faces = new ArrayList<>();
 		final Vector toPlayer = GeneralMethods.getDirection(center, player.getEyeLocation());
-		final double[] vars = { toPlayer.getX(), toPlayer.getY(), toPlayer.getZ() };
+		final double[] vars = {toPlayer.getX(), toPlayer.getY(), toPlayer.getZ()};
 		for (int i = 0; i < 3; i++) {
 			if (vars[i] != 0) {
 				faces.add(GeneralMethods.getBlockFaceFromValue(i, vars[i]));
@@ -181,8 +182,8 @@ public class IceBreath extends IceAbility implements AddonAbility {
 		for (final Location l : GeneralMethods.getCircle(center, radius, 1, false, true, 0)) {
 			final Block b = l.getBlock();
 			for (final BlockFace face : faces) {
-				if (MaterialCheck.isAir(b.getRelative(face))) {
-					if (!isWater(b) || GeneralMethods.isRegionProtectedFromBuild(this.player, b.getLocation())) {
+				if (b.getRelative(face).getType().isAir()) {
+					if (!isWater(b) || RegionProtection.isRegionProtected(this.player, b.getLocation())) {
 						continue;
 					}
 					new TempBlock(b, Material.ICE.createBlockData(), frostDuration);
@@ -277,7 +278,7 @@ public class IceBreath extends IceAbility implements AddonAbility {
 			for (Location testLoc : GeneralMethods.getCircle(collision.getLocationSecond(), radius, radius, true, true, 0)) {
 				final Block testBlock = testLoc.getBlock();
 				if (MaterialCheck.isLeaf(testBlock)) testBlock.breakNaturally();
-				if (MaterialCheck.isAir(testBlock) || isWater(testBlock)) {
+				if (testBlock.getType().isAir() || isWater(testBlock)) {
 					PhaseChange.getFrozenBlocksMap().put(new TempBlock(testBlock, Material.ICE.createBlockData(), ThreadLocalRandom.current().nextInt(1000) + frostDuration), player);
 				}
 			}

@@ -4,11 +4,12 @@ plugins {
 }
 
 group = "me.moros"
-version = "1.6.7"
+version = "1.7.0"
 
-configure<JavaPluginExtension> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(16))
+    }
 }
 
 repositories {
@@ -18,9 +19,9 @@ repositories {
 }
 
 dependencies {
-    implementation("org.bstats", "bstats-bukkit", "2.2.1")
-    compileOnly("org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT")
-    compileOnly("com.github.ProjectKorra:ProjectKorra:v1.9.0")
+    implementation("org.bstats", "bstats-bukkit", "3.0.0")
+    compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
+    compileOnly("com.github.ProjectKorra:ProjectKorra:v1.10.2")
 }
 
 tasks {

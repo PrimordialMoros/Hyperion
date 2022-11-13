@@ -177,7 +177,7 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 						entity.setVelocity(new Vector(0, 0, 0));
 						DamageHandler.damageEntity(entity, damage, this);
 						entity.setFireTicks(30);
-						new FireDamageTimer(entity, player);
+						new FireDamageTimer(entity, player, this);
 						AirAbility.breakBreathbendingHold(entity);
 						break;
 					}
@@ -306,7 +306,7 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 				collision.setRemovingSecond(false);
 			}
 			if (collision.isRemovingSecond()) {
-				collision.getAbilitySecond().getLocations().forEach(l -> ParticleEffect.CLOUD.display(l, 2, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble()));
+				collision.getAbilitySecond().getLocations().forEach(l -> ParticleEffect.CLOUD.display(l, 4, 0.4, 0.4, 0.4));
 			}
 		}
 		super.handleCollision(collision);

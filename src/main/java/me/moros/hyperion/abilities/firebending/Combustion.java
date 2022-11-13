@@ -27,6 +27,7 @@ import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
+import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
@@ -175,7 +176,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 			ParticleEffect.SMOKE_LARGE.display(location, 1, 0, 0, 0, 0.06);
 			ParticleEffect.FIREWORKS_SPARK.display(location, 1, 0, 0, 0, 0.06);
 			if (i % 2 != 0) {
-				if (GeneralMethods.isRegionProtectedFromBuild(this, location)) {
+				if (RegionProtection.isRegionProtected(this, location)) {
 					remove();
 					return;
 				}
@@ -204,11 +205,11 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 		if (regenDelay > 0 && !center.getBlock().isLiquid()) {
 			int r = NumberConversions.round(size);
 			for (Location l : GeneralMethods.getCircle(center, r, 1, false, true, 0)) {
-				if (GeneralMethods.isRegionProtectedFromBuild(this, l)) {
+				if (RegionProtection.isRegionProtected(this, l)) {
 					remove();
 					return;
 				}
-				if (MaterialCheck.isAir(l.getBlock()) || MaterialCheck.isUnbreakable(l.getBlock()) || l.getBlock().isLiquid()) {
+				if (l.getBlock().getType().isAir() || MaterialCheck.isUnbreakable(l.getBlock()) || l.getBlock().isLiquid()) {
 					continue;
 				}
 				new TempBlock(l.getBlock(), Material.AIR.createBlockData(), regenDelay + ThreadLocalRandom.current().nextInt(1000));
@@ -230,7 +231,7 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 				}
 				DamageHandler.damageEntity(e, damage * factor, this);
 				e.setFireTicks(fireTicks);
-				new FireDamageTimer(e, player);
+				new FireDamageTimer(e, player, this);
 			}
 		}
 		remove();

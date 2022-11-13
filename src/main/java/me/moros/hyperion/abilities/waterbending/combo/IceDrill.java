@@ -25,6 +25,7 @@ import com.projectkorra.projectkorra.ability.ComboAbility;
 import com.projectkorra.projectkorra.ability.IceAbility;
 import com.projectkorra.projectkorra.ability.util.ComboManager.AbilityInformation;
 import com.projectkorra.projectkorra.attribute.Attribute;
+import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.BlockSource;
 import com.projectkorra.projectkorra.util.ClickType;
 import com.projectkorra.projectkorra.util.TempBlock;
@@ -125,7 +126,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 	}
 
 	private void formIce(Block block) {
-		if (blocks.contains(block) || TempBlock.isTempBlock(block) || MaterialCheck.isUnbreakable(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation())) {
+		if (blocks.contains(block) || TempBlock.isTempBlock(block) || MaterialCheck.isUnbreakable(block) || RegionProtection.isRegionProtected(this, block.getLocation())) {
 			return;
 		}
 		String matName = block.getType().name();
@@ -145,7 +146,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 		final Location targetLocation = origin.clone().add(direction.clone().multiply(maxLength - 1));
 		int radius = (int) Math.ceil(0.2 * maxLength);
 		for (Location testLoc : GeneralMethods.getCircle(origin, radius, 1, true, true, 0)) {
-			if (!GeneralMethods.isRegionProtectedFromBuild(this, testLoc) && (isWater(testLoc.getBlock()) || isIce(testLoc.getBlock()))) {
+			if (!RegionProtection.isRegionProtected(this, testLoc) && (isWater(testLoc.getBlock()) || isIce(testLoc.getBlock()))) {
 				lines.add(CoreMethods.blockRayTrace(testLoc.getBlock(), targetLocation.getBlock()));
 			}
 		}
@@ -159,7 +160,7 @@ public class IceDrill extends IceAbility implements AddonAbility, ComboAbility {
 
 	private boolean grabSource() {
 		final Block sourceBlock = BlockSource.getWaterSourceBlock(player, selectRange, ClickType.SHIFT_DOWN, true, true, false);
-		if (!GeneralMethods.isAdjacentToThreeOrMoreSources(sourceBlock) || GeneralMethods.isRegionProtectedFromBuild(this, sourceBlock.getLocation())) {
+		if (!GeneralMethods.isAdjacentToThreeOrMoreSources(sourceBlock) || RegionProtection.isRegionProtected(this, sourceBlock.getLocation())) {
 			return false;
 		}
 		playFocusWaterEffect(sourceBlock);

@@ -29,7 +29,7 @@ import java.util.List;
 
 public class HyperionCommand extends PKCommand {
 	public HyperionCommand() {
-		super("hyperion", "/bending hyperion <reload>", "Show information about Hyperion and optionally reload its config.", new String[]{ "hyperion" });
+		super("hyperion", "/bending hyperion <reload>", "Show information about Hyperion and optionally reload its config.", new String[]{"hyperion"});
 	}
 
 	@Override

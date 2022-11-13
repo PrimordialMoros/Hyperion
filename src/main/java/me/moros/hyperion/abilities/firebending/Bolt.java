@@ -22,13 +22,12 @@ package me.moros.hyperion.abilities.firebending;
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
-import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.LightningAbility;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
+import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import me.moros.hyperion.Hyperion;
-import me.moros.hyperion.abilities.earthbending.EarthGuard;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.MaterialCheck;
 import org.bukkit.Location;
@@ -81,7 +80,7 @@ public class Bolt extends LightningAbility implements AddonAbility {
 	public void progress() {
 		if (!bPlayer.canBendIgnoreCooldowns(this) || isWater(player.getEyeLocation().getBlock())) {
 			remove();
-		return;
+			return;
 		}
 
 		if (charged) {
@@ -161,10 +160,10 @@ public class Bolt extends LightningAbility implements AddonAbility {
 		if (targetedEntity instanceof LivingEntity) {
 			targetLocation = targetedEntity.getLocation();
 		} else {
-			targetLocation = player.getTargetBlock(MaterialCheck.getIgnoreMaterialSet(), range).getLocation();
+			targetLocation = player.getTargetBlock(getTransparentMaterialSet(), range).getLocation();
 		}
 
-		if (GeneralMethods.isRegionProtectedFromBuild(this, targetLocation)) {
+		if (RegionProtection.isRegionProtected(this, targetLocation)) {
 			remove();
 			return;
 		}
@@ -181,18 +180,14 @@ public class Bolt extends LightningAbility implements AddonAbility {
 		boolean enhanced = isWater(strikeLocation.getBlock());
 		for (final Entity e : GeneralMethods.getEntitiesAroundPoint(strikeLocation, 5)) {
 			if (e instanceof Creeper) ((Creeper) e).setPowered(true);
-			if (e instanceof LivingEntity && !(e instanceof ArmorStand)) {
+			if (e instanceof LivingEntity livingEntity && !(e instanceof ArmorStand)) {
 				if ((e instanceof Player && Commands.invincible.contains((e).getName()))) {
 					continue;
 				}
 				final double distance = e.getLocation().distance(strikeLocation);
 				if (distance > 5) continue;
 
-				boolean vulnerable = enhanced;
-				if (e instanceof Player && CoreAbility.hasAbility((Player) e, EarthGuard.class)) {
-					final EarthGuard armorAbility = CoreAbility.getAbility((Player) e, EarthGuard.class);
-					if (armorAbility.hasActiveArmor() && armorAbility.isMetalArmor()) vulnerable = true;
-				}
+				boolean vulnerable = enhanced || MaterialCheck.hasMetalArmor(livingEntity);
 				double baseDamage = vulnerable ? damage * 2 : damage;
 				double distanceModifier = enhanced ? distance / 3 : distance / 2;
 				DamageHandler.damageEntity(e, (distance < 1.5) ? baseDamage : baseDamage - distanceModifier, this);

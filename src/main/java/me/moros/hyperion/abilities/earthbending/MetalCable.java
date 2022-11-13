@@ -24,6 +24,7 @@ import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.MetalAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.attribute.Attribute;
+import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
 import me.moros.hyperion.Hyperion;
@@ -135,8 +136,7 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 			} else {
 				if (target.getType() == CableTarget.Type.ENTITY) {
 					entityToMove.setVelocity(new Vector());
-					if (target.getEntity() instanceof FallingBlock) {
-						FallingBlock fb = (FallingBlock) target.getEntity();
+					if (target.getEntity() instanceof FallingBlock fb) {
 						Location tempLocation = fb.getLocation().add(0, 0.5, 0);
 						ParticleEffect.BLOCK_CRACK.display(tempLocation, 4, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, fb.getBlockData());
 						ParticleEffect.BLOCK_DUST.display(tempLocation, 6, ThreadLocalRandom.current().nextDouble() / 4, ThreadLocalRandom.current().nextDouble() / 8, ThreadLocalRandom.current().nextDouble() / 4, 0, fb.getBlockData());
@@ -171,7 +171,7 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 		if (targetedEntity instanceof LivingEntity) {
 			targetLocation = targetedEntity.getLocation();
 		} else {
-			targetLocation = player.getTargetBlock(MaterialCheck.getIgnoreMaterialSet(), range).getLocation();
+			targetLocation = player.getTargetBlock(getTransparentMaterialSet(), range).getLocation();
 		}
 
 		Vector direction = GeneralMethods.getDirection(location, targetLocation).normalize();
@@ -310,7 +310,7 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 
 	public void setHitBlock(Block block) {
 		if (target != null) return;
-		if (GeneralMethods.isRegionProtectedFromBuild(player, block.getLocation())) {
+		if (RegionProtection.isRegionProtected(player, block.getLocation())) {
 			remove();
 			return;
 		}
@@ -329,7 +329,7 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 
 	public void setHitEntity(Entity entity) {
 		if (target != null) return;
-		if (GeneralMethods.isRegionProtectedFromBuild(player, entity.getLocation())) {
+		if (RegionProtection.isRegionProtected(player, entity.getLocation())) {
 			remove();
 			return;
 		}

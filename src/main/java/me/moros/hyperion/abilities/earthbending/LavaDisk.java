@@ -28,6 +28,7 @@ import com.projectkorra.projectkorra.ability.util.MultiAbilityManager;
 import com.projectkorra.projectkorra.ability.util.MultiAbilityManager.MultiAbilityInfoSub;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
+import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
@@ -53,7 +54,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility {
-	private static final String[] colors = { "2F1600", "5E2C00", "8C4200", "B05300", "C45D00", "F05A00", "F0A000", "F0BE00" };
+	private static final String[] colors = {"2F1600", "5E2C00", "8C4200", "B05300", "C45D00", "F05A00", "F0A000", "F0BE00"};
 
 	private enum LavaDiskMode {
 		FOLLOW, ADVANCE, RETURN, ROTATE, SHATTER
@@ -114,31 +115,31 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 
 		final Vector dir = player.getEyeLocation().getDirection();
 		switch (player.getInventory().getHeldItemSlot()) {
-			case 1:
+			case 1 -> {
 				mode = LavaDiskMode.ADVANCE;
 				distance = location.distance(player.getEyeLocation());
 				dir.multiply(range + 5);
-				break;
-			case 2:
+			}
+			case 2 -> {
 				mode = LavaDiskMode.RETURN;
 				distance = location.distance(player.getEyeLocation());
 				dir.multiply(2.5);
-				break;
-			case 3:
+			}
+			case 3 -> {
 				mode = LavaDiskMode.ROTATE;
 				angle = player.isSneaking() ? angle + 4 : angle - 4;
 				angle = angle % 360;
 				dir.multiply(distance);
-				break;
-			case 4:
+			}
+			case 4 -> {
 				mode = LavaDiskMode.SHATTER;
 				remove();
 				return;
-			case 0:
-			default:
+			}
+			default -> {
 				mode = LavaDiskMode.FOLLOW;
 				dir.multiply(distance);
-				break;
+			}
 		}
 
 		final Location targetLocation = player.getEyeLocation().add(dir);
@@ -174,7 +175,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 					continue;
 				}
 				DamageHandler.damageEntity(entity, damage, this);
-				ParticleEffect.LAVA.display(entity.getLocation(), 4, ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), ThreadLocalRandom.current().nextDouble(), 0.1);
+				ParticleEffect.LAVA.display(entity.getLocation(), 4, 0.5, 0.5, 0.5, 0.1);
 				if (!passHit) {
 					remove();
 					return;
@@ -184,7 +185,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 	}
 
 	private boolean damageBlock(Block block) {
-		if (isMetal(block) || block.isLiquid() || TempBlock.isTempBlock(block) || GeneralMethods.isRegionProtectedFromBuild(this, block.getLocation()))
+		if (isMetal(block) || block.isLiquid() || TempBlock.isTempBlock(block) || RegionProtection.isRegionProtected(this, block.getLocation()))
 			return false;
 		if (MaterialCheck.isLeaf(block) || isPlant(block) || materials.contains(block.getType().name()) || isEarthbendable(block)) {
 			new TempBlock(block, Material.AIR.createBlockData(), regenDelay);
@@ -316,9 +317,7 @@ public class LavaDisk extends LavaAbility implements AddonAbility, MultiAbility 
 
 	@Override
 	public void remove() {
-		for (int i = 0; i < 10; i++) {
-			ParticleEffect.BLOCK_CRACK.display(location, 2, 0, 0, 0, Material.MAGMA_BLOCK.createBlockData());
-		}
+		ParticleEffect.BLOCK_CRACK.display(location, 20, 0.1, 0.1, 0.1, Material.MAGMA_BLOCK.createBlockData());
 		location.getWorld().playSound(location, Sound.BLOCK_STONE_BREAK, 1, 1.5f);
 		ParticleEffect.LAVA.display(location, 2);
 		bPlayer.addCooldown(this);

@@ -4,8 +4,11 @@ author: Moros
 version: ${pluginVersion}
 main: me.moros.hyperion.Hyperion
 depend: [ProjectKorra]
-api-version: 1.16
+api-version: 1.17
 permissions:
+  bending.admin.overridelock:
+    default: false
+    description: Allows removing a locksmithing lock even without a matching key.
   bending.command.hyperion:
     default: true
     description: Shows info about Hyperion.
@@ -26,6 +29,7 @@ permissions:
       bending.ability.EarthLine: true
       bending.ability.EarthShot: true
       bending.ability.LavaDisk: true
+      bending.ability.Locksmithing: true
       bending.ability.MetalCable: true
       bending.ability.FireWave: true
       bending.ability.Bolt: true

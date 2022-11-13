@@ -38,13 +38,17 @@ import me.moros.hyperion.abilities.earthbending.EarthLine;
 import me.moros.hyperion.abilities.earthbending.EarthShot;
 import me.moros.hyperion.abilities.earthbending.LavaDisk;
 import me.moros.hyperion.abilities.earthbending.MetalCable;
+import me.moros.hyperion.abilities.earthbending.passive.Locksmithing;
 import me.moros.hyperion.abilities.firebending.Bolt;
 import me.moros.hyperion.abilities.firebending.Combustion;
+import me.moros.hyperion.abilities.firebending.FlameRush;
 import me.moros.hyperion.abilities.waterbending.IceBreath;
 import me.moros.hyperion.abilities.waterbending.IceCrawl;
 import me.moros.hyperion.abilities.waterbending.combo.IceDrill;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -52,7 +56,6 @@ import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
 public class AbilityListener implements Listener {
-
 	@EventHandler
 	public void onPlayerSneak(final PlayerToggleSneakEvent event) {
 		final Player player = event.getPlayer();
@@ -90,6 +93,8 @@ public class AbilityListener implements Listener {
 					new Combustion(player);
 				} else if (abilityName.equalsIgnoreCase("bolt")) {
 					new Bolt(player);
+				} else if (abilityName.equalsIgnoreCase("flamerush")) {
+					new FlameRush(player);
 				}
 			} else if (coreAbility instanceof WaterAbility && bPlayer.isElementToggled(Element.WATER)) {
 				if (abilityName.equalsIgnoreCase("icebreath")) {
@@ -116,9 +121,10 @@ public class AbilityListener implements Listener {
 		final BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
 		if (bPlayer == null) {
 			return;
-		} else if (PKListener.getRightClickInteract().contains(player.getUniqueId())) {
+		} else if (PKListener.getRightClickPlayers().contains(player.getUniqueId())) {
 			return;
 		}
+
 		final CoreAbility coreAbility = bPlayer.getBoundAbility();
 		final String abilityName = bPlayer.getBoundAbilityName();
 
@@ -160,6 +166,18 @@ public class AbilityListener implements Listener {
 				if (abilityName.equalsIgnoreCase("smokescreen")) {
 					new Smokescreen(player);
 				}
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR)
+	public void onPlayerInteract(PlayerInteractEvent event) {
+		if (event.getHand() == EquipmentSlot.HAND && event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+			Player player = event.getPlayer();
+			BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+			Block block = event.getClickedBlock();
+			if (block != null && bPlayer != null) {
+				Locksmithing.act(bPlayer, block);
 			}
 		}
 	}

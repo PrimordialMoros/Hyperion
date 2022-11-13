@@ -26,6 +26,7 @@ import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.IceAbility;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import com.projectkorra.projectkorra.command.Commands;
+import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
 import com.projectkorra.projectkorra.util.TempBlock;
@@ -169,7 +170,7 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 				location.add(0, -1, 0);
 			}
 		}
-		if (GeneralMethods.isRegionProtectedFromBuild(this, location) || location.distanceSquared(sourceBlock.getLocation()) > range * range) {
+		if (RegionProtection.isRegionProtected(this, location) || location.distanceSquared(sourceBlock.getLocation()) > range * range) {
 			remove();
 		}
 	}
