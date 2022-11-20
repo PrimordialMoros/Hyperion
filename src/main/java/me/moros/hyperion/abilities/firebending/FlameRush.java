@@ -215,6 +215,11 @@ public class FlameRush extends FireAbility implements AddonAbility {
 	}
 
 	@Override
+	public boolean isEnabled() {
+		return Hyperion.getPlugin().getConfig().getBoolean("Abilities.Fire.FlameRush.Enabled");
+	}
+
+	@Override
 	public String getName() {
 		return "FlameRush";
 	}
