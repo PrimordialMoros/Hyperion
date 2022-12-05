@@ -55,7 +55,6 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 	private LivingEntity grabbedTarget;
 	private Vector lastVelocity;
 	private Item glove;
-	private Side side;
 
 	@Attribute(Attribute.DAMAGE)
 	private double damage;
@@ -80,7 +79,6 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 
 		if (launchEarthGlove()) {
 			start();
-			bPlayer.addCooldown(getCooldownForSide(side), cooldown);
 		}
 	}
 
@@ -141,11 +139,12 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 
 	private boolean launchEarthGlove() {
 		final Location gloveSpawnLocation;
-		side = lastUsedSide.get(player.getUniqueId());
+		Side side = lastUsedSide.get(player.getUniqueId());
 		if (side != null && bPlayer.isOnCooldown(getCooldownForSide(side))) {
 			return false;
 		}
-		side = lastUsedSide.computeIfPresent(player.getUniqueId(), (u, s) -> side == Side.LEFT ? Side.RIGHT : Side.LEFT);
+		side = lastUsedSide.compute(player.getUniqueId(), (u, s) -> (s == null || s == Side.LEFT) ? Side.RIGHT : Side.LEFT);
+		bPlayer.addCooldown(getCooldownForSide(side), cooldown);
 		if (side == Side.RIGHT) {
 			gloveSpawnLocation = GeneralMethods.getRightSide(player.getLocation(), 0.5).add(0, 0.8, 0);
 		} else {
