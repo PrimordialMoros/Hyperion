@@ -1,10 +1,10 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow").version("7.1.2")
+    id("com.github.johnrengelman.shadow").version("8.1.1")
 }
 
 group = "me.moros"
-version = "1.7.1"
+version = "1.7.2"
 
 java {
     toolchain {
@@ -19,9 +19,9 @@ repositories {
 }
 
 dependencies {
-    implementation("org.bstats", "bstats-bukkit", "3.0.0")
+    implementation("org.bstats", "bstats-bukkit", "3.0.2")
     compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
-    compileOnly("com.github.ProjectKorra:ProjectKorra:v1.10.2")
+    compileOnly("com.github.ProjectKorra:ProjectKorra:v1.11.1")
 }
 
 tasks {
