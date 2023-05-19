@@ -23,7 +23,9 @@ import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.attribute.Attribute;
+import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.earthbending.EarthArmor;
+import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
@@ -110,14 +112,17 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 
 	@Override
 	public void progress() {
-		if (!bPlayer.canBendIgnoreBindsCooldowns(this)) {
-			remove();
-			return;
-		}
-
 		if (!formed) {
+			if (!bPlayer.canBendIgnoreBindsCooldowns(this)) {
+				remove();
+				return;
+			}
 			moveBlock();
 		} else {
+			if (!canRemainActive()) {
+				remove();
+				return;
+			}
 			if (System.currentTimeMillis() > time + duration) {
 				player.getLocation().getWorld().playSound(player.getLocation(), Sound.BLOCK_STONE_BREAK, 2, 1);
 				ParticleEffect.BLOCK_CRACK.display(player.getEyeLocation(), 8, 0.1, 0.1, 0.1, blockData);
@@ -126,6 +131,26 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 			}
 			player.setFireTicks(0);
 		}
+	}
+
+	private boolean canRemainActive() {
+		final List<String> disabledWorlds = getConfig().getStringList("Properties.DisabledWorlds");
+		if (!this.player.isOnline() || this.player.isDead()) {
+			return false;
+		} else if (!this.bPlayer.canBind(this)) {
+			return false;
+		} else if (this.getPlayer() != null && this.getLocation() != null && !this.getLocation().getWorld().equals(this.player.getWorld())) {
+			return false;
+		} else if (disabledWorlds.contains(this.player.getWorld().getName())) {
+			return false;
+		} else if (Commands.isToggledForAll || !this.bPlayer.isToggled() || !this.bPlayer.isElementToggled(this.getElement())) {
+			return false;
+		} else if (this.player.getGameMode() == GameMode.SPECTATOR) {
+			return false;
+		} else if (RegionProtection.isRegionProtected(this.player, this.player.getLocation(), this.getName())) {
+			return false;
+		}
+		return true;
 	}
 
 	private void formArmor(Material material) {
@@ -159,8 +184,9 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 
 		for (ItemStack item : newArmor) {
 			ItemMeta generalMeta = item.getItemMeta();
-			if (generalMeta instanceof LeatherArmorMeta) {
-				((LeatherArmorMeta) generalMeta).setColor(color);
+			generalMeta.setUnbreakable(true);
+			if (generalMeta instanceof LeatherArmorMeta meta) {
+				meta.setColor(color);
 			}
 			generalMeta.setDisplayName(ChatColor.GREEN + "Earth Guard Armor");
 			generalMeta.setLore(Collections.singletonList(ChatColor.DARK_GREEN + "Temporary"));
@@ -256,7 +282,6 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		return Hyperion.getVersion();
 	}
 
-
 	@Override
 	public long getCooldown() {
 		return cooldown;
@@ -286,7 +311,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		if (armorFallingBlock != null) {
 			armorFallingBlock.remove();
 		}
-		if (player.isValid() && player.isOnline() && formed) {
+		if (formed) {
 			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 			if (!originalMode.equals(player.getGameMode())) {
 				for (ItemStack armorItem : oldArmor) {
