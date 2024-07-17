@@ -1,20 +1,20 @@
 /*
- *   Copyright 2016, 2017, 2020 Moros <https://github.com/PrimordialMoros>
+ * Copyright 2016-2024 Moros
  *
- * 	  This file is part of Hyperion.
+ * This file is part of Hyperion.
  *
- *    Hyperion is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ * Hyperion is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *    Hyperion is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
+ * Hyperion is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- *    You should have received a copy of the GNU General Public License
- *    along with Hyperion.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Hyperion. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package me.moros.hyperion.abilities.waterbending;
@@ -42,7 +42,6 @@ import me.moros.hyperion.util.MaterialCheck;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ArmorStand;
@@ -149,8 +148,8 @@ public class IceBreath extends IceAbility implements AddonAbility {
 	private void visualizeBreath(double offset, double particleSize) {
 		ParticleEffect.SNOW_SHOVEL.display(location, 5, offset, 1, offset, particleSize);
 		ParticleEffect.BLOCK_CRACK.display(location, 4, offset, 1, offset, particleSize, Material.ICE.createBlockData());
-		ParticleEffect.SPELL_MOB.display(CoreMethods.withGaussianOffset(location, offset), 0, 220, 220, 220, 0.003, new Particle.DustOptions(Color.fromRGB(220, 220, 220), 1));
-		ParticleEffect.SPELL_MOB.display(CoreMethods.withGaussianOffset(location, offset), 0, 180, 180, 255, 0.0035, new Particle.DustOptions(Color.fromRGB(180, 180, 255), 1));
+		ParticleEffect.SPELL_MOB.display(CoreMethods.withGaussianOffset(location, offset), 0, 220, 220, 220, 0.003, Color.fromRGB(220, 220, 220));
+		ParticleEffect.SPELL_MOB.display(CoreMethods.withGaussianOffset(location, offset), 0, 180, 180, 255, 0.0035, Color.fromRGB(180, 180, 255));
 	}
 
 	private boolean calculateBreath() {
@@ -204,7 +203,7 @@ public class IceBreath extends IceAbility implements AddonAbility {
 					final MovementHandler mh = new MovementHandler((LivingEntity) entity, CoreAbility.getAbility(IceCrawl.class));
 					mh.stopWithDuration(frostDuration / 50, Element.ICE.getColor() + "* Frozen *");
 					new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0), Material.PACKED_ICE.createBlockData(), new Vector(), this, false, frostDuration);
-					new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOW, (int) (frostDuration / 50), 3));
+					new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOWNESS, (int) (frostDuration / 50), 3));
 
 				}
 			}

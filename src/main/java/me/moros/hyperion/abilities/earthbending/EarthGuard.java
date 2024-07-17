@@ -1,20 +1,20 @@
 /*
- *   Copyright 2016, 2017, 2020 Moros <https://github.com/PrimordialMoros>
+ * Copyright 2016-2024 Moros
  *
- * 	  This file is part of Hyperion.
+ * This file is part of Hyperion.
  *
- *    Hyperion is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ * Hyperion is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *    Hyperion is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
+ * Hyperion is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
  *
- *    You should have received a copy of the GNU General Public License
- *    along with Hyperion.  If not, see <https://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU General Public License
+ * along with Hyperion. If not, see <https://www.gnu.org/licenses/>.
  */
 
 package me.moros.hyperion.abilities.earthbending;
@@ -207,7 +207,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 
 		originalMode = player.getGameMode();
 		player.getInventory().setArmorContents(newArmor.toArray(new ItemStack[4]));
-		new TempPotionEffect(player, new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, NumberConversions.round(duration / 50F), resistance));
+		new TempPotionEffect(player, new PotionEffect(PotionEffectType.RESISTANCE, NumberConversions.round(duration / 50F), resistance));
 		time = System.currentTimeMillis();
 		formed = true;
 	}
@@ -315,7 +315,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 			armorFallingBlock.remove();
 		}
 		if (formed) {
-			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+			player.removePotionEffect(PotionEffectType.RESISTANCE);
 			if (!originalMode.equals(player.getGameMode())) {
 				for (ItemStack armorItem : oldArmor) {
 					if (armorItem != null && armorItem.getType() != Material.AIR) {

@@ -1,14 +1,14 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow").version("8.1.1")
+    id("io.github.goooler.shadow").version("8.1.8")
 }
 
 group = "me.moros"
-version = "1.7.2"
+version = "1.7.3"
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(16))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 
@@ -20,8 +20,8 @@ repositories {
 
 dependencies {
     implementation("org.bstats", "bstats-bukkit", "3.0.2")
-    compileOnly("org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT")
-    compileOnly("com.github.ProjectKorra:ProjectKorra:v1.11.1")
+    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
+    compileOnly("com.github.ProjectKorra:ProjectKorra:v1.11.2")
 }
 
 tasks {
@@ -34,6 +34,10 @@ tasks {
     }
     build {
         dependsOn(shadowJar)
+    }
+    withType<JavaCompile> {
+        options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
+        options.encoding = "UTF-8"
     }
     withType<AbstractArchiveTask> {
         isPreserveFileTimestamps = false
