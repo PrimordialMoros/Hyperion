@@ -19,12 +19,13 @@
 
 package me.moros.hyperion.configuration;
 
+import com.cjcrafter.foliascheduler.folia.FoliaTask;
 import me.moros.hyperion.Hyperion;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public class ConfigManager {
-
+	private static final String path = "Abilities.Fire.RainbowWave.";
 	public static Config modifiersConfig;
 
 	public ConfigManager() {
@@ -200,6 +201,10 @@ public class ConfigManager {
 		config.addDefault("Abilities.Fire.FlameRush.CollisionRadius", 0.5);
 		config.addDefault("Abilities.Fire.FlameRush.Knockback", 0.9);
 		config.addDefault("Abilities.Fire.FlameRush.FireTicks", 15);
+		config.addDefault(path + "Cooldown", 2000);
+		config.addDefault(path + "Damage", 4.0);
+		config.addDefault(path + "Range", 16.0);
+		config.addDefault(path + "Speed", 0.4);
 
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Enabled", true);
 		config.addDefault("Abilities.Fire.FireCombo.FireWave.Description", "Master Jeong Jeong used this advanced technique to cast a great fire wave that grows in size while it advances forward.");
@@ -243,6 +248,9 @@ public class ConfigManager {
 		config.addDefault("Abilities.Chi.Smokescreen.CloudDuration", 7000);
 		config.addDefault("Abilities.Chi.Smokescreen.BlindnessTicks", 30);
 		config.addDefault("Abilities.Chi.Smokescreen.Radius", 5.0);
+		config.addDefault("Properties.Fire.RainbowFire.DamageFactor", 1.0);
+		config.addDefault("Properties.Fire.RainbowFire.CooldownFactor", 1.0);
+		config.addDefault("Properties.Fire.RainbowFire.RangeFactor", 1.0);
 
 		config.options().copyDefaults(true);
 		Hyperion.getPlugin().saveConfig();

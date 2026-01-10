@@ -1,22 +1,3 @@
-/*
- * Copyright 2016-2024 Moros
- *
- * This file is part of Hyperion.
- *
- * Hyperion is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Hyperion is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Hyperion. If not, see <https://www.gnu.org/licenses/>.
- */
-
 package me.moros.hyperion.abilities.earthbending.passive;
 
 import com.projectkorra.projectkorra.BendingPlayer;
@@ -26,9 +7,12 @@ import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.MetalAbility;
 import com.projectkorra.projectkorra.ability.PassiveAbility;
 import com.projectkorra.projectkorra.region.RegionProtection;
-import com.projectkorra.projectkorra.util.ActionBar;
 import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.util.MaterialCheck;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -98,13 +82,19 @@ public class Locksmithing extends MetalAbility implements AddonAbility, PassiveA
 					String keyName = getOrCreateKey(key, meta);
 					container.setLock(keyName);
 					state.update();
-					block.getWorld().playSound(loc, Sound.BLOCK_CHEST_LOCKED, 1, 1);
-					ActionBar.sendActionBar(Element.METAL.getColor() + "Locked", player);
+					Hyperion.plugin.adventure().world(Key.key(block.getWorld().getName())).playSound(net.kyori.adventure.sound.Sound.sound(Key.key("block.chest.locked"), net.kyori.adventure.sound.Sound.Source.PLAYER, 1, 1), block.getX(), block.getY(), block.getZ());
+					Hyperion.plugin.adventure().player(player).sendMessage(
+							Component.text("Locked", TextColor.color(Element.METAL.getColor().getColor().getRGB()))
+									.decorate(TextDecoration.BOLD)
+					);
 				} else if (player.isSneaking() && (player.hasPermission(OVERRIDE) || validKey(container, meta))) {
 					container.setLock(null);
 					state.update();
 					block.getWorld().playSound(loc, Sound.BLOCK_CHEST_LOCKED, 1, 2);
-					ActionBar.sendActionBar(Element.METAL.getColor() + "Unlocked", player);
+					Hyperion.plugin.adventure().player(player).sendMessage(
+							Component.text("Unlocked", TextColor.color(Element.METAL.getColor().getColor().getRGB()))
+									.decorate(TextDecoration.BOLD)
+					);
 				}
 			}
 		}
@@ -124,7 +114,6 @@ public class Locksmithing extends MetalAbility implements AddonAbility, PassiveA
 		}
 		return container.getLock().equals(meta.getDisplayName());
 	}
-
 
 	@Override
 	public boolean isInstantiable() {

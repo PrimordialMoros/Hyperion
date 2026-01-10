@@ -31,7 +31,10 @@ import com.projectkorra.projectkorra.util.TempBlock;
 import com.projectkorra.projectkorra.util.TempPotionEffect;
 import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.util.BendingFallingBlock;
-import org.bukkit.ChatColor;
+import me.moros.hyperion.util.PotionEffectAdapter;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Color;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -39,6 +42,7 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -59,6 +63,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 	private BendingFallingBlock armorFallingBlock;
 	private BlockData blockData;
 	private GameMode originalMode;
+	private static Entity entity;
 
 	@Attribute(Attribute.COOLDOWN)
 	private long cooldown;
@@ -110,14 +115,13 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		}
 	}
 
-	@Override
 	public void progress() {
 		if (!formed) {
 			if (!bPlayer.canBendIgnoreBindsCooldowns(this)) {
 				remove();
 				return;
 			}
-			moveBlock();
+			moveBlock(entity);
 		} else {
 			if (!canRemainActive()) {
 				remove();
@@ -153,7 +157,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		return true;
 	}
 
-	private void formArmor(Material material) {
+	private void formArmor(Material material, Object entity) {
 		if (formed) return;
 
 		final ItemStack head, chest, leggings, boots;
@@ -188,8 +192,10 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 			if (generalMeta instanceof LeatherArmorMeta meta) {
 				meta.setColor(color);
 			}
-			generalMeta.setDisplayName(ChatColor.GREEN + "Earth Guard Armor");
-			generalMeta.setLore(Collections.singletonList(ChatColor.DARK_GREEN + "Temporary"));
+			generalMeta.setDisplayName(toLegacy(
+					Component.text("Earth Guard Armor", NamedTextColor.GREEN)
+			));
+			generalMeta.setLore(Collections.singletonList(toLegacy(Component.text("Temporary", NamedTextColor.DARK_GREEN))));
 			Hyperion.getLayer().addEarthGuardKey(generalMeta);
 			item.setItemMeta(generalMeta);
 		}
@@ -207,12 +213,12 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 
 		originalMode = player.getGameMode();
 		player.getInventory().setArmorContents(newArmor.toArray(new ItemStack[4]));
-		new TempPotionEffect(player, new PotionEffect(PotionEffectType.RESISTANCE, NumberConversions.round(duration / 50F), resistance));
+	new TempPotionEffect(player, Hyperion.plugin.getPotionEffectAdapter().getResistanceEffect(NumberConversions.round(duration), resistance));
 		time = System.currentTimeMillis();
 		formed = true;
 	}
 
-	private void moveBlock() {
+	private void moveBlock(Object entity) {
 		if (!player.getWorld().equals(armorFallingBlock.getFallingBlock().getWorld())) {
 			remove();
 			return;
@@ -234,7 +240,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 		if (distanceSquared <= 0.5 * 0.5) {
 			Material mat = armorFallingBlock.getFallingBlock().getBlockData().getMaterial();
 			armorFallingBlock.remove();
-			formArmor(mat);
+			formArmor(mat, entity);
 			return;
 		}
 
@@ -315,7 +321,7 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 			armorFallingBlock.remove();
 		}
 		if (formed) {
-			player.removePotionEffect(PotionEffectType.RESISTANCE);
+			player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 			if (!originalMode.equals(player.getGameMode())) {
 				for (ItemStack armorItem : oldArmor) {
 					if (armorItem != null && armorItem.getType() != Material.AIR) {
@@ -342,4 +348,9 @@ public class EarthGuard extends EarthAbility implements AddonAbility {
 	@Override
 	public void stop() {
 	}
+
+	public static String toLegacy(Component component) {
+		return LegacyComponentSerializer.legacySection().serialize(component);
+	}
+
 }

@@ -19,13 +19,12 @@
 
 package me.moros.hyperion.abilities.firebending.combo;
 
-import com.projectkorra.projectkorra.Element.SubElement;
+
 import com.projectkorra.projectkorra.GeneralMethods;
 import com.projectkorra.projectkorra.ability.AddonAbility;
 import com.projectkorra.projectkorra.ability.AirAbility;
 import com.projectkorra.projectkorra.ability.BlueFireAbility;
 import com.projectkorra.projectkorra.ability.ComboAbility;
-import com.projectkorra.projectkorra.ability.FireAbility;
 import com.projectkorra.projectkorra.ability.util.Collision;
 import com.projectkorra.projectkorra.ability.util.ComboManager.AbilityInformation;
 import com.projectkorra.projectkorra.attribute.Attribute;
@@ -38,6 +37,8 @@ import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.waterbending.SurgeWall;
 import com.projectkorra.projectkorra.waterbending.SurgeWave;
 import me.moros.hyperion.Hyperion;
+import me.moros.hyperion.abilities.Elements.FireAbility;
+import me.moros.hyperion.abilities.Elements.RainbowFireAbility;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
@@ -55,6 +56,9 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+
+import static com.projectkorra.projectkorra.Element.BLUE_FIRE;
+import static me.moros.hyperion.Elements.RAINBOWFIRE;
 
 public class FireWave extends FireAbility implements AddonAbility, ComboAbility {
 	private final Set<Block> blocks = new HashSet<>();
@@ -96,12 +100,20 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 		maxHeight = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.FireCombo.FireWave.MaxHeight");
 		width = Hyperion.getPlugin().getConfig().getInt("Abilities.Fire.FireCombo.FireWave.Width");
 
-		if (bPlayer.canUseSubElement(SubElement.BLUE_FIRE)) {
+		if (bPlayer.canUseSubElement(BLUE_FIRE)) {
 			damage *= BlueFireAbility.getDamageFactor();
 			height *= BlueFireAbility.getRangeFactor();
 			maxHeight *= BlueFireAbility.getRangeFactor();
 			width *= BlueFireAbility.getRangeFactor();
 			cooldown *= BlueFireAbility.getCooldownFactor();
+		}
+
+		if (bPlayer.canUseSubElement(RAINBOWFIRE)) {
+			damage *= RainbowFireAbility.getDamageFactor();
+			height *= RainbowFireAbility.getRangeFactor();
+			maxHeight *= RainbowFireAbility.getRangeFactor();
+			width *= RainbowFireAbility.getRangeFactor();
+			cooldown *= RainbowFireAbility.getCooldownFactor();
 		}
 
 		damage = getDayFactor(damage, player.getWorld());
@@ -301,7 +313,7 @@ public class FireWave extends FireAbility implements AddonAbility, ComboAbility 
 	@Override
 	public void handleCollision(Collision collision) {
 		if (collision.getAbilitySecond() instanceof SurgeWave || collision.getAbilitySecond() instanceof SurgeWall) {
-			if (!bPlayer.canUseSubElement(SubElement.BLUE_FIRE)) collision.setRemovingFirst(true);
+			if (!bPlayer.canUseSubElement(BLUE_FIRE)) collision.setRemovingFirst(true);
 			if (collision.getAbilitySecond() instanceof SurgeWall && ((SurgeWall) collision.getAbilitySecond()).isFrozen()) {
 				collision.setRemovingSecond(false);
 			}

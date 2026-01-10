@@ -29,6 +29,7 @@ import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
 import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.methods.CoreMethods;
+import me.moros.hyperion.util.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -114,7 +115,7 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 					return;
 				}
 				grabbedTarget.setVelocity(GeneralMethods.getDirection(grabbedTarget.getLocation(), returnLocation).normalize().multiply(GLOVE_GRABBED_SPEED));
-				glove.teleport(grabbedTarget.getEyeLocation().subtract(0, grabbedTarget.getHeight() / 2, 0));
+                PaperLib.teleportAsync(glove, grabbedTarget.getEyeLocation().subtract(0, grabbedTarget.getHeight() / 2, 0));
 				return;
 			} else {
 				setGloveVelocity(GeneralMethods.getDirection(glove.getLocation(), returnLocation).normalize().multiply(GLOVE_SPEED));
@@ -179,7 +180,7 @@ public class EarthGlove extends EarthAbility implements AddonAbility {
 		returning = true;
 		grabbed = true;
 		grabbedTarget = entity;
-		glove.teleport(grabbedTarget.getEyeLocation().subtract(0, grabbedTarget.getHeight() / 2, 0));
+        PaperLib.teleportAsync(glove, grabbedTarget.getEyeLocation().subtract(0, grabbedTarget.getHeight() / 2, 0));
 	}
 
 	public void checkDamage() {

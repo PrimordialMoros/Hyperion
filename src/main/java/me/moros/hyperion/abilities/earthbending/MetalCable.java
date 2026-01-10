@@ -32,6 +32,7 @@ import me.moros.hyperion.abilities.earthbending.util.Projectile;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.BendingFallingBlock;
 import me.moros.hyperion.util.MaterialCheck;
+import me.moros.hyperion.util.PaperLib;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -123,7 +124,7 @@ public class MetalCable extends MetalAbility implements AddonAbility {
 			Entity entityToMove = player;
 			Location targetLocation = location;
 			if (target.getType() == CableTarget.Type.ENTITY) {
-				cable.teleport(target.getEntity().getLocation());
+                PaperLib.teleportAsync(cable, target.getEntity().getLocation());
 				if (player.isSneaking()) {
 					entityToMove = target.getEntity();
 					Vector dir = player.getEyeLocation().getDirection().multiply(distance / 2);

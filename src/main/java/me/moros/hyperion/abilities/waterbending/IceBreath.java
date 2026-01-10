@@ -203,7 +203,7 @@ public class IceBreath extends IceAbility implements AddonAbility {
 					final MovementHandler mh = new MovementHandler((LivingEntity) entity, CoreAbility.getAbility(IceCrawl.class));
 					mh.stopWithDuration(frostDuration / 50, Element.ICE.getColor() + "* Frozen *");
 					new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0), Material.PACKED_ICE.createBlockData(), new Vector(), this, false, frostDuration);
-					new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOWNESS, (int) (frostDuration / 50), 3));
+					new TempPotionEffect((LivingEntity) entity, Hyperion.plugin.getPotionEffectAdapter().getSlownessEffect((int) (frostDuration), 3));
 
 				}
 			}

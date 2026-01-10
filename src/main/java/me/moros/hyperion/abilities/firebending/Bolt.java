@@ -30,6 +30,7 @@ import com.projectkorra.projectkorra.util.DamageHandler;
 import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.MaterialCheck;
+import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.ArmorStand;
@@ -169,7 +170,7 @@ public class Bolt extends LightningAbility implements AddonAbility {
 		}
 		location = targetLocation;
 		player.getWorld().strikeLightningEffect(location);
-		player.getWorld().playSound(location, Sound.ENTITY_LIGHTNING_BOLT_THUNDER, 5, 1.2F);
+		Hyperion.plugin.adventure().world(Key.key(player.getWorld().getName())).playSound(net.kyori.adventure.sound.Sound.sound(Key.key("entity.lightning_bolt.thunder"), net.kyori.adventure.sound.Sound.Source.PLAYER, 5, 1.2F), location.getX(), location.getY(), location.getZ());
 		bPlayer.addCooldown(this);
 		if (!Bolt.isNearbyChannel(location, player)) {
 			dealDamage(location);

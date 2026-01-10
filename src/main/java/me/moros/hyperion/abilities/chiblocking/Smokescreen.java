@@ -24,6 +24,8 @@ import com.projectkorra.projectkorra.ability.ChiAbility;
 import com.projectkorra.projectkorra.attribute.Attribute;
 import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.methods.CoreMethods;
+import me.moros.hyperion.util.PotionEffectAdapter;
+import me.moros.hyperion.util.PotionMetaUtil;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.entity.AreaEffectCloud;

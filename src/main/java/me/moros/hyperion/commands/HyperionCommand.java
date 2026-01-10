@@ -22,10 +22,23 @@ package me.moros.hyperion.commands;
 import com.projectkorra.projectkorra.command.PKCommand;
 import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.configuration.ConfigManager;
+import me.moros.hyperion.util.HexColor;
+import me.moros.hyperion.util.ThreadUtil;
+import me.moros.hyperion.util.UpdateChecker;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
+import org.checkerframework.checker.units.qual.C;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+
+
 
 public class HyperionCommand extends PKCommand {
 	public HyperionCommand() {
@@ -35,15 +48,45 @@ public class HyperionCommand extends PKCommand {
 	@Override
 	public void execute(CommandSender sender, List<String> args) {
 		if (!hasPermission(sender) || !correctLength(sender, args.size(), 0, 1)) return;
-		if (args.size() == 0) {
-			sender.sendMessage(ChatColor.GREEN + "Hyperion Version: " + ChatColor.RED + Hyperion.getVersion());
-			sender.sendMessage(ChatColor.GREEN + "Developed by: " + ChatColor.RED + Hyperion.getAuthor());
+
+		if (args.isEmpty()) {
+			Hyperion.plugin.adventure().sender(sender).sendMessage(Component.text("Hyperion Version: ", HexColor.GREEN).append(Component.text(Hyperion.getVersion(), NamedTextColor.RED)));
+			Hyperion.plugin.adventure().sender(sender).sendMessage(Component.text("Developed by: ", NamedTextColor.GREEN).append(Component.text(Hyperion.getAuthor(), NamedTextColor.RED)));
 		} else if (args.size() == 1) {
-			if (args.get(0).equals("reload") && hasPermission(sender, "reload")) {
-				Hyperion.getPlugin().reloadConfig();
-				ConfigManager.modifiersConfig.reloadConfig();
-				sender.sendMessage(ChatColor.GREEN + "Hyperion config has been reloaded.");
+			String sub = args.get(0).toLowerCase();
+
+			if (sub.equals("reload") && hasPermission(sender, "reload")) {
+                ThreadUtil.runGlobal(Hyperion::reload);
+				Hyperion.plugin.adventure().sender(sender).sendMessage(Component.text("Hyperion config has been reloaded.", NamedTextColor.GREEN));
+			}
+
+
+			else if (sub.equals("checkupdate") && hasPermission(sender, "checkupdate")) {
+				UpdateChecker checker = Hyperion.getUpdateChecker();
+
+				if (checker == null) {
+					Hyperion.plugin.adventure().sender(sender).sendMessage(Component.text("Update checker not initialized.", NamedTextColor.RED));
+					return;
+				}
+
+                if (!checker.hasChecked()) {
+					Hyperion.plugin.adventure().sender(sender).sendMessage(Component.text("Still checking for updates, please try again shortly.", NamedTextColor.GRAY));
+					return;
+				}
+
+				if (checker.isUpdateAvailable()) {
+					String current = checker.getCurrentVersion() != null ? checker.getCurrentVersion() : "unknown";
+					String latest = checker.getLatestVersion() != null ? checker.getLatestVersion() : "unknown";
+
+					Hyperion.plugin.adventure().sender(sender).sendMessage(Component.text("[Hyperion] " + " A new version is available!", HexColor.ORANGE));
+					Hyperion.plugin.adventure().sender(sender).sendMessage(Component.text("You're running: " + current, HexColor.RED));
+					Hyperion.plugin.adventure().sender(sender).sendMessage(Component.text("Latest version: ", NamedTextColor.GRAY).append(Component.text(latest, HexColor.GREEN)));
+					Hyperion.plugin.adventure().sender(sender).sendMessage(Component.text("Download: ", NamedTextColor.GRAY).decorate(TextDecoration.UNDERLINED).append(Component.text("https://github.com/Hihelloy-main/Hyperion", NamedTextColor.BLUE).decorate(TextDecoration.UNDERLINED).clickEvent(ClickEvent.openUrl("https://github.com/Hihelloy-main/Hyperion"))));
+				} else {
+					Hyperion.plugin.adventure().sender(sender).sendMessage(Component.text("You're running the latest version of Hyperion.", HexColor.GREEN));
+				}
 			}
 		}
 	}
+
 }

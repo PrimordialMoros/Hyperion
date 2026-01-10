@@ -69,6 +69,10 @@ public class CoreMethods {
 	public static final String GLOVE_KEY = "BENDING_HYPERION_EARTH_GLOVE";
 	public static final String CABLE_KEY = "BENDING_HYPERION_METAL_CABLE_KEY";
 	public static final String SMOKESCREEN_KEY = "BENDING_HYPERION_SMOKESCREEN_KEY";
+    public static Number value1;
+    public static String key1;
+    public static boolean HassetAttributesbeencalled;
+	public static CoreAbility attributedabil;
 
 	public static List<Location> getCirclePoints(Location location, int points, double size) {
 		List<Location> locations = new ArrayList<>();
@@ -249,7 +253,13 @@ public class CoreMethods {
 			} else {
 				continue;
 			}
+			attributedabil = ability;
+			HassetAttributesbeencalled = true;
+            value1 = value;
+            key1 = key;
+            // Deprecated - PK 1.12.0
 			ability.setAttribute(key, value);
+            ability.recalculateAttributes();
 		}
 	}
 }

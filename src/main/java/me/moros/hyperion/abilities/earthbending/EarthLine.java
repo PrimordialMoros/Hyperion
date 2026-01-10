@@ -30,7 +30,6 @@ import com.projectkorra.projectkorra.earthbending.RaiseEarth;
 import com.projectkorra.projectkorra.earthbending.passive.DensityShift;
 import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
 import com.projectkorra.projectkorra.region.RegionProtection;
-import com.projectkorra.projectkorra.util.ActionBar;
 import com.projectkorra.projectkorra.util.DamageHandler;
 import com.projectkorra.projectkorra.util.MovementHandler;
 import com.projectkorra.projectkorra.util.ParticleEffect;
@@ -39,6 +38,8 @@ import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.BendingFallingBlock;
 import me.moros.hyperion.util.TempArmorStand;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -51,8 +52,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -94,6 +97,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 	private boolean launched;
 	private boolean targetLocked;
 	private boolean collapsing;
+	private final List<TempArmorStand> armorStands = new ArrayList<>();
 
 	private boolean makeSpikes;
 	private double earthLineSpeed;
@@ -141,8 +145,20 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		}
 	}
 
+	private void removeExpiredArmorStands() {
+		Iterator<TempArmorStand> it = armorStands.iterator();
+		while (it.hasNext()) {
+			TempArmorStand stand = it.next();
+			if (stand.isExpired()) {
+				stand.remove();
+				it.remove();
+			}
+		}
+	}
 	@Override
 	public void progress() {
+		removeExpiredArmorStands();
+		TempArmorStand.manage();
 		if (launched) {
 			if (!bPlayer.canBendIgnoreBindsCooldowns(this)) {
 				remove();
@@ -218,7 +234,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		if (mode != EarthLineMode.NORMAL) return;
 		ticks = 0;
 		mode = EarthLineMode.PRISON;
-		ActionBar.sendActionBar(getElement().getColor() + "* Prison Mode *", player);
+		Hyperion.plugin.adventure().player(player).sendActionBar(Component.text("* Prison Mode *", TextColor.color(getElement().getColor().getColor().getRGB())));
 	}
 
 	private void imprisonTarget() {
@@ -249,7 +265,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 				new TempArmorStand(this, loc.add(0, -0.6, 0), material, prisonDuration, true);
 			}
 			final MovementHandler mh = new MovementHandler(target, CoreAbility.getAbility(EarthLine.class));
-			mh.stopWithDuration(prisonDuration / 50, Element.EARTH.getColor() + "* Imprisoned *");
+			mh.stopWithDuration(prisonDuration, Element.EARTH.getColor() + "* Imprisoned *");
 			remove();
 		}
 	}
@@ -264,6 +280,7 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 		pillar2.setCooldown(0);
 		pillar2.setInterval(100);
 		remove();
+		removeExpiredArmorStands();
 	}
 
 	private void advanceLocation() {
@@ -450,7 +467,9 @@ public class EarthLine extends EarthAbility implements AddonAbility {
 
 	@Override
 	public void remove() {
+		removeExpiredArmorStands();
 		sourceBlock.revertBlock();
+		BendingFallingBlock.removeAll();
 		super.remove();
 	}
 

@@ -29,12 +29,12 @@ import com.projectkorra.projectkorra.command.Commands;
 import com.projectkorra.projectkorra.firebending.util.FireDamageTimer;
 import com.projectkorra.projectkorra.region.RegionProtection;
 import com.projectkorra.projectkorra.util.DamageHandler;
-import com.projectkorra.projectkorra.util.ParticleEffect;
 import com.projectkorra.projectkorra.util.TempBlock;
 import me.moros.hyperion.Hyperion;
 import me.moros.hyperion.methods.CoreMethods;
 import me.moros.hyperion.util.FastMath;
 import me.moros.hyperion.util.MaterialCheck;
+import net.kyori.adventure.key.Key;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -47,6 +47,11 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
 import java.util.concurrent.ThreadLocalRandom;
+
+
+import static com.projectkorra.projectkorra.util.ParticleEffect.*;
+import static com.projectkorra.projectkorra.util.ParticleEffect.FIREWORKS_SPARK;
+import static com.projectkorra.projectkorra.util.ParticleEffect.SMOKE_LARGE;
 
 public class Combustion extends CombustionAbility implements AddonAbility {
 	private Location location;
@@ -157,13 +162,13 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 		final Vector direction = player.getEyeLocation().getDirection();
 		ThreadLocalRandom rand = ThreadLocalRandom.current();
 		if (distanceTravelled >= randomBeamDistance) {
-			player.getWorld().playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1.5f, 0.01F);
+			Hyperion.plugin.adventure().player(player).playSound(net.kyori.adventure.sound.Sound.sound(Key.key("entity.firework_rocket.blast"), net.kyori.adventure.sound.Sound.Source.PLAYER, 1.5f, 0.01f), location.getX(), location.getY(), location.getZ());
 			randomBeamDistance = distanceTravelled + 7 + 3 * rand.nextGaussian();
 			double radius = rand.nextDouble(0.6, 1.6);
 			for (int angle = 0; angle <= 360; angle += 12) {
 				final Vector temp = GeneralMethods.getOrthogonalVector(direction, angle, 0.2);
 				final Vector dir = GeneralMethods.getOrthogonalVector(direction, angle, radius);
-				ParticleEffect.FIREWORKS_SPARK.display(location.clone().add(temp), 0, dir.getX(), dir.getY(), dir.getZ(), 0.12);
+				FIREWORKS_SPARK.display(location.clone().add(temp), 0, dir.getX(), dir.getY(), dir.getZ(), 0.12);
 			}
 		}
 		for (int i = 0; i < NumberConversions.round(speed / 0.4); i++) {
@@ -173,15 +178,15 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 				return;
 			}
 			location.add(direction.clone().multiply(0.4));
-			ParticleEffect.SMOKE_LARGE.display(location, 1, 0, 0, 0, 0.06);
-			ParticleEffect.FIREWORKS_SPARK.display(location, 1, 0, 0, 0, 0.06);
+			SMOKE_LARGE.display(location, 1, 0, 0, 0, 0.06);
+			FIREWORKS_SPARK.display(location, 1, 0, 0, 0, 0.06);
 			if (i % 2 != 0) {
 				if (RegionProtection.isRegionProtected(this, location)) {
 					remove();
 					return;
 				}
 				if (rand.nextInt(3) == 0) {
-					location.getWorld().playSound(location, Sound.ENTITY_FIREWORK_ROCKET_BLAST, 1, 0.01F);
+					Hyperion.plugin.adventure().world(Key.key(location.getWorld().getName())).playSound(net.kyori.adventure.sound.Sound.sound(Key.key("entity.firework_rocket.blast"), net.kyori.adventure.sound.Sound.Source.PLAYER, 1, 0.01F), location.getX(), location.getY(), location.getZ());
 				}
 				if (location.getBlock().isLiquid() || !isTransparent(location.getBlock())) {
 					createExplosion(location, power, damage);
@@ -195,11 +200,11 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 	private void createExplosion(Location center, double size, double damage) {
 		if (hasExploded) return;
 		hasExploded = true;
-		ParticleEffect.FLAME.display(center, 20, 1, 1, 1, 0.5f, 20);
-		ParticleEffect.SMOKE_LARGE.display(center, 20, 1, 1, 1, 0.5f);
-		ParticleEffect.FIREWORKS_SPARK.display(center, 20, 1, 1, 1, 0.5f);
-		ParticleEffect.SMOKE_LARGE.display(center, 20, 1, 1, 1, 0.5f);
-		ParticleEffect.EXPLOSION_HUGE.display(center, 5, 1, 1, 1, 0.5f);
+		FLAME.display(center, 20, 1, 1, 1, 0.5f, 20);
+		SMOKE_LARGE.display(center, 20, 1, 1, 1, 0.5f);
+		FIREWORKS_SPARK.display(center, 20, 1, 1, 1, 0.5f);
+		SMOKE_LARGE.display(center, 20, 1, 1, 1, 0.5f);
+		EXPLOSION_HUGE.display(center, 5, 1, 1, 1, 0.5f);
 		center.getWorld().playSound(center, Sound.ENTITY_GENERIC_EXPLODE, 1, 1);
 
 		if (regenDelay > 0 && !center.getBlock().isLiquid()) {
@@ -243,8 +248,8 @@ public class Combustion extends CombustionAbility implements AddonAbility {
 			double x = 1.75 * FastMath.cos(currentRingPoint);
 			double z = 1.75 * FastMath.sin(currentRingPoint);
 			Location loc = player.getLocation().clone().add(x, 1, z);
-			ParticleEffect.FLAME.display(loc, 2, 0, 0, 0, 0.01);
-			ParticleEffect.SMOKE_NORMAL.display(loc, 2, 0, 0, 0, 0.01);
+			FLAME.display(loc, 2, 0, 0, 0, 0.01);
+			SMOKE_NORMAL.display(loc, 2, 0, 0, 0, 0.01);
 		}
 	}
 

@@ -29,6 +29,8 @@ import com.projectkorra.projectkorra.ability.CoreAbility;
 import com.projectkorra.projectkorra.ability.EarthAbility;
 import com.projectkorra.projectkorra.ability.FireAbility;
 import com.projectkorra.projectkorra.ability.WaterAbility;
+import com.projectkorra.projectkorra.event.PlayerSwingEvent;
+import me.moros.hyperion.Elements;
 import me.moros.hyperion.abilities.airbending.Evade;
 import me.moros.hyperion.abilities.chiblocking.Smokescreen;
 import me.moros.hyperion.abilities.earthbending.EarthGlove;
@@ -39,23 +41,28 @@ import me.moros.hyperion.abilities.earthbending.EarthShot;
 import me.moros.hyperion.abilities.earthbending.LavaDisk;
 import me.moros.hyperion.abilities.earthbending.MetalCable;
 import me.moros.hyperion.abilities.earthbending.passive.Locksmithing;
-import me.moros.hyperion.abilities.firebending.Bolt;
-import me.moros.hyperion.abilities.firebending.Combustion;
-import me.moros.hyperion.abilities.firebending.FlameRush;
+import me.moros.hyperion.abilities.firebending.*;
 import me.moros.hyperion.abilities.waterbending.IceBreath;
 import me.moros.hyperion.abilities.waterbending.IceCrawl;
 import me.moros.hyperion.abilities.waterbending.combo.IceDrill;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerToggleSneakEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import static com.projectkorra.projectkorra.ability.CoreAbility.getAbility;
+import static com.projectkorra.projectkorra.ability.CoreAbility.hasAbility;
+
+
 public class AbilityListener implements Listener {
+
 	@EventHandler
 	public void onPlayerSneak(final PlayerToggleSneakEvent event) {
 		final Player player = event.getPlayer();
@@ -110,8 +117,8 @@ public class AbilityListener implements Listener {
 	public void onPlayerSwing(final PlayerInteractEvent event) {
 		final Player player = event.getPlayer();
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR) {
-			if (CoreAbility.hasAbility(player, EarthLine.class)) {
-				CoreAbility.getAbility(player, EarthLine.class).setPrisonMode();
+			if (hasAbility(player, EarthLine.class)) {
+				getAbility(player, EarthLine.class).setPrisonMode();
 			}
 			return;
 		}
@@ -181,4 +188,47 @@ public class AbilityListener implements Listener {
 			}
 		}
 	}
+
+	@EventHandler
+	public void onPlayerLeftClick(PlayerInteractEvent event) {
+		if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) return;
+
+		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(event.getPlayer());
+		final String abilityName = bPlayer.getBoundAbilityName();
+		if (bPlayer == null || !bPlayer.canUseSubElement(me.moros.hyperion.Elements.RAINBOWFIRE)) return;
+		if (abilityName.equalsIgnoreCase("rainbowtest")) {
+			Bukkit.getLogger().info("Rainbowtest is not currently available");
+		}
+	}
+
+	@EventHandler
+	public void onLeftClick(PlayerInteractEvent event) {
+		if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) {
+			return;
+		}
+
+		Player player = event.getPlayer();
+		BendingPlayer bPlayer = BendingPlayer.getBendingPlayer(player);
+
+		if (bPlayer == null || !bPlayer.canUseSubElement(Elements.RAINBOWFIRE)) {
+			return;
+		}
+
+		final String abilityName = bPlayer.getBoundAbilityName();
+
+		if ("RainbowWave".equalsIgnoreCase(abilityName)) {
+			// Check if player doesn't already have this ability active
+			if (!RainbowWave.hasAbility(player, RainbowWave.class)) {
+				// Instantiate the ability (this will call start() automatically)
+				new RainbowWave(player);
+			} else {
+				// If ability already exists, trigger the wave movement
+				RainbowWave ability = RainbowWave.getAbility(player, RainbowWave.class);
+				if (ability != null) {
+					ability.triggerWave();
+				}
+			}
+		}
+	}
 }
+

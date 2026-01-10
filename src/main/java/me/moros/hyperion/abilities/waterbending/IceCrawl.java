@@ -1,22 +1,3 @@
-/*
- * Copyright 2016-2024 Moros
- *
- * This file is part of Hyperion.
- *
- * Hyperion is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Hyperion is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Hyperion. If not, see <https://www.gnu.org/licenses/>.
- */
-
 package me.moros.hyperion.abilities.waterbending;
 
 import com.projectkorra.projectkorra.Element;
@@ -49,10 +30,14 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.Vector;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class IceCrawl extends IceAbility implements AddonAbility {
+
 	private Location location;
 	private Location endLocation;
 	private LivingEntity target;
@@ -75,13 +60,13 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 	private boolean launched;
 	private boolean locked;
 
+	private final List<TempArmorStand> armorStands = new ArrayList<>();
+	private final List<TempBlock> tempBlocks = new ArrayList<>();
+
 	public IceCrawl(Player player) {
 		super(player);
 
-		if (!bPlayer.canBend(this)) {
-			return;
-		}
-
+		if (!bPlayer.canBend(this)) return;
 		if (hasAbility(player, IceCrawl.class)) {
 			getAbility(player, IceCrawl.class).prepare();
 			return;
@@ -113,22 +98,24 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 				return;
 			}
 			if (locked) {
-				if (target == null || !target.isValid() || (target instanceof Player && !((Player) target).isOnline()) || !target.getWorld().equals(location.getWorld())) {
+				if (target == null || !target.isValid()
+						|| (target instanceof Player && !((Player) target).isOnline())
+						|| !target.getWorld().equals(location.getWorld())) {
 					locked = false;
+				} else if (target.getLocation().distanceSquared(endLocation) < 25) {
+					endLocation = target.getLocation().clone();
+					direction = CoreMethods.calculateFlatVector(sourceBlock.getLocation(), endLocation);
 				} else {
-					if (target.getLocation().distanceSquared(endLocation) < 25) {
-						endLocation = target.getLocation().clone();
-						direction = CoreMethods.calculateFlatVector(sourceBlock.getLocation(), endLocation);
-					} else {
-						locked = false;
-					}
+					locked = false;
 				}
 			}
 			advanceLocation();
 			checkDamage();
 			if (ThreadLocalRandom.current().nextInt(5) == 0) playIcebendingSound(location);
+			cleanupArmorStands();
 		} else {
-			if (!bPlayer.canBendIgnoreCooldowns(this) || sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(selectRange + 5, 2)) {
+			if (!bPlayer.canBendIgnoreCooldowns(this)
+					|| sourceBlock.getLocation().distanceSquared(player.getLocation()) > Math.pow(selectRange + 5, 2)) {
 				remove();
 				return;
 			}
@@ -144,62 +131,95 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 		if (isLava(location.getBlock())) {
 			CoreMethods.playExtinguishEffect(location.clone().add(0, 0.2, 0), 8);
 			remove();
+			return;
 		}
 
-		if (isWater(location.getBlock().getRelative(BlockFace.DOWN)))
-			PhaseChange.getFrozenBlocksMap().put(new TempBlock(location.getBlock().getRelative(BlockFace.DOWN), Material.ICE.createBlockData(), iceDuration), player);
+		Block down = location.getBlock().getRelative(BlockFace.DOWN);
+		if (isWater(down)) {
+			TempBlock tb = new TempBlock(down, Material.ICE.createBlockData(), iceDuration);
+			PhaseChange.getFrozenBlocksMap().put(tb, player);
+			tempBlocks.add(tb);  // Track the temporary ice block
+
+			// Debugging info
+			System.out.println("TempBlock added: " + tb.getBlock().getLocation());
+		}
+
 		double x = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
 		double z = ThreadLocalRandom.current().nextDouble(-0.125, 0.125);
-		new TempArmorStand(this, location.clone().add(x, -2, z), Material.PACKED_ICE, 1400);
+		TempArmorStand stand = new TempArmorStand(this, location.clone().add(x, -2, z), Material.PACKED_ICE, 1400);
+		armorStands.add(stand);
 
 		location.add(direction.clone().multiply(0.7));
-		final Block baseBlock = location.getBlock().getRelative(BlockFace.DOWN);
-		if (!isValidBlock(baseBlock)) {
-			if (isValidBlock(baseBlock.getRelative(BlockFace.UP))) {
+
+		Block base = location.getBlock().getRelative(BlockFace.DOWN);
+		if (!isValidBlock(base)) {
+			if (isValidBlock(base.getRelative(BlockFace.UP))) {
 				location.add(0, 1, 0);
-			} else if (isValidBlock(baseBlock.getRelative(BlockFace.DOWN))) {
+			} else if (isValidBlock(base.getRelative(BlockFace.DOWN))) {
 				location.add(0, -1, 0);
 			} else {
 				remove();
 				return;
 			}
-		} else if (endLocation.getBlockY() != location.getBlockY()) { // Advance location vertically while under water
-			if (endLocation.getBlockY() > location.getBlockY() && isValidBlock(baseBlock.getRelative(BlockFace.UP))) {
+		} else if (endLocation.getBlockY() != location.getBlockY()) {
+			if (endLocation.getBlockY() > location.getBlockY()
+					&& isValidBlock(base.getRelative(BlockFace.UP))) {
 				location.add(0, 1, 0);
-			} else if (endLocation.getBlockY() < location.getBlockY() && isValidBlock(baseBlock.getRelative(BlockFace.DOWN))) {
+			} else if (endLocation.getBlockY() < location.getBlockY()
+					&& isValidBlock(base.getRelative(BlockFace.DOWN))) {
 				location.add(0, -1, 0);
 			}
 		}
-		if (RegionProtection.isRegionProtected(this, location) || location.distanceSquared(sourceBlock.getLocation()) > range * range) {
+
+		if (RegionProtection.isRegionProtected(this, location)
+				|| location.distanceSquared(sourceBlock.getLocation()) > range * range) {
 			remove();
 		}
 	}
 
-	private boolean isValidBlock(final Block block) {
+	private void cleanupArmorStands() {
+		Iterator<TempArmorStand> it = armorStands.iterator();
+		while (it.hasNext()) {
+			TempArmorStand stand = it.next();
+			if (stand.isExpired()) {
+				stand.remove();
+				it.remove();
+			}
+		}
+	}
+
+	private boolean isValidBlock(Block block) {
 		if (!isTransparent(block.getRelative(BlockFace.UP))) return false;
 		return isWater(block) || isIce(block) || GeneralMethods.isSolid(block);
 	}
 
 	private void checkDamage() {
-		boolean hasHit = false;
+		boolean hit = false;
 		for (Entity entity : GeneralMethods.getEntitiesAroundPoint(location, 0.8)) {
-			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId() && !(entity instanceof ArmorStand)) {
+			if (entity instanceof LivingEntity && entity.getEntityId() != player.getEntityId()
+					&& !(entity instanceof ArmorStand)) {
+
 				if (entity instanceof Player && Commands.invincible.contains(entity.getName())) {
 					continue;
 				}
+
 				DamageHandler.damageEntity(entity, getNightFactor(damage, player.getWorld()), this);
 				if (entity.isValid()) {
-					final MovementHandler mh = new MovementHandler((LivingEntity) entity, CoreAbility.getAbility(IceCrawl.class));
-					mh.stopWithDuration(duration / 50, Element.ICE.getColor() + "* Frozen *");
-					new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0), Material.PACKED_ICE.createBlockData(), new Vector(), this, false, duration);
-					new TempPotionEffect((LivingEntity) entity, new PotionEffect(PotionEffectType.SLOWNESS, NumberConversions.round(duration / 50F), 5));
+					MovementHandler mh = new MovementHandler((LivingEntity) entity,
+							CoreAbility.getAbility(IceCrawl.class));
+					mh.stopWithDuration(duration / 50,
+							Element.ICE.getColor() + "* Frozen *");
+					new BendingFallingBlock(entity.getLocation().clone().add(0, -0.2, 0),
+							Material.PACKED_ICE.createBlockData(),
+							new Vector(), this, false, duration);
+					new TempPotionEffect((LivingEntity) entity, Hyperion.plugin.getPotionEffectAdapter().getSlownessEffect(NumberConversions.round(duration), 5));
 				}
-				hasHit = true;
+
+				hit = true;
 			}
 		}
-		if (hasHit) {
-			remove();
-		}
+
+		if (hit) remove();
 	}
 
 	public boolean prepare() {
@@ -208,12 +228,12 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 		if (block == null) {
 			block = getWaterSourceBlock(player, selectRange, false);
 		}
-
-		if (block == null || (!isWater(block) && !isIce(block)) || !isTransparent(block.getRelative(BlockFace.UP))) {
+		if (block == null
+				|| (!isWater(block) && !isIce(block))
+				|| !isTransparent(block.getRelative(BlockFace.UP))) {
 			if (isStarted()) remove();
 			return false;
 		}
-
 		sourceBlock = block;
 		playFocusWaterEffect(sourceBlock);
 		location = sourceBlock.getLocation();
@@ -221,67 +241,45 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 	}
 
 	@Override
-	public boolean isEnabled() {
-		return Hyperion.getPlugin().getConfig().getBoolean("Abilities.Water.IceCrawl.Enabled");
+	public void remove() {
+		super.remove();
+
+		// Cleanup Armor Stands
+		for (TempArmorStand stand : armorStands) {
+			stand.remove();
+		}
+		armorStands.clear();
+
+		// Revert all temporary ice blocks
+		for (TempBlock tb : tempBlocks) {
+			tb.revertBlock();  // This should remove the ice block
+		}
+		tempBlocks.clear();
+
+		// Additional debugging log
+		System.out.println("IceCrawl ability removed, ice blocks reverted.");
 	}
 
-	@Override
-	public String getName() {
-		return "IceCrawl";
+	@Override public boolean isEnabled() {
+		return Hyperion.getPlugin().getConfig()
+				.getBoolean("Abilities.Water.IceCrawl.Enabled");
 	}
 
-	@Override
-	public String getDescription() {
-		return Hyperion.getPlugin().getConfig().getString("Abilities.Water.IceCrawl.Description");
+	@Override public String getName() { return "IceCrawl"; }
+	@Override public String getDescription() {
+		return Hyperion.getPlugin().getConfig()
+				.getString("Abilities.Water.IceCrawl.Description");
 	}
-
-	@Override
-	public String getAuthor() {
-		return Hyperion.getAuthor();
-	}
-
-	@Override
-	public String getVersion() {
-		return Hyperion.getVersion();
-	}
-
-	@Override
-	public boolean isHarmlessAbility() {
-		return false;
-	}
-
-	@Override
-	public boolean isSneakAbility() {
-		return true;
-	}
-
-	@Override
-	public long getCooldown() {
-		return cooldown;
-	}
-
-	@Override
-	public Location getLocation() {
-		return location;
-	}
-
-	@Override
-	public boolean isCollidable() {
-		return launched;
-	}
-
-	@Override
-	public double getCollisionRadius() {
-		return 0.8;
-	}
-
-	@Override
-	public void load() {
-	}
-
-	@Override
-	public void stop() {
-	}
+	@Override public String getAuthor() { return Hyperion.getAuthor(); }
+	@Override public String getVersion() { return Hyperion.getVersion(); }
+	@Override public boolean isHarmlessAbility() { return false; }
+	@Override public boolean isSneakAbility() { return true; }
+	@Override public long getCooldown() { return cooldown; }
+	@Override public Location getLocation() { return location; }
+	@Override public boolean isCollidable() { return launched; }
+	@Override public double getCollisionRadius() { return 0.8; }
+	@Override public void load() {}
+	@Override public void stop() {}
 
 	public static void shootLine(Player player) {
 		if (hasAbility(player, IceCrawl.class)) {
@@ -291,10 +289,12 @@ public class IceCrawl extends IceAbility implements AddonAbility {
 
 	private void shootLine() {
 		if (launched) return;
-		final Entity targetedEntity = GeneralMethods.getTargetedEntity(player, range + selectRange, Collections.singletonList(player));
-		if (targetedEntity instanceof LivingEntity && targetedEntity.getLocation().distanceSquared(location) <= range * range) {
+		Entity ent = GeneralMethods.getTargetedEntity(player, range + selectRange,
+				Collections.singletonList(player));
+		if (ent instanceof LivingEntity
+				&& ent.getLocation().distanceSquared(location) <= range * range) {
 			locked = true;
-			target = (LivingEntity) targetedEntity;
+			target = (LivingEntity) ent;
 			endLocation = target.getLocation().clone();
 		} else {
 			endLocation = GeneralMethods.getTargetedLocation(player, range, Material.WATER);
